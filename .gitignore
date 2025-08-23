@@ -1,2 +1,4 @@
 .DS_Store
 _tmp_html/
+tmp_html/
+public/
