@@ -1,13 +1,6 @@
-# ignore raw sources and dev artifacts
-source/
+# Ignore local tools and raw sources in deploy
 scripts/
+source/
 _tmp_html/
-*.psd
-*.ai
-*.docx
-
-# keep the website bits
-!index.html
-!site.json
-!static/
-!rag/
+.DS_Store
+Thumbs.db
