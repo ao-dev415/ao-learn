@@ -1,6 +1,6 @@
-# Ignore local tools and raw sources in deploy
-scripts/
 source/
+scripts/
 _tmp_html/
-.DS_Store
-Thumbs.db
+tmp_html/
+public/
+README-local.md
