@@ -1,380 +1,86 @@
 [
   {
-    "id": "ch1-why-seek-the-objective-truth",
-    "title": "My Perfect Plan • Why seek the objective truth?",
-    "text": "Why seek the objective truth?",
-    "url": "#ch1-1-2-why-be-rational"
-  },
-  {
-    "id": "ch1-how-can-i-prioritize-my-lifestyle",
-    "title": "My Perfect Plan • How can I prioritize my lifestyle?",
-    "text": "How can I prioritize my lifestyle?",
-    "url": "#ch1-1-2-why-be-rational"
-  },
-  {
-    "id": "ch1-having-a-battle-plan",
-    "title": "My Perfect Plan • Having a Battle Plan",
-    "text": "Having a Battle Plan",
-    "url": "#ch1-1-3-me-myself-and-i"
-  },
-  {
-    "id": "ch1-when-to-consider-professional-help",
-    "title": "My Perfect Plan • When to consider professional help",
-    "text": "When to consider professional help",
-    "url": "#ch1-1-3-me-myself-and-i"
-  },
-  {
-    "id": "ch1-respecting-others-perspectives",
-    "title": "My Perfect Plan • Respecting others’ perspectives",
-    "text": "Respecting others’ perspectives",
-    "url": "#ch1-1-4-roles-and-accountability"
-  },
-  {
-    "id": "ch1-it-s-our-plan-our-money-our-decision",
-    "title": "My Perfect Plan • It’s our plan, our money, our decision",
-    "text": "It’s our plan, our money, our decision",
-    "url": "#ch1-1-4-roles-and-accountability"
-  },
-  {
-    "id": "ch1-choosing-roles-and-responsibilities",
-    "title": "My Perfect Plan • Choosing roles and responsibilities",
-    "text": "Choosing roles and responsibilities",
-    "url": "#ch1-1-4-roles-and-accountability"
-  },
-  {
-    "id": "ch1-what-is-expected-of-me",
-    "title": "My Perfect Plan • What is expected of me?",
-    "text": "What is expected of me?",
-    "url": "#ch1-1-5-about-this-course"
-  },
-  {
-    "id": "ch1-old-conventions-may-not-be-applicable",
-    "title": "My Perfect Plan • Old conventions may not be applicable",
-    "text": "Old conventions may not be applicable",
-    "url": "#ch1-1-7-personal-financial-decisions"
-  },
-  {
-    "id": "ch1-how-can-i-organize-my-financial-tasks",
-    "title": "My Perfect Plan • How can I organize my financial tasks?",
-    "text": "How can I organize my financial tasks?",
-    "url": "#ch1-1-7-personal-financial-decisions"
-  },
-  {
-    "id": "ch1-continuing-the-conversation",
-    "title": "My Perfect Plan • Continuing the conversation",
-    "text": "Continuing the conversation",
-    "url": "#ch1-1-7-personal-financial-decisions"
-  },
-  {
-    "id": "ch2-are-retirees-being-real",
-    "title": "Expenses • Are retirees being real?",
-    "text": "Are retirees being real?",
-    "url": "#ch2-2-1-being-real"
-  },
-  {
-    "id": "ch2-how-do-i-keep-a-budget",
-    "title": "Expenses • How do I keep a budget?",
-    "text": "How do I keep a budget?",
-    "url": "#ch2-2-2-my-expenses"
-  },
-  {
-    "id": "ch2-what-s-the-cpi",
-    "title": "Expenses • What’s the CPI?",
-    "text": "What’s the CPI?",
-    "url": "#ch2-2-3-understanding-inflation"
-  },
-  {
-    "id": "ch2-inflation-rates",
-    "title": "Expenses • Inflation Rates",
-    "text": "Inflation Rates",
-    "url": "#ch2-2-3-understanding-inflation"
-  },
-  {
-    "id": "ch2-it-s-our-economy",
-    "title": "Expenses • It’s Our Economy",
-    "text": "It’s Our Economy",
-    "url": "#ch2-2-3-understanding-inflation"
-  },
-  {
-    "id": "ch2-icons-image",
-    "title": "Expenses • Icons image",
-    "text": "Icons image",
-    "url": "#ch2-2-3-understanding-inflation"
-  },
-  {
-    "id": "ch2-economic-powers-beyond-inflation",
-    "title": "Expenses • Economic powers beyond inflation",
-    "text": "Economic powers beyond inflation",
-    "url": "#ch2-2-3-understanding-inflation"
-  },
-  {
-    "id": "ch2-deciding-on-a-longevity-assumption",
-    "title": "Expenses • Deciding on a longevity assumption",
-    "text": "Deciding on a longevity assumption",
-    "url": "#ch2-2-5-estimating-longevity"
-  },
-  {
-    "id": "ch2-types-of-debt",
-    "title": "Expenses • Types of debt",
-    "text": "Types of debt",
-    "url": "#ch2-2-7-debt-management"
-  },
-  {
-    "id": "ch2-debt-gone-bad",
-    "title": "Expenses • Debt gone bad",
-    "text": "Debt gone bad",
-    "url": "#ch2-2-7-debt-management"
-  },
-  {
-    "id": "ch2-anticipate-bad-luck",
-    "title": "Expenses • Anticipate “Bad Luck”",
-    "text": "Anticipate “Bad Luck”",
-    "url": "#ch2-2-7-debt-management"
-  },
-  {
-    "id": "ch2-the-cost-of-liquidity-is-a-lost-opportunity-cost",
-    "title": "Expenses • The cost of liquidity is a lost opportunity cost",
-    "text": "The cost of liquidity is a lost opportunity cost",
-    "url": "#ch2-2-7-debt-management"
-  },
-  {
-    "id": "ch2-how-does-amortization-work",
-    "title": "Expenses • How does amortization work?",
-    "text": "How does amortization work?",
-    "url": "#ch2-2-7-debt-management"
-  },
-  {
-    "id": "ch2-leveraging-home-equity",
-    "title": "Expenses • Leveraging home equity",
-    "text": "Leveraging home equity",
-    "url": "#ch2-2-7-debt-management"
-  },
-  {
-    "id": "ch2-retirement-timeline",
-    "title": "Expenses • Retirement timeline",
-    "text": "Retirement timeline",
-    "url": "#ch2-2-8-picking-a-retirement-date"
-  },
-  {
-    "id": "ch2-continuing-the-conversation",
-    "title": "Expenses • Continuing the conversation",
-    "text": "Continuing the conversation",
-    "url": "#ch2-2-9-a-methodical-process"
-  },
-  {
-    "id": "ch2-how-can-i-organize-my-financial-information",
-    "title": "Expenses • How can I organize my financial information?",
-    "text": "How can I organize my financial information?",
-    "url": "#ch2-2-9-a-methodical-process"
-  },
-  {
-    "id": "ch3-c-s-lewis",
-    "title": "Cash Flow & Net Worth • C.S. Lewis",
-    "text": "C.S. Lewis",
-    "url": "#ch3-x"
-  },
-  {
-    "id": "ch3-how-can-i-estimate-my-net-worth",
+    "id": "ch1-how-can-i-estimate-my-net-worth",
     "title": "Cash Flow & Net Worth • How can I estimate my net worth?",
     "text": "How can I estimate my net worth?",
-    "url": "#ch3-lo-4"
+    "url": "#ch1-3-1-key-planning-documents"
   },
   {
-    "id": "ch3-how-can-i-calculate-my-savings",
+    "id": "ch1-how-can-i-calculate-my-savings",
     "title": "Cash Flow & Net Worth • How can I calculate my savings?",
     "text": "How can I calculate my savings?",
-    "url": "#ch3-learning-objective-3-2-positive-cash-flow"
+    "url": "#ch1-learning-objective-3-2-positive-cash-flow"
   },
   {
-    "id": "ch3-historical-tracker-add-to-graph",
-    "title": "Cash Flow & Net Worth • HISTORICAL TRACKER ADD to graph",
-    "text": "HISTORICAL TRACKER ADD to graph",
-    "url": "#ch3-learning-objective-3-2-positive-cash-flow"
+    "id": "ch2-financial-planning-is-becoming-much-more-about-you-the-client-for-the-first-time-in-history-the-landscape-for-objective-financial-guidance-is-finally-taking-shape",
+    "title": "My Perfect Plan • Financial planning is becoming much more about you, the client. For the first time in history, the landscape for objective financial guidance is finally taking shape.",
+    "text": "Financial planning is becoming much more about you, the client. For the first time in history, the landscape for objective financial guidance is finally taking shape.",
+    "url": "#ch2-1-2-why-be-rational"
   },
   {
-    "id": "ch3-tax-terms",
-    "title": "Cash Flow & Net Worth • Tax Terms",
-    "text": "Tax Terms",
-    "url": "#ch3-3-4-taxes"
+    "id": "ch2-why-seek-the-objective-truth",
+    "title": "My Perfect Plan • Why seek the objective truth?",
+    "text": "Why seek the objective truth?",
+    "url": "#ch2-1-2-why-be-rational"
   },
   {
-    "id": "ch3-the-2024-standard-deduction",
-    "title": "Cash Flow & Net Worth • The 2024 Standard Deduction",
-    "text": "The 2024 Standard Deduction",
-    "url": "#ch3-3-4-taxes"
+    "id": "ch2-how-can-i-prioritize-my-lifestyle",
+    "title": "My Perfect Plan • How can I prioritize my lifestyle?",
+    "text": "How can I prioritize my lifestyle?",
+    "url": "#ch2-1-2-why-be-rational"
   },
   {
-    "id": "ch3-state-income-tax",
-    "title": "Cash Flow & Net Worth • State Income Tax",
-    "text": "State Income Tax",
-    "url": "#ch3-3-4-taxes"
+    "id": "ch2-life-is-not-math",
+    "title": "My Perfect Plan • Life is not math.",
+    "text": "Life is not math.",
+    "url": "#ch2-1-3-me-myself-and-i"
   },
   {
-    "id": "ch3-alternative-minimum-tax-amt",
-    "title": "Cash Flow & Net Worth • Alternative Minimum Tax (AMT)",
-    "text": "Alternative Minimum Tax (AMT)",
-    "url": "#ch3-3-6-additional-tax-considerations"
+    "id": "ch2-having-a-battle-plan",
+    "title": "My Perfect Plan • Having a Battle Plan",
+    "text": "Having a Battle Plan",
+    "url": "#ch2-1-3-me-myself-and-i"
   },
   {
-    "id": "ch3-amt-exemptions-2024",
-    "title": "Cash Flow & Net Worth • AMT Exemptions (2024)",
-    "text": "AMT Exemptions (2024)",
-    "url": "#ch3-3-6-additional-tax-considerations"
+    "id": "ch2-when-to-consider-professional-help",
+    "title": "My Perfect Plan • When to consider professional help",
+    "text": "When to consider professional help",
+    "url": "#ch2-1-3-me-myself-and-i"
   },
   {
-    "id": "ch3-amt-phaseout-thresholds-2024",
-    "title": "Cash Flow & Net Worth • AMT Phaseout Thresholds (2024)",
-    "text": "AMT Phaseout Thresholds (2024)",
-    "url": "#ch3-3-6-additional-tax-considerations"
+    "id": "ch3-are-retirees-being-real",
+    "title": "Expenses • Are retirees being real?",
+    "text": "Are retirees being real?",
+    "url": "#ch3-2-1-being-real"
   },
   {
-    "id": "ch3-coordinating-a-retirement-date",
-    "title": "Cash Flow & Net Worth • Coordinating a Retirement Date",
-    "text": "Coordinating a Retirement Date",
-    "url": "#ch3-3-7-tax-management-strategies"
+    "id": "ch3-how-do-i-keep-a-budget",
+    "title": "Expenses • How do I keep a budget?",
+    "text": "How do I keep a budget?",
+    "url": "#ch3-2-2-my-expenses"
   },
   {
-    "id": "ch3-participating-in-a-work-retirement-plan",
-    "title": "Cash Flow & Net Worth • Participating in a work retirement plan",
-    "text": "Participating in a work retirement plan",
-    "url": "#ch3-3-7-tax-management-strategies"
+    "id": "ch3-what-s-the-cpi",
+    "title": "Expenses • What’s the CPI?",
+    "text": "What’s the CPI?",
+    "url": "#ch3-2-3-understanding-inflation"
   },
   {
-    "id": "ch3-contributing-to-a-traditional-or-roth-ira",
-    "title": "Cash Flow & Net Worth • Contributing to a Traditional or Roth IRA",
-    "text": "Contributing to a Traditional or Roth IRA",
-    "url": "#ch3-3-7-tax-management-strategies"
+    "id": "ch3-inflation-rates",
+    "title": "Expenses • Inflation Rates",
+    "text": "Inflation Rates",
+    "url": "#ch3-2-3-understanding-inflation"
   },
   {
-    "id": "ch3-funding-a-variety-of-accounts",
-    "title": "Cash Flow & Net Worth • Funding a variety of accounts",
-    "text": "Funding a variety of accounts",
-    "url": "#ch3-3-7-tax-management-strategies"
+    "id": "ch3-it-s-our-economy",
+    "title": "Expenses • It’s Our Economy",
+    "text": "It’s Our Economy",
+    "url": "#ch3-2-3-understanding-inflation"
   },
   {
-    "id": "ch3-roth-conversions",
-    "title": "Cash Flow & Net Worth • Roth Conversions",
-    "text": "Roth Conversions",
-    "url": "#ch3-3-7-tax-management-strategies"
-  },
-  {
-    "id": "ch3-the-tax-efficiency-of-asset-classes",
-    "title": "Cash Flow & Net Worth • The tax efficiency of asset classes",
-    "text": "The tax efficiency of asset classes",
-    "url": "#ch3-3-7-tax-management-strategies"
-  },
-  {
-    "id": "ch3-health-related-tax-deductible-accounts",
-    "title": "Cash Flow & Net Worth • Health-related tax-deductible accounts",
-    "text": "Health-related tax-deductible accounts",
-    "url": "#ch3-3-7-tax-management-strategies"
-  },
-  {
-    "id": "ch3-getting-all-adjustments-and-credits",
-    "title": "Cash Flow & Net Worth • Getting all adjustments and credits",
-    "text": "Getting all adjustments and credits",
-    "url": "#ch3-3-7-tax-management-strategies"
-  },
-  {
-    "id": "ch3-the-qbi-deduction",
-    "title": "Cash Flow & Net Worth • The QBI deduction",
-    "text": "The QBI deduction",
-    "url": "#ch3-3-7-tax-management-strategies"
-  },
-  {
-    "id": "ch3-qbi-information-2024",
-    "title": "Cash Flow & Net Worth • QBI information (2024)",
-    "text": "QBI information (2024)",
-    "url": "#ch3-3-7-tax-management-strategies"
-  },
-  {
-    "id": "ch3-timing-in-selling-of-post-tax-investments",
-    "title": "Cash Flow & Net Worth • Timing in Selling of Post-Tax Investments",
-    "text": "Timing in Selling of Post-Tax Investments",
-    "url": "#ch3-3-7-tax-management-strategies"
-  },
-  {
-    "id": "ch3-capital-loss-rules",
-    "title": "Cash Flow & Net Worth • Capital Loss Rules",
-    "text": "Capital Loss Rules",
-    "url": "#ch3-3-7-tax-management-strategies"
-  },
-  {
-    "id": "ch3-asset-selection-coordinating-accounts",
-    "title": "Cash Flow & Net Worth • Asset Selection & Coordinating Accounts",
-    "text": "Asset Selection & Coordinating Accounts",
-    "url": "#ch3-3-7-tax-management-strategies"
-  },
-  {
-    "id": "ch3-other-gain-considerations",
-    "title": "Cash Flow & Net Worth • Other gain considerations",
-    "text": "Other gain considerations",
-    "url": "#ch3-3-8-investment-tax-rates"
-  },
-  {
-    "id": "ch3-qualified-dividend-income",
-    "title": "Cash Flow & Net Worth • Qualified dividend income",
-    "text": "Qualified dividend income",
-    "url": "#ch3-3-8-investment-tax-rates"
-  },
-  {
-    "id": "ch3-net-investment-income-tax-niit",
-    "title": "Cash Flow & Net Worth • Net Investment Income Tax (NIIT)",
-    "text": "Net Investment Income Tax (NIIT)",
-    "url": "#ch3-3-8-investment-tax-rates"
-  },
-  {
-    "id": "ch3-interest-income",
-    "title": "Cash Flow & Net Worth • Interest Income",
-    "text": "Interest Income",
-    "url": "#ch3-3-8-investment-tax-rates"
-  },
-  {
-    "id": "ch3-what-s-my-after-everything-return",
-    "title": "Cash Flow & Net Worth • What’s my After Everything return?",
-    "text": "What’s my After Everything return?",
-    "url": "#ch3-3-10-income-real-estate"
-  },
-  {
-    "id": "ch3-do-i-need-the-income",
-    "title": "Cash Flow & Net Worth • Do I need the income?",
-    "text": "Do I need the income?",
-    "url": "#ch3-3-10-income-real-estate"
-  },
-  {
-    "id": "ch3-just-a-second-home",
-    "title": "Cash Flow & Net Worth • Just a second home",
-    "text": "Just a second home",
-    "url": "#ch3-3-10-income-real-estate"
-  },
-  {
-    "id": "ch3-what-if-i-want-to-sell-an-investment-property",
-    "title": "Cash Flow & Net Worth • What if I want to sell an investment property?",
-    "text": "What if I want to sell an investment property?",
-    "url": "#ch3-3-10-income-real-estate"
-  },
-  {
-    "id": "ch3-it-s-great-now-but",
-    "title": "Cash Flow & Net Worth • It's great now, but…",
-    "text": "It's great now, but…",
-    "url": "#ch3-3-10-income-real-estate"
-  },
-  {
-    "id": "ch3-what-if-i-m-not-around",
-    "title": "Cash Flow & Net Worth • What if I’m not around?",
-    "text": "What if I’m not around?",
-    "url": "#ch3-3-10-income-real-estate"
-  },
-  {
-    "id": "ch3-not-all-properties-are-equal",
-    "title": "Cash Flow & Net Worth • Not all properties are equal",
-    "text": "Not all properties are equal",
-    "url": "#ch3-3-10-income-real-estate"
-  },
-  {
-    "id": "ch3-continuing-the-conversation",
-    "title": "Cash Flow & Net Worth • Continuing the conversation…",
-    "text": "Continuing the conversation…",
-    "url": "#ch3-3-10-income-real-estate"
+    "id": "ch3-economic-powers-beyond-inflation",
+    "title": "Expenses • Economic powers beyond inflation",
+    "text": "Economic powers beyond inflation",
+    "url": "#ch3-2-3-understanding-inflation"
   }
 ]
