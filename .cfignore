@@ -1,10 +1,13 @@
-# Don’t publish raw sources or scripts
+# ignore raw sources and dev artifacts
 source/
 scripts/
-2024-test/
 _tmp_html/
+*.psd
+*.ai
 *.docx
 
-# Keep build helpers off the public site
-README*.md
-*.psd
+# keep the website bits
+!index.html
+!site.json
+!static/
+!rag/
