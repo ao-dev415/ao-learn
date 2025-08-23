@@ -1,0 +1,10 @@
+# Don’t publish raw sources or scripts
+source/
+scripts/
+2024-test/
+_tmp_html/
+*.docx
+
+# Keep build helpers off the public site
+README*.md
+*.psd
