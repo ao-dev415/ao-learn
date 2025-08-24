@@ -119,7 +119,7 @@
     // ---- load site.json ----
     let site;
     try {
-      const res = await fetch('site.json', { cache:'no-store', credentials:'same-origin' });
+      const res = await fetch('/site.json', { cache:'no-store', credentials:'same-origin' });
       if (!res.ok) throw new Error(`site.json ${res.status}`);
       site = await res.json();
     } catch (e) {
