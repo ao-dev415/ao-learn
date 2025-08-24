@@ -1,669 +1,478 @@
 <!doctype html>
 <html lang="en">
-
- <!-- ===== DEBUG OVERLAY FOR site.json / full/site.json ===== -->
-<script>
-(() => {
-  if (window.__SITE_DEBUG_INIT__) return; // guard against duplicates
-  window.__SITE_DEBUG_INIT__ = true;
-
-  // --- tiny overlay UI ---
-  function makeOverlay() {
-    const box = document.createElement('div');
-    box.id = '__site_debug_overlay__';
-    box.style.cssText = [
-      'position:fixed','left:20px','top:20px','z-index:999999',
-      'max-width:680px','min-width:360px',
-      'background:#0e141c','color:#e8eef3',
-      'border:1px solid #374458','border-radius:12px',
-      'box-shadow:0 12px 28px rgba(0,0,0,.45)',
-      'font:13px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif'
-    ].join(';');
-    box.innerHTML = `
-      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #263140">
-        <div id="__sd_title" style="font-weight:700">site.json debug</div>
-        <div id="__sd_status" style="margin-left:auto;padding:2px 8px;border-radius:999px;background:#2a3a4d;color:#cfe0ee">checking…</div>
-        <button id="__sd_close" title="Close" style="all:unset;cursor:pointer;color:#9fb3c6">✕</button>
-      </div>
-      <pre id="__sd_detail" style="margin:0;padding:12px;white-space:pre-wrap;max-height:48vh;overflow:auto"></pre>
-      <div style="display:flex;gap:8px;padding:10px 12px;border-top:1px solid #263140">
-        <button id="__sd_copy" style="all:unset;cursor:pointer;background:#1a2430;color:#cfe0ee;border:1px solid #2b3b4f;border-radius:8px;padding:6px 10px">Copy detail</button>
-        <button id="__sd_hide" style="all:unset;cursor:pointer;background:#1a2430;color:#cfe0ee;border:1px solid #2b3b4f;border-radius:8px;padding:6px 10px">Hide</button>
-      </div>
-    `;
-    document.body.appendChild(box);
-    const title  = box.querySelector('#__sd_title');
-    const status = box.querySelector('#__sd_status');
-    const detail = box.querySelector('#__sd_detail');
-    box.querySelector('#__sd_close').onclick = () => box.remove();
-    box.querySelector('#__sd_hide').onclick  = () => box.style.display = 'none';
-    box.querySelector('#__sd_copy').onclick  = async () => {
-      try { await navigator.clipboard.writeText(detail.textContent); status.textContent = 'copied'; }
-      catch { status.textContent = 'copy failed'; }
-      setTimeout(()=>status.textContent='ok', 900);
-    };
-    return { box, title, status, detail };
-  }
-  const ui = makeOverlay();
-
-  const pickUrl = () => {
-    try {
-      const u = new URL(location.href);
-      return u.searchParams.get('full') === '1' ? '/full/site.json' : '/site.json';
-    } catch { return '/site.json'; }
-  };
-
-  const prettyHeaders = res =>
-    [...res.headers.entries()].map(([k,v]) => `${k}: ${v}`).join('\n');
-
-  function show(title, badge, body, ok=false) {
-    ui.title.textContent  = title;
-    ui.status.textContent = badge;
-    ui.status.style.background = ok ? '#123f2c' : '#3b2930';
-    ui.status.style.color      = ok ? '#a8f0c7' : '#f7c0c7';
-    ui.detail.textContent = body;
-    ui.box.style.display  = 'block';
-  }
-
-  (async () => {
-    const url = pickUrl();
-    ui.title.textContent = `site.json debug — ${url}`;
-
-    let res, text = '';
-    try {
-      res = await fetch(url, {
-        credentials: 'same-origin',
-        cache: 'no-store',
-        headers: { 'Accept': 'application/json' }
-      });
-    } catch (e) {
-      show('Network error', 'error',
-           `URL: ${url}\n\n${String(e && e.message || e)}`);
-      return;
-    }
-
-    try { text = await res.text(); } catch {}
-
-    if (!res.ok) {
-      show(`Fetch failed ${res.status} ${res.statusText}`, 'error',
-           `URL: ${res.url}\n\nHEADERS:\n${prettyHeaders(res)}\n\nBODY SAMPLE:\n${text.slice(0,1000)}`);
-      return;
-    }
-
-    const ct = (res.headers.get('content-type') || '').toLowerCase();
-    if (!ct.includes('application/json')) {
-      show('Non-JSON response', 'error',
-           `URL: ${res.url}\ncontent-type: ${ct || '(none)'}\n\nBODY SAMPLE:\n${text.slice(0,1000)}\n\nHINTS:\n• Ensure _redirects has explicit 200 rules for /site.json and /full/site.json.\n• Ensure _headers sets Content-Type: application/json and Cache-Control: no-store for those paths.`);
-      return;
-    }
-
-    let json;
-    try { json = JSON.parse(text); }
-    catch (e) {
-      show('JSON parse error', 'error',
-           `${e.message}\n\nBODY SAMPLE:\n${text.slice(0,1000)}`);
-      return;
-    }
-
-    // expose in console for quick inspection
-    window.__SITE_DEBUG__ = {
-      url,
-      status: res.status,
-      headers: Object.fromEntries(res.headers.entries()),
-      textSample: text.slice(0,1000),
-      json
-    };
-    window.dispatchEvent(new CustomEvent('sitejson:debug', { detail: window.__SITE_DEBUG__ }));
-
-    const chapters = Array.isArray(json?.chapters) ? json.chapters.length : 0;
-    const bookName = (json?.book?.title || json?.book?.name || 'Book');
-    show('site.json OK', 'ok',
-         `URL: ${url}\nstatus: ${res.status}\ncontent-type: ${ct}\nbook: ${bookName}\nchapters: ${chapters}\n\nTip: add ?full=1 to the URL to force /full/site.json`, true);
-
-    // Auto-hide after a few seconds, leave it re-openable via console
-    setTimeout(() => { ui.box.style.display = 'none'; }, 6000);
-    // Reopen later: document.getElementById('__site_debug_overlay__').style.display='block'
-  })();
-})();
-</script>
-<!-- ===== /DEBUG OVERLAY ===== -->
- 
-  
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Advice Only™ Bookstore</title>
-<meta name="robots" content="noindex,nofollow"/>
-<style>
-  :root{
-    --bg:#0b0d10;--panel:#12151a;--muted:#8ea1b2;--fg:#e8eef3;--brand:#00d0b6;
-    --border:#1e242c;--hover:#171c24;--accent:#0e2723;--accentOutline:#11433b
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,"Helvetica Neue",Arial,sans-serif}
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Advice Only™ Bookstore (Preview)</title>
+  <meta name="robots" content="noindex,nofollow"/>
 
-  a{color:var(--brand);text-decoration:none}
-  .kbd{font:12px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#0d1117;padding:1px 6px;border-radius:6px;border:1px solid #222a33;color:#a3b4c5}
-  .muted{color:var(--muted)}
+  <style>
+    :root{
+      --bg:#0b0e13; --panel:#10151c; --muted:#9bb0c2; --fg:#e8eef3; --brand:#00d0b6;
+      --border:#1e2630; --hover:#131b24; --ok:#123f2c; --okfg:#a8f0c7; --err:#3b2930; --errfg:#f7c0c7
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial,sans-serif}
+    a{color:var(--brand);text-decoration:none}
+    code,kbd,pre{font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 
-  /* App bar */
-  .appbar{
-    display:flex;align-items:center;gap:12px;
-    padding:10px 12px;border-bottom:1px solid var(--border);background:rgba(0,0,0,.3);
-    position:sticky;top:0;z-index:100
-  }
-  .brand{display:flex;align-items:center;gap:8px;font-weight:600}
-  .tabs{display:flex;gap:8px;margin-left:12px}
-  .tab{padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:transparent;cursor:pointer;color:var(--fg)}
-  .tab[aria-current="true"]{background:var(--accent);outline:1px solid var(--accentOutline)}
-  .spacer{flex:1}
-  .search{
-    display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:10px;padding:4px 8px;background:#0f1318;width:360px;
-  }
-  .search input{
-    flex:1;background:transparent;border:0;color:var(--fg);outline:none
-  }
-  .btn{cursor:pointer}
+    /* Top bar */
+    .top{display:flex;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);background:#0c1117;position:sticky;top:0;z-index:10}
+    .brand{display:flex;align-items:center;gap:8px;font-weight:700}
+    .brand .logo{width:16px;height:16px;border-radius:4px;background:linear-gradient(135deg,#00d0b6,#1ea8e6)}
+    .tabs{display:flex;gap:6px;margin-left:12px}
+    .tab{padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:transparent;color:#cfe0ee;cursor:pointer}
+    .tab[aria-current="true"]{background:#0f1b22}
+    .grow{flex:1}
+    .search{display:flex;gap:6px}
+    .search input{width:280px;max-width:40vw;border:1px solid var(--border);background:#0e141b;color:var(--fg);padding:6px 8px;border-radius:8px}
+    .search button{padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:#14202a;color:#cfe0ee;cursor:pointer}
 
-  /* Layout */
-  .wrap{
-    display:grid;grid-template-columns:300px 1fr 340px;gap:16px;min-height:calc(100vh - 56px);
-    padding:16px
-  }
-  .card{background:var(--panel);border:1px solid var(--border);border-radius:10px}
-  .left{padding:12px;overflow:auto;max-height:calc(100vh - 88px)}
-  .main{padding:16px;overflow:auto}
-  .rail{padding:12px}
-  .rail h4{margin:0 0 8px;color:#bcd0e0;font-weight:600}
-  .alert{border:1px solid var(--border);padding:12px;border-radius:10px;color:#c7d7e6}
+    /* Shell */
+    .wrap{display:grid;grid-template-columns:280px 1fr 320px;gap:14px;min-height:calc(100vh - 52px);padding:14px}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;min-height:120px}
+    .nav{padding:10px;overflow:auto}
+    .nav h3{margin:12px 8px 8px;color:#bfd2e3;font-size:12px;font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+    .nav ul{list-style:none;margin:0;padding:0}
+    .nav li{margin:0}
+    .nav button{display:block;width:100%;text-align:left;background:transparent;border:0;color:var(--fg);padding:8px 10px;border-radius:8px;cursor:pointer}
+    .nav button:hover{background:var(--hover)}
+    .nav .lo{padding-left:18px;color:#cfe0ee}
+    .nav button[aria-current="true"]{background:#0e2723;outline:1px solid #11433b}
+    .nav .lock{opacity:.55}
 
-  /* Chapter nav (Read) */
-  .nav h3{margin:16px 8px 6px;color:#bcd0e0;font-weight:600;font-size:13px}
-  .nav ul{list-style:none;margin:0;padding:0}
-  .nav li{margin:0}
-  .nav button{display:block;width:100%;text-align:left;background:transparent;border:0;color:var(--fg);padding:8px 10px;border-radius:8px;cursor:pointer}
-  .nav button:hover{background:var(--hover)}
-  .nav .lo{padding-left:18px;color:#cfe0ee}
-  .nav button[aria-current="true"]{background:var(--accent);outline:1px solid var(--accentOutline)}
+    .main{padding:16px;overflow:auto}
+    .main h1{margin:0 0 14px;font-size:22px}
+    .main h2{margin:18px 0 8px;font-size:16px}
+    .lead{color:#c7d7e6;margin-bottom:14px}
+    .muted{color:var(--muted)}
+    .rail{padding:12px}
+    .alert{border:1px solid var(--border);padding:12px;border-radius:10px;color:#c7d7e6}
+    .hr{border-top:1px solid var(--border);margin:14px 0}
 
-  /* Type */
-  .main h1{margin:0 0 14px;font-size:22px}
-  .main h2{margin:20px 0 8px;font-size:16px}
+    /* Simple blocks & callouts */
+    .callout{border:1px dashed #2b3a4a;padding:10px;border-radius:10px;background:#0f141b;margin:10px 0}
+    blockquote{margin:10px 0;padding:10px 12px;border-left:3px solid #2c3c4d;background:#0f141b;border-radius:8px}
+    ul,ol{margin:8px 0 12px 18px}
+    figure{margin:12px 0}
+    figcaption{color:var(--muted);font-size:12px;margin-top:6px}
 
-  /* My Data */
-  .progress{display:grid;grid-template-columns:1fr auto;align-items:center;padding:8px 10px;border:1px solid var(--border);border-radius:8px;margin:8px 0}
-  .bar{height:6px;background:#10161f;border:1px solid var(--border);border-radius:999px;overflow:hidden}
-  .bar>span{display:block;height:100%;background:var(--brand);width:0%}
-  .lo-list{list-style:none;margin:8px 0 0;padding:0}
-  .lo-list li{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-top:1px dashed #223}
-  .lo-list li:first-child{border-top:0}
-  .small{font-size:12px;color:#9fb2c2}
+    /* Empty states */
+    .empty{color:#9fb3c6;padding:8px}
 
-  /* Events */
-  .event{border:1px solid var(--border);border-radius:8px;padding:12px;margin:10px 0}
-  .event h4{margin:0 0 6px}
-
-  /* Search results */
-  .sr{border:1px solid var(--border);border-radius:8px;padding:10px;margin:8px 0}
-  .sr .path{font-size:12px;color:#9fb2c2;margin-top:4px}
-
-  @media (max-width:1200px){
-    .wrap{grid-template-columns:1fr;grid-auto-rows:auto}
-    .left{order:1}
-    .main{order:2}
-    .rail{order:3}
-  }
-</style>
+    /* Responsive */
+    @media (max-width:1100px){.wrap{grid-template-columns:1fr}.rail{order:3}.nav{order:1}.main{order:2}}
+  </style>
 </head>
 <body>
-  <header class="appbar">
-    <div class="brand">💧 <span>Advice Only™ Bookstore</span></div>
-    <nav class="tabs" id="tabs">
-      <button class="tab" data-tab="read">Read</button>
-      <button class="tab" data-tab="data">My Data</button>
-      <button class="tab" data-tab="events">Events</button>
-      <button class="tab" data-tab="profile">Profile</button>
-      <button class="tab" data-tab="transparency">Transparency</button>
+
+  <!-- Top bar -->
+  <header class="top">
+    <div class="brand"><div class="logo"></div> Advice Only™ Bookstore</div>
+    <nav class="tabs" id="topTabs">
+      <button class="tab" data-view="read" aria-current="true">Read</button>
+      <button class="tab" data-view="data">My Data</button>
+      <button class="tab" data-view="events">Events</button>
+      <button class="tab" data-view="profile">Profile</button>
+      <button class="tab" data-view="transparency">Transparency</button>
     </nav>
-    <div class="spacer"></div>
-    <form class="search" id="searchForm">
-      <input id="searchInput" placeholder="Search snippets, topics…" aria-label="Search"/>
-      <button type="submit" class="btn">Search</button>
+    <div class="grow"></div>
+    <form class="search" id="searchForm" autocomplete="off">
+      <input id="searchInput" placeholder="Search snippets, topics…"/>
+      <button type="submit">Search</button>
     </form>
   </header>
 
+  <!-- Body -->
   <div class="wrap">
-    <aside class="card left nav" id="left"><div class="muted">Loading…</div></aside>
+    <aside class="card nav" id="nav"><div class="empty">Loading…</div></aside>
 
     <main class="card main" id="main">
       <h1>Welcome</h1>
-      <p>Select a learning objective from the left.</p>
-      <div class="muted">If blank, check <span class="kbd">site.json</span> in Network, then hard-reload.</div>
+      <p class="lead">Select a learning objective from the left.</p>
+      <div class="muted">This page is using an <code>inline JSON</code> bundle embedded in the HTML.</div>
     </main>
 
     <aside class="card rail" id="rail">
-      <h4>Alerts</h4>
-      <div id="alerts" class="alert">Loading…</div>
+      <h3 style="margin:0 0 10px;color:#bfd2e3;font-size:12px;font-weight:700;letter-spacing:.3px;text-transform:uppercase">Alerts</h3>
+      <div class="alert">“Site accessibility tutorial” lives here for now. Later: notifications for subscribed users.</div>
     </aside>
   </div>
 
-<script>
-(async () => {
-  // ---------- state ----------
-  const S = {
-    site: null,
-    chunks: [],
-    view: 'read', // read | data | events | profile | transparency | search
-    ch: 1, lo: 1, // 1-based indices for read mode
-    q: ''
-  };
+  <script>
+  (()=>{
+    const el = sel => document.querySelector(sel);
+    const navEl = el('#nav');
+    const mainEl = el('#main');
+    const tabsEl = el('#topTabs');
+    const searchForm = el('#searchForm');
+    const searchInput = el('#searchInput');
 
-  const els = {
-    tabs: document.getElementById('tabs'),
-    left: document.getElementById('left'),
-    main: document.getElementById('main'),
-    rail: document.getElementById('rail'),
-    alerts: document.getElementById('alerts'),
-    searchForm: document.getElementById('searchForm'),
-    searchInput: document.getElementById('searchInput')
-  };
-
-  // ---------- helpers ----------
-  const h = (t,a={},...c)=>{const e=document.createElement(t);for(const[k,v]of Object.entries(a)){if(k==='class')e.className=v;else if(k==='html')e.innerHTML=v;else if(k.startsWith('on')&&typeof v==='function')e.addEventListener(k.slice(2),v);else e.setAttribute(k,v)}for(const x of c){if(x!=null)e.appendChild(typeof x==='string'?document.createTextNode(x):x)}return e};
-
-  function slug(str){ return (str||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') }
-
-  // persist progress
-  const LS_KEY = 'ao:progress';
-  const progress = {
-    get(){ try { return JSON.parse(localStorage.getItem(LS_KEY)||'{}') } catch { return {} } },
-    set(obj){ localStorage.setItem(LS_KEY, JSON.stringify(obj)) },
-    clear(){ localStorage.removeItem(LS_KEY) }
-  };
-
-  // ---------- data load ----------
-  async function loadSite(){
-    // Prefer /site.json; you can switch to /full/site.json behind Access
-    const res = await fetch('/site.json', {cache:'no-store', credentials:'same-origin'});
-    if(!res.ok) throw new Error('site.json '+res.status);
-    S.site = await res.json();
-  }
-
-  async function loadChunks(){
-    try{
-      const r = await fetch('/static/rag/chunks.json', {cache:'no-store'}); 
-      if(r.ok) S.chunks = await r.json();
-    }catch{}
-  }
-
-  // ---------- chapter/LO helpers ----------
-  function enumerateChapters(site){
-    // Builds normalized structure with indices and ids
-    const out = [];
-    (site.chapters||[]).forEach((ch, ci)=>{
-      const los = (ch.los||[]).map((lo, li)=>({
-        ...lo,
-        _chIndex: ci+1,
-        _loIndex: li+1,
-        _id: `ch${ci+1}-lo${li+1}`
-      }));
-      out.push({
-        ...ch,
-        _index: ci+1,
-        los
-      });
-    });
-    return out;
-  }
-
-  // ---------- render: alerts ----------
-  function renderAlerts(){
-    const alerts = S.site?.alerts && S.site.alerts.length ? S.site.alerts : [
-      '“Site accessibility tutorial” lives here for now. Later: notifications for subscribed users.'
-    ];
-    els.alerts.innerHTML = '';
-    alerts.forEach(txt => els.alerts.append(h('div', {style:'margin:8px 0'}, txt)));
-  }
-
-  // ---------- READ ----------
-  function renderReadNav(chapters){
-    els.left.innerHTML = '';
-    chapters.forEach(ch=>{
-      els.left.append(h('h3', {}, ch.title || `Chapter ${ch._index}`));
-      const ul = h('ul');
-      ch.los.forEach(lo=>{
-        const btn = h('button', {
-          class:'lo',
-          'aria-current': (S.ch===lo._chIndex && S.lo===lo._loIndex) ? 'true':'false',
-          onclick: ()=>go(`#/read/ch${lo._chIndex}/lo${lo._loIndex}`)
-        }, formatLoLabel(lo));
-        ul.append(h('li', {}, btn));
-      });
-      els.left.append(ul);
-    });
-  }
-
-  function formatLoLabel(lo){
-    const t = (lo.title||'').trim();
-    const m = t.match(/(\d+\.\d+)/);
-    if(m){
-      const rest = t.replace(m[0],'').replace(/^[-—:\s]+/,'').trim();
-      return `${m[0]} — ${rest||''}`.trim();
-    }
-    return t || 'Untitled';
-  }
-
-  function renderReadMain(chapters){
-    const ch = chapters[S.ch-1];
-    const lo = ch?.los?.[S.lo-1];
-    els.main.innerHTML = '';
-    if(!ch||!lo){
-      els.main.append(
-        h('h1', {}, 'Welcome'),
-        h('p', {}, 'Select a learning objective from the left.'),
-        h('div',{class:'muted'}, 'If blank, check ', h('span',{class:'kbd'},'site.json'), ' in Network, then hard-reload.')
-      );
-      return;
-    }
-    els.main.append(
-      h('h1', {}, `${ch.title} — ${lo.title}`)
-    );
-    if(lo.preview) els.main.append(h('p', {class:'muted'}, lo.preview));
-
-    // Body from snippets
-    const snips = Array.isArray(lo.snippets) ? lo.snippets : [];
-    if(snips.length===0){
-      els.main.append(h('div',{class:'muted'},'No body yet. Importer can map first N paragraphs into snippets.'));
-    } else {
-      snips.forEach(s=>{
-        if(s.title) els.main.append(h('h2', {}, s.title));
-        if(s.body)  els.main.append(h('p', {}, s.body));
-        if(s.list && s.list.length){
-          const ul = h('ul');
-          s.list.forEach(li=>ul.append(h('li',{},li)));
-          els.main.append(ul);
-        }
-      });
+    // ---- read inline JSON ----
+    let SITE = {};
+    try {
+      const raw = document.getElementById('SITE_DATA')?.textContent ?? '{}';
+      SITE = JSON.parse(raw);
+    } catch(e) {
+      console.error('Inline JSON parse error:', e);
+      SITE = { book:{title:'(invalid inline JSON)'}, chapters:[] };
     }
 
-    // Completion toggle
-    const key = `${S.ch}-${S.lo}`;
-    const st = progress.get();
-    const checked = !!st[key];
-    const row = h('div', {style:'margin-top:18px;border-top:1px dashed #234;padding-top:10px;display:flex;gap:10px;align-items:center'},
-      h('input', {type:'checkbox', id:'doneBox', checked:checked?'':'', onchange: e=>{
-        const obj = progress.get();
-        if(e.target.checked) obj[key]=true; else delete obj[key];
-        progress.set(obj);
-        // optional toast
-      }}),
-      h('label', {for:'doneBox'}, 'Mark this LO complete'),
-      h('span',{class:'small'}, ' Stored locally in your browser')
-    );
-    els.main.append(row);
-  }
-
-  // ---------- MY DATA ----------
-  function renderData(chapters){
-    els.left.innerHTML = h('div',{class:'muted'},'Chapters hidden in this view.').outerHTML;
-    els.main.innerHTML = '';
-    els.main.append(h('h1', {}, 'My Data'));
-
-    const st = progress.get();
-
-    chapters.forEach(ch=>{
-      // compute chapter progress
-      const total = ch.los.length;
-      const done = ch.los.reduce((n,lo)=> n + (st[`${ch._index}-${lo._loIndex}`] ? 1:0), 0);
-      const pct = total ? Math.round(100*done/total) : 0;
-
-      const bar = h('div', {class:'bar'}, h('span',{style:`width:${pct}%;`}));
-      const row = h('div',{class:'progress'},
-        h('div',{}, h('strong',{}, ch.title || `Chapter ${ch._index}`), h('div',{class:'small'}, `${done}/${total} complete`)),
-        h('div',{style:'min-width:220px'}, bar)
-      );
-      els.main.append(row);
-
-      const ul = h('ul',{class:'lo-list'});
-      ch.los.forEach(lo=>{
-        const key = `${ch._index}-${lo._loIndex}`;
-        const checked = !!st[key];
-        ul.append(h('li',{},
-          h('input',{type:'checkbox', checked:checked?'':'', onchange:e=>{
-            const o = progress.get();
-            if(e.target.checked) o[key]=true; else delete o[key];
-            progress.set(o);
-            renderData(chapters); // refresh meters
-          }}),
-          h('div',{},
-            h('a',{href:`#/read/ch${ch._index}/lo${lo._loIndex}`}, formatLoLabel(lo)),
-            h('div',{class:'small'}, lo.preview || '')
-          )
-        ));
-      });
-      els.main.append(ul);
-    });
-
-    els.main.append(
-      h('div',{style:'margin-top:16px;display:flex;gap:8px'},
-        h('button',{class:'tab',onclick:()=>{progress.clear();renderData(chapters)}},'Clear progress (local)')
-      )
-    );
-  }
-
-  // ---------- EVENTS ----------
-  function renderEvents(){
-    els.left.innerHTML = h('div',{class:'muted'},'Chapters hidden in this view.').outerHTML;
-    els.main.innerHTML = '';
-    els.main.append(h('h1',{},'Events'));
-
-    const arr = Array.isArray(S.site?.events) ? S.site.events : [];
-    if(arr.length===0){
-      els.main.append(h('div',{class:'muted'},'No upcoming events.'));
-      return;
+    // ---- simple router ----
+    function setTab(view){
+      tabsEl.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-current', String(b.dataset.view===view)));
+      if (view==='read')      renderRead();
+      else if (view==='data') renderData();
+      else if (view==='events') renderEvents();
+      else if (view==='profile') renderProfile();
+      else if (view==='transparency') renderTransparency();
+      history.replaceState(null,'',location.pathname + location.search + (view==='read' ? location.hash : ''));
     }
 
-    arr.forEach(ev=>{
-      const when = (ev.date||'') + (ev.time?` • ${ev.time}`:'');
-      els.main.append(
-        h('div',{class:'event'},
-          h('h4',{}, ev.title || 'Event'),
-          h('div',{class:'small'}, when, ev.tz?` ${ev.tz}`:'', ev.mode?` • ${ev.mode}`:''),
-          ev.ctaUrl ? h('div',{style:'margin-top:8px'},
-            h('a',{href:ev.ctaUrl,target:'_blank',rel:'noopener',class:'tab'}, ev.ctaLabel||'Learn more')
-          ) : null
-        )
-      );
-    });
-  }
-
-  // ---------- PROFILE ----------
-  function renderProfile(){
-    els.left.innerHTML = h('div',{class:'muted'},'Chapters hidden in this view.').outerHTML;
-    els.main.innerHTML = '';
-    els.main.append(h('h1',{},'Profile'));
-
-    const p = S.site?.profile || {};
-    els.main.append(
-      h('div',{class:'event'},
-        h('h4',{}, p.name || '—'),
-        h('div',{class:'small'}, p.subtitle || ''),
-        p.siteUrl ? h('div',{style:'margin-top:6px'}, h('a',{href:p.siteUrl,target:'_blank',rel:'noopener'}, p.site||p.siteUrl)) : null,
-        p.office ? h('div',{style:'margin-top:6px'}, 'Office: ', p.office) : null,
-        p.email ? h('div',{style:'margin-top:6px'}, 'Contact: ', h('a',{href:`mailto:${p.email}`}, p.email)) : null
-      )
-    );
-  }
-
-  // ---------- TRANSPARENCY ----------
-  function renderTransparency(){
-    els.left.innerHTML = h('div',{class:'muted'},'Chapters hidden in this view.').outerHTML;
-    els.main.innerHTML = '';
-    els.main.append(h('h1',{},'Transparency'));
-
-    els.main.append(
-      h('div',{class:'sr'},
-        h('div',{}, 'This is a static site delivered via Cloudflare Pages. Access control (PIN) is enforced by Cloudflare Access at the domain level.'),
-        h('ul',{},
-          h('li',{}, 'We store your “My Data” completion locally in your browser (LocalStorage).'),
-          h('li',{}, 'No personal data leaves your device unless you click outbound links.'),
-          h('li',{}, 'Caching: assets cached aggressively; JSON is fetched with no-store for freshness.')
-        )
-      )
-    );
-  }
-
-  // ---------- SEARCH ----------
-  function searchAll(query, chapters){
-    const q = (query||'').toLowerCase().trim();
-    if(!q) return [];
-
-    const results = [];
-    // LO titles, previews
-    chapters.forEach(ch=>{
-      ch.los.forEach(lo=>{
-        const t = (lo.title||'').toLowerCase();
-        const p = (lo.preview||'').toLowerCase();
-        if(t.includes(q) || p.includes(q)){
-          results.push({
-            type:'LO',
-            title: lo.title || 'Untitled',
-            snippet: lo.preview || '',
-            href: `#/read/ch${ch._index}/lo${lo._loIndex}`
-          });
-        }
-      });
+    tabsEl.addEventListener('click', e=>{
+      const btn = e.target.closest('.tab'); if(!btn) return;
+      setTab(btn.dataset.view);
     });
 
-    // RAG chunks (optional)
-    (S.chunks||[]).forEach(c=>{
-      const text = (c.text||'').toLowerCase();
-      if(text.includes(q)){
-        // You can store mapping in chunks to ch/lo; if not present, link to read root
-        const href = (c.ch && c.lo) ? `#/read/ch${c.ch}/lo${c.lo}` : '#/read';
-        results.push({
-          type:'Snippet',
-          title: c.title || 'Snippet',
-          snippet: c.text.slice(0,160)+'…',
-          href
-        });
+    // ---- nav + main (READ) ----
+    function loLabel(lo){
+      const t = (lo.title||'').trim();
+      const m = t.match(/(\d+\.\d+)/);
+      if(m){
+        const rest = t.replace(m[0],'').replace(/^[-—:\s]+/,'').trim();
+        return `${m[0]} — ${rest||''}`.trim();
       }
+      return t||'Untitled';
+    }
+
+    function renderNav(chapters){
+      navEl.innerHTML = '';
+      const ul = document.createElement('ul');
+      chapters.forEach((ch,chIdx)=>{
+        const h3 = document.createElement('h3');
+        h3.textContent = ch.title || `Chapter ${chIdx+1}`;
+        ul.appendChild(h3);
+        (ch.los||[]).forEach((lo,loIdx)=>{
+          const btn = document.createElement('button');
+          btn.className = 'lo';
+          btn.textContent = loLabel(lo) + (ch.locked ? ' 🔒' : '');
+          if (ch.locked) btn.classList.add('lock');
+          btn.onclick = ()=>{
+            if (ch.locked) {
+              mainEl.innerHTML = `<h1>${ch.title}</h1><div class="callout">This chapter is available in the full version.</div>`;
+              setActive(btn);
+              return;
+            }
+            renderLo(ch, lo);
+            location.hash = `#ch${chIdx+1}-lo${loIdx+1}`;
+            setActive(btn);
+          };
+          ul.appendChild(document.createElement('li')).appendChild(btn);
+        });
+      });
+      navEl.appendChild(ul);
+    }
+
+    function setActive(btn){
+      navEl.querySelectorAll('button[aria-current="true"]').forEach(b=>b.setAttribute('aria-current','false'));
+      btn?.setAttribute('aria-current','true');
+      btn?.scrollIntoView({block:'nearest'});
+    }
+
+    function renderLo(ch, lo){
+      mainEl.innerHTML = '';
+      const h1 = document.createElement('h1');
+      h1.textContent = `${ch.title} — ${lo.title}`;
+      const p = document.createElement('p'); p.className='lead';
+      p.textContent = lo.preview || 'Learning objective.';
+      mainEl.append(h1,p);
+
+      // Snippets (title, body, quote, list, image)
+      (lo.snippets||[]).forEach(s=>{
+        if (s.title) mainEl.appendChild(Object.assign(document.createElement('h2'),{textContent:s.title}));
+        if (s.body)  mainEl.appendChild(Object.assign(document.createElement('p'),{textContent:s.body}));
+        if (s.quote) {
+          const bq = document.createElement('blockquote');
+          bq.textContent = s.quote;
+          mainEl.appendChild(bq);
+        }
+        if (Array.isArray(s.bullets) && s.bullets.length){
+          const ul = document.createElement('ul');
+          s.bullets.forEach(t=>ul.appendChild(Object.assign(document.createElement('li'),{textContent:t})));
+          mainEl.appendChild(ul);
+        }
+        if (s.image && s.image.src){
+          const fig = document.createElement('figure');
+          const img = Object.assign(document.createElement('img'), {src:s.image.src, alt:s.image.alt||'', style:'max-width:100%;border-radius:8px'});
+          fig.appendChild(img);
+          if (s.image.caption) fig.appendChild(Object.assign(document.createElement('figcaption'),{textContent:s.image.caption}));
+          mainEl.appendChild(fig);
+        }
+      });
+    }
+
+    function openFromHash(){
+      const m = location.hash.match(/^#ch(\d+)-lo(\d+)$/);
+      const chIndex = m ? (+m[1]-1) : 0;
+      const loIndex = m ? (+m[2]-1) : 0;
+      const chapters = SITE.chapters || [];
+      const ch = chapters[chIndex];
+      const lo = ch?.los?.[loIndex];
+      if (ch && lo){
+        renderLo(ch, lo);
+        const btns = [...navEl.querySelectorAll('button.lo')];
+        // compute flat index to mark active
+        let flat=0,target=0;
+        chapters.forEach((c,ci)=> (c.los||[]).forEach((l,li)=>{ if (ci===chIndex && li===loIndex) target=flat; flat++; }));
+        setActive(btns[target]);
+        return true;
+      }
+      return false;
+    }
+
+    function renderRead(){
+      renderNav(SITE.chapters||[]);
+      if (!openFromHash()){
+        // pick the first non-locked LO
+        const chIndex = (SITE.chapters||[]).findIndex(c=>!c.locked && (c.los||[]).length);
+        if (chIndex>=0){
+          location.hash = `#ch${chIndex+1}-lo1`;
+          openFromHash();
+        } else {
+          mainEl.innerHTML = `<h1>${SITE.book?.title||'Book'}</h1><div class="callout">No readable chapters in this preview.</div>`;
+        }
+      }
+    }
+
+    // ---- other tabs (lightweight stubs) ----
+    function renderData(){
+      navEl.innerHTML = `<div class="empty">Navigation hidden on this view.</div>`;
+      mainEl.innerHTML = `
+        <h1>My Data</h1>
+        <div class="callout">This is a placeholder panel for progress, saved snippets, and downloads.</div>
+        <div class="hr"></div>
+        <p class="muted">Coming soon: CSV/PDF export, saved reading position, and private notes.</p>`;
+    }
+
+    function renderEvents(){
+      navEl.innerHTML = `<div class="empty">Navigation hidden on this view.</div>`;
+      mainEl.innerHTML = `
+        <h1>Events</h1>
+        <div class="callout">Upcoming sessions will appear here.</div>
+        <ul>
+          <li>Online — Platform Walkthrough (Preview), Nov 3, 2025 · 4–5pm PT</li>
+          <li>Advisor CE — Advice Only in Practice (Online), Oct 1, 2025 · 4–5pm PT</li>
+          <li>Advisor CE — In Person (San Mateo), Oct 1, 2025 · 4–5pm PT</li>
+        </ul>`;
+    }
+
+    function renderProfile(){
+      navEl.innerHTML = `<div class="empty">Navigation hidden on this view.</div>`;
+      mainEl.innerHTML = `
+        <h1>Profile</h1>
+        <div class="callout">Sign-in and profile integrations can live here (Cloudflare Access + email fallback).</div>
+        <p class="muted">For preview, this is static content.</p>`;
+    }
+
+    function renderTransparency(){
+      navEl.innerHTML = `<div class="empty">Navigation hidden on this view.</div>`;
+      mainEl.innerHTML = `
+        <h1>Transparency</h1>
+        <ul>
+          <li>Privacy & Data Use</li>
+          <li>Content updates & change log</li>
+          <li>Accessibility notes</li>
+        </ul>`;
+    }
+
+    // ---- search (simple: scans titles + snippet bodies) ----
+    searchForm.addEventListener('submit', e=>{
+      e.preventDefault();
+      const q = (searchInput.value||'').trim().toLowerCase();
+      if (!q) return;
+      const hits = [];
+      (SITE.chapters||[]).forEach((ch,ci)=>{
+        (ch.los||[]).forEach((lo,li)=>{
+          const hay = [
+            lo.title||'',
+            lo.preview||'',
+            ...(lo.snippets||[]).flatMap(s=>[s.title||'',s.body||'',s.quote||''])
+          ].join('\n').toLowerCase();
+          if (hay.includes(q)) hits.push({ch,lo,ci,li});
+        });
+      });
+      navEl.innerHTML = `<div class="empty">${hits.length} result(s) for “${q}”</div>`;
+      mainEl.innerHTML = `<h1>Search</h1>`;
+      if (!hits.length){
+        mainEl.innerHTML += `<div class="callout">No matches. Try different keywords.</div>`;
+        return;
+      }
+      const ul = document.createElement('ul');
+      hits.slice(0,50).forEach(h=>{
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = `#ch${h.ci+1}-lo${h.li+1}`;
+        a.textContent = `${h.ch.title} — ${h.lo.title}`;
+        a.onclick = (ev)=>{
+          ev.preventDefault();
+          setTab('read');
+          location.hash = `#ch${h.ci+1}-lo${h.li+1}`;
+          openFromHash();
+        };
+        li.appendChild(a);
+        ul.appendChild(li);
+      });
+      mainEl.appendChild(ul);
     });
 
-    return results.slice(0,50);
+    // ---- init ----
+    setTab('read');
+    window.addEventListener('hashchange', ()=>{ if (tabsEl.querySelector('.tab[aria-current="true"]').dataset.view==='read') openFromHash(); });
+  })();
+  </script>
+
+  <!-- Inline JSON bundle (edit/replace with your generator output) -->
+  <script id="SITE_DATA" type="application/json">
+  {
+    "book": { "title": "Advice Only™ Methodology (Preview)" },
+    "chapters": [
+      {
+        "title": "My Perfect Plan",
+        "los": [
+          {
+            "title": "1.1 — What's The Perfect Plan?",
+            "preview": "The individual holds the power to define what is the 'perfect' financial plan.",
+            "snippets": [
+              {
+                "title": "Body",
+                "body": "A rational, repeatable process helps maintain focus and control with realistic assumptions."
+              },
+              {
+                "quote": "The Perfect Plan tends to be sustainable, repeatable, and client-led."
+              },
+              {
+                "title": "In practice",
+                "bullets": [
+                  "Clarify objectives before tools.",
+                  "Document assumptions in plain language.",
+                  "Iterate as life changes."
+                ]
+              }
+            ]
+          },
+          {
+            "title": "1.2 — Why Be Rational?",
+            "preview": "Objectivity reduces friction and increases confidence in decisions.",
+            "snippets": [
+              {
+                "title": "Why seek the objective truth?",
+                "body": "We define objectivity as a process guided by knowledge to reach independent conclusions."
+              },
+              {
+                "title": "How can I prioritize my lifestyle?",
+                "body": "Use structured exercises to rank what matters and make tradeoffs explicit."
+              }
+            ]
+          },
+          {
+            "title": "1.3 — Me, Myself and I",
+            "preview": "Planning is about you—the individual—first.",
+            "snippets": [
+              { "body": "Your values inform constraints and choices; the plan reflects that, not the other way around." }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Expenses",
+        "los": [
+          {
+            "title": "2.1 — Being Real",
+            "preview": "Ground the plan in transparent, realistic cash needs.",
+            "snippets": [
+              { "body": "Start with fixed, then flex. Identify seasonal spikes. Separate needs vs. wants." }
+            ]
+          },
+          {
+            "title": "2.2 — My Expenses",
+            "preview": "A simple categorization model keeps the process durable.",
+            "snippets": [
+              { "bullets": ["Housing & utilities","Food & health","Transport","Savings & giving","Fun & misc."] }
+            ]
+          },
+          {
+            "title": "2.3 — Understanding Inflation",
+            "preview": "Inflation is uneven; tag categories with different long-run assumptions.",
+            "snippets": [
+              { "body": "Differentiate essentials from discretionary for stress testing." }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Cash Flow & Net Worth",
+        "locked": true,
+        "los": [
+          {
+            "title": "3.1 — Key Planning Documents",
+            "preview": "Available in the full version.",
+            "snippets": []
+          },
+          {
+            "title": "3.2 — Learning Objective: Positive Cash Flow",
+            "preview": "Available in the full version.",
+            "snippets": []
+          },
+          {
+            "title": "3.3 — Compounding Interest",
+            "preview": "Available in the full version.",
+            "snippets": []
+          }
+        ]
+      }
+    ]
   }
+  </script>
 
-  function renderSearch(chapters){
-    els.left.innerHTML = h('div',{class:'muted'},'Chapters hidden in this view.').outerHTML;
-    els.main.innerHTML = '';
-    els.main.append(h('h1',{}, 'Search'));
-    els.main.append(h('div',{class:'muted'}, `Results for “${S.q}”`));
+  <!-- Optional: Debug overlay for quick diagnostics -->
+  <script>
+  (() => {
+    if (window.__SITE_DEBUG_INIT__) return;
+    window.__SITE_DEBUG_INIT__ = true;
+    const box = document.createElement('div');
+    box.style.cssText='position:fixed;left:20px;top:20px;z-index:99999;max-width:680px;min-width:360px;background:#0e141c;color:#e8eef3;border:1px solid #374458;border-radius:12px;box-shadow:0 12px 28px rgba(0,0,0,.45);display:none';
+    box.innerHTML = `
+      <div style="display:flex;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px solid #263140">
+        <div style="font-weight:700">Inline JSON debug</div>
+        <span id="sd_badge" style="margin-left:auto;padding:2px 8px;border-radius:999px;background:#2a3a4d;color:#cfe0ee">ok</span>
+        <button id="sd_close" style="all:unset;cursor:pointer;color:#9fb3c6">✕</button>
+      </div>
+      <pre id="sd_detail" style="white-space:pre-wrap;margin:0;padding:12px;max-height:48vh;overflow:auto"></pre>
+      <div style="display:flex;gap:8px;padding:10px 12px;border-top:1px solid #263140">
+        <button id="sd_copy" style="all:unset;cursor:pointer;background:#1a2430;color:#cfe0ee;border:1px solid #2b3b4f;border-radius:8px;padding:6px 10px">Copy</button>
+        <button id="sd_hide" style="all:unset;cursor:pointer;background:#1a2430;color:#cfe0ee;border:1px solid #2b3b4f;border-radius:8px;padding:6px 10px">Hide</button>
+      </div>`;
+    document.body.appendChild(box);
+    const badge = box.querySelector('#sd_badge');
+    const detail = box.querySelector('#sd_detail');
+    box.querySelector('#sd_close').onclick = ()=>box.remove();
+    box.querySelector('#sd_hide').onclick = ()=>box.style.display='none';
+    box.querySelector('#sd_copy').onclick = async ()=>{ try{ await navigator.clipboard.writeText(detail.textContent); badge.textContent='copied'; } catch{ badge.textContent='copy failed'; } setTimeout(()=>badge.textContent='ok',800); };
 
-    const hits = searchAll(S.q, chapters);
-    if(hits.length===0){
-      els.main.append(h('div',{style:'margin-top:12px'}, 'No matches.'));
-      return;
+    try{
+      const raw = document.getElementById('SITE_DATA')?.textContent ?? '';
+      const json = JSON.parse(raw);
+      window.__SITE_DEBUG__ = { inlineBytes: raw.length, chapters: (json.chapters||[]).length, book: json.book?.title || '(no title)' };
+      detail.textContent = `inline bytes: ${raw.length}\nbook: ${window.__SITE_DEBUG__.book}\nchapters: ${window.__SITE_DEBUG__.chapters}\n\nTip: replace the JSON block with your full export when ready.`;
+    }catch(e){
+      badge.textContent='error'; badge.style.background='#3b2930'; badge.style.color='#f7c0c7';
+      detail.textContent = 'Inline JSON parse error: ' + e.message;
     }
+    // Show briefly then hide; reopen in console: document.querySelectorAll('[id^=sd_]').length && (document.body.lastChild.style.display='block')
+    box.style.display='block'; setTimeout(()=>box.style.display='none', 4000);
+  })();
+  </script>
 
-    hits.forEach(r=>{
-      els.main.append(
-        h('div',{class:'sr'},
-          h('div',{}, h('a',{href:r.href}, r.title)),
-          r.snippet ? h('div',{class:'small',style:'margin-top:6px'}, r.snippet) : null,
-          h('div',{class:'path'}, r.type)
-        )
-      );
-    });
-  }
-
-  // ---------- router ----------
-  function setActiveTab(tab){
-    els.tabs.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-current','false'));
-    const btn = els.tabs.querySelector(`.tab[data-tab="${tab}"]`);
-    if(btn) btn.setAttribute('aria-current','true');
-  }
-
-  function go(hash){ location.hash = hash }
-
-  function parseHash(){
-    const h = location.hash || '#/read';
-    // Patterns:
-    // #/read
-    // #/read/ch1/lo2
-    // #/data
-    // #/events
-    // #/profile
-    // #/transparency
-    // #/search?q=...
-    const mRead = h.match(/^#\/read(?:\/ch(\d+)\/lo(\d+))?/);
-    const mQ = h.match(/^#\/search\??.*q=([^&]+)/);
-
-    if(mRead){
-      S.view = 'read';
-      S.ch = mRead[1] ? +mRead[1] : 1;
-      S.lo = mRead[2] ? +mRead[2] : 1;
-      return;
-    }
-    if(h.startsWith('#/data')) { S.view='data'; return }
-    if(h.startsWith('#/events')) { S.view='events'; return }
-    if(h.startsWith('#/profile')) { S.view='profile'; return }
-    if(h.startsWith('#/transparency')) { S.view='transparency'; return }
-    if(h.startsWith('#/search')){
-      S.view='search';
-      S.q = mQ ? decodeURIComponent(mQ[1]) : '';
-      return;
-    }
-    S.view='read';
-  }
-
-  function updateUI(){
-    const chapters = enumerateChapters(S.site||{});
-    setActiveTab(S.view);
-
-    // show/hide left column
-    if(S.view==='read'){
-      document.querySelector('.wrap').style.gridTemplateColumns = '300px 1fr 340px';
-      renderReadNav(chapters);
-      renderReadMain(chapters);
-    } else {
-      document.querySelector('.wrap').style.gridTemplateColumns = '1fr 1fr';
-      els.left.innerHTML = '';
-      if(S.view==='data') renderData(chapters);
-      if(S.view==='events') renderEvents();
-      if(S.view==='profile') renderProfile();
-      if(S.view==='transparency') renderTransparency();
-      if(S.view==='search') renderSearch(chapters);
-    }
-
-    renderAlerts();
-  }
-
-  // ---------- wire up ----------
-  els.tabs.addEventListener('click', (e)=>{
-    const b = e.target.closest('.tab'); if(!b) return;
-    const tab = b.getAttribute('data-tab');
-    if(tab==='read') go('#/read'); else go(`#/${tab}`);
-  });
-
-  els.searchForm.addEventListener('submit', (e)=>{
-    e.preventDefault();
-    const q = (els.searchInput.value||'').trim();
-    if(q) go(`#/search?q=${encodeURIComponent(q)}`);
-  });
-
-  window.addEventListener('hashchange', ()=>{ parseHash(); updateUI() });
-
-  // init
-  try {
-    await loadSite();
-    await loadChunks();
-  } catch (e) {
-    els.left.innerHTML = '';
-    els.left.append(h('div',{class:'muted'}, 'Could not load site data. ', String(e)));
-  }
-  parseHash(); updateUI();
-})();
-</script>
 </body>
 </html>
