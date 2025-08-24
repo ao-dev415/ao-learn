@@ -1,4 +1,37 @@
 {
+  "profile": {
+    "name": "Quincy Hall, CFP®",
+    "subtitle": "Objective retirement planning",
+    "site": "adviceonly.info",
+    "siteUrl": "https://adviceonly.info",
+    "office": "Corte Madera, CA",
+    "email": "hello@adviceonly.org"
+  },
+
+  "events": [
+    {
+      "title": "Online — Platform Walkthrough (Preview)",
+      "date": "2025-11-03",
+      "time": "16:00",
+      "tz": "America/Los_Angeles",
+      "mode": "Online",
+      "ctaLabel": "Register",
+      "ctaUrl": "https://example.com/register-walkthrough"
+    },
+    {
+      "title": "Advisor CE — Advice Only in Practice (Online)",
+      "date": "2025-10-01",
+      "time": "16:00",
+      "tz": "America/Los_Angeles",
+      "mode": "Online",
+      "ctaLabel": "Register",
+      "ctaUrl": "https://example.com/register-ce-online"
+    }
+  ],
+
+  "alerts": [
+    "“Site accessibility tutorial” lives here for now. Later: notifications for subscribed users."
+  ]
   "book": "Advice Only™ Methodology (2024)",
   "chapters": [
     {
