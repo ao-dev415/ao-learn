@@ -1,126 +1,540 @@
-<!-- ===== DEBUG OVERLAY FOR site.json / full/site.json ===== -->
-<script>
-(() => {
-  if (window.__SITE_DEBUG_INIT__) return; // guard against duplicates
-  window.__SITE_DEBUG_INIT__ = true;
-
-  // --- tiny overlay UI ---
-  function makeOverlay() {
-    const box = document.createElement('div');
-    box.id = '__site_debug_overlay__';
-    box.style.cssText = [
-      'position:fixed','left:20px','top:20px','z-index:999999',
-      'max-width:680px','min-width:360px',
-      'background:#0e141c','color:#e8eef3',
-      'border:1px solid #374458','border-radius:12px',
-      'box-shadow:0 12px 28px rgba(0,0,0,.45)',
-      'font:13px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif'
-    ].join(';');
-    box.innerHTML = `
-      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #263140">
-        <div id="__sd_title" style="font-weight:700">site.json debug</div>
-        <div id="__sd_status" style="margin-left:auto;padding:2px 8px;border-radius:999px;background:#2a3a4d;color:#cfe0ee">checking…</div>
-        <button id="__sd_close" title="Close" style="all:unset;cursor:pointer;color:#9fb3c6">✕</button>
-      </div>
-      <pre id="__sd_detail" style="margin:0;padding:12px;white-space:pre-wrap;max-height:48vh;overflow:auto"></pre>
-      <div style="display:flex;gap:8px;padding:10px 12px;border-top:1px solid #263140">
-        <button id="__sd_copy" style="all:unset;cursor:pointer;background:#1a2430;color:#cfe0ee;border:1px solid #2b3b4f;border-radius:8px;padding:6px 10px">Copy detail</button>
-        <button id="__sd_hide" style="all:unset;cursor:pointer;background:#1a2430;color:#cfe0ee;border:1px solid #2b3b4f;border-radius:8px;padding:6px 10px">Hide</button>
-      </div>
-    `;
-    document.body.appendChild(box);
-    const title  = box.querySelector('#__sd_title');
-    const status = box.querySelector('#__sd_status');
-    const detail = box.querySelector('#__sd_detail');
-    box.querySelector('#__sd_close').onclick = () => box.remove();
-    box.querySelector('#__sd_hide').onclick  = () => box.style.display = 'none';
-    box.querySelector('#__sd_copy').onclick  = async () => {
-      try { await navigator.clipboard.writeText(detail.textContent); status.textContent = 'copied'; }
-      catch { status.textContent = 'copy failed'; }
-      setTimeout(()=>status.textContent='ok', 900);
-    };
-    return { box, title, status, detail };
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Advice Only™ Bookstore</title>
+<meta name="robots" content="noindex,nofollow"/>
+<style>
+  :root{
+    --bg:#0b0d10;--panel:#12151a;--muted:#8ea1b2;--fg:#e8eef3;--brand:#00d0b6;
+    --border:#1e242c;--hover:#171c24;--accent:#0e2723;--accentOutline:#11433b
   }
-  const ui = makeOverlay();
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,"Helvetica Neue",Arial,sans-serif}
 
-  const pickUrl = () => {
-    try {
-      const u = new URL(location.href);
-      return u.searchParams.get('full') === '1' ? '/full/site.json' : '/site.json';
-    } catch { return '/site.json'; }
+  a{color:var(--brand);text-decoration:none}
+  .kbd{font:12px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#0d1117;padding:1px 6px;border-radius:6px;border:1px solid #222a33;color:#a3b4c5}
+  .muted{color:var(--muted)}
+
+  /* App bar */
+  .appbar{
+    display:flex;align-items:center;gap:12px;
+    padding:10px 12px;border-bottom:1px solid var(--border);background:rgba(0,0,0,.3);
+    position:sticky;top:0;z-index:100
+  }
+  .brand{display:flex;align-items:center;gap:8px;font-weight:600}
+  .tabs{display:flex;gap:8px;margin-left:12px}
+  .tab{padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:transparent;cursor:pointer;color:var(--fg)}
+  .tab[aria-current="true"]{background:var(--accent);outline:1px solid var(--accentOutline)}
+  .spacer{flex:1}
+  .search{
+    display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:10px;padding:4px 8px;background:#0f1318;width:360px;
+  }
+  .search input{
+    flex:1;background:transparent;border:0;color:var(--fg);outline:none
+  }
+  .btn{cursor:pointer}
+
+  /* Layout */
+  .wrap{
+    display:grid;grid-template-columns:300px 1fr 340px;gap:16px;min-height:calc(100vh - 56px);
+    padding:16px
+  }
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:10px}
+  .left{padding:12px;overflow:auto;max-height:calc(100vh - 88px)}
+  .main{padding:16px;overflow:auto}
+  .rail{padding:12px}
+  .rail h4{margin:0 0 8px;color:#bcd0e0;font-weight:600}
+  .alert{border:1px solid var(--border);padding:12px;border-radius:10px;color:#c7d7e6}
+
+  /* Chapter nav (Read) */
+  .nav h3{margin:16px 8px 6px;color:#bcd0e0;font-weight:600;font-size:13px}
+  .nav ul{list-style:none;margin:0;padding:0}
+  .nav li{margin:0}
+  .nav button{display:block;width:100%;text-align:left;background:transparent;border:0;color:var(--fg);padding:8px 10px;border-radius:8px;cursor:pointer}
+  .nav button:hover{background:var(--hover)}
+  .nav .lo{padding-left:18px;color:#cfe0ee}
+  .nav button[aria-current="true"]{background:var(--accent);outline:1px solid var(--accentOutline)}
+
+  /* Type */
+  .main h1{margin:0 0 14px;font-size:22px}
+  .main h2{margin:20px 0 8px;font-size:16px}
+
+  /* My Data */
+  .progress{display:grid;grid-template-columns:1fr auto;align-items:center;padding:8px 10px;border:1px solid var(--border);border-radius:8px;margin:8px 0}
+  .bar{height:6px;background:#10161f;border:1px solid var(--border);border-radius:999px;overflow:hidden}
+  .bar>span{display:block;height:100%;background:var(--brand);width:0%}
+  .lo-list{list-style:none;margin:8px 0 0;padding:0}
+  .lo-list li{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-top:1px dashed #223}
+  .lo-list li:first-child{border-top:0}
+  .small{font-size:12px;color:#9fb2c2}
+
+  /* Events */
+  .event{border:1px solid var(--border);border-radius:8px;padding:12px;margin:10px 0}
+  .event h4{margin:0 0 6px}
+
+  /* Search results */
+  .sr{border:1px solid var(--border);border-radius:8px;padding:10px;margin:8px 0}
+  .sr .path{font-size:12px;color:#9fb2c2;margin-top:4px}
+
+  @media (max-width:1200px){
+    .wrap{grid-template-columns:1fr;grid-auto-rows:auto}
+    .left{order:1}
+    .main{order:2}
+    .rail{order:3}
+  }
+</style>
+</head>
+<body>
+  <header class="appbar">
+    <div class="brand">💧 <span>Advice Only™ Bookstore</span></div>
+    <nav class="tabs" id="tabs">
+      <button class="tab" data-tab="read">Read</button>
+      <button class="tab" data-tab="data">My Data</button>
+      <button class="tab" data-tab="events">Events</button>
+      <button class="tab" data-tab="profile">Profile</button>
+      <button class="tab" data-tab="transparency">Transparency</button>
+    </nav>
+    <div class="spacer"></div>
+    <form class="search" id="searchForm">
+      <input id="searchInput" placeholder="Search snippets, topics…" aria-label="Search"/>
+      <button type="submit" class="btn">Search</button>
+    </form>
+  </header>
+
+  <div class="wrap">
+    <aside class="card left nav" id="left"><div class="muted">Loading…</div></aside>
+
+    <main class="card main" id="main">
+      <h1>Welcome</h1>
+      <p>Select a learning objective from the left.</p>
+      <div class="muted">If blank, check <span class="kbd">site.json</span> in Network, then hard-reload.</div>
+    </main>
+
+    <aside class="card rail" id="rail">
+      <h4>Alerts</h4>
+      <div id="alerts" class="alert">Loading…</div>
+    </aside>
+  </div>
+
+<script>
+(async () => {
+  // ---------- state ----------
+  const S = {
+    site: null,
+    chunks: [],
+    view: 'read', // read | data | events | profile | transparency | search
+    ch: 1, lo: 1, // 1-based indices for read mode
+    q: ''
   };
 
-  const prettyHeaders = res =>
-    [...res.headers.entries()].map(([k,v]) => `${k}: ${v}`).join('\n');
+  const els = {
+    tabs: document.getElementById('tabs'),
+    left: document.getElementById('left'),
+    main: document.getElementById('main'),
+    rail: document.getElementById('rail'),
+    alerts: document.getElementById('alerts'),
+    searchForm: document.getElementById('searchForm'),
+    searchInput: document.getElementById('searchInput')
+  };
 
-  function show(title, badge, body, ok=false) {
-    ui.title.textContent  = title;
-    ui.status.textContent = badge;
-    ui.status.style.background = ok ? '#123f2c' : '#3b2930';
-    ui.status.style.color      = ok ? '#a8f0c7' : '#f7c0c7';
-    ui.detail.textContent = body;
-    ui.box.style.display  = 'block';
+  // ---------- helpers ----------
+  const h = (t,a={},...c)=>{const e=document.createElement(t);for(const[k,v]of Object.entries(a)){if(k==='class')e.className=v;else if(k==='html')e.innerHTML=v;else if(k.startsWith('on')&&typeof v==='function')e.addEventListener(k.slice(2),v);else e.setAttribute(k,v)}for(const x of c){if(x!=null)e.appendChild(typeof x==='string'?document.createTextNode(x):x)}return e};
+
+  function slug(str){ return (str||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') }
+
+  // persist progress
+  const LS_KEY = 'ao:progress';
+  const progress = {
+    get(){ try { return JSON.parse(localStorage.getItem(LS_KEY)||'{}') } catch { return {} } },
+    set(obj){ localStorage.setItem(LS_KEY, JSON.stringify(obj)) },
+    clear(){ localStorage.removeItem(LS_KEY) }
+  };
+
+  // ---------- data load ----------
+  async function loadSite(){
+    // Prefer /site.json; you can switch to /full/site.json behind Access
+    const res = await fetch('/site.json', {cache:'no-store', credentials:'same-origin'});
+    if(!res.ok) throw new Error('site.json '+res.status);
+    S.site = await res.json();
   }
 
-  (async () => {
-    const url = pickUrl();
-    ui.title.textContent = `site.json debug — ${url}`;
+  async function loadChunks(){
+    try{
+      const r = await fetch('/static/rag/chunks.json', {cache:'no-store'}); 
+      if(r.ok) S.chunks = await r.json();
+    }catch{}
+  }
 
-    let res, text = '';
-    try {
-      res = await fetch(url, {
-        credentials: 'same-origin',
-        cache: 'no-store',
-        headers: { 'Accept': 'application/json' }
+  // ---------- chapter/LO helpers ----------
+  function enumerateChapters(site){
+    // Builds normalized structure with indices and ids
+    const out = [];
+    (site.chapters||[]).forEach((ch, ci)=>{
+      const los = (ch.los||[]).map((lo, li)=>({
+        ...lo,
+        _chIndex: ci+1,
+        _loIndex: li+1,
+        _id: `ch${ci+1}-lo${li+1}`
+      }));
+      out.push({
+        ...ch,
+        _index: ci+1,
+        los
       });
-    } catch (e) {
-      show('Network error', 'error',
-           `URL: ${url}\n\n${String(e && e.message || e)}`);
+    });
+    return out;
+  }
+
+  // ---------- render: alerts ----------
+  function renderAlerts(){
+    const alerts = S.site?.alerts && S.site.alerts.length ? S.site.alerts : [
+      '“Site accessibility tutorial” lives here for now. Later: notifications for subscribed users.'
+    ];
+    els.alerts.innerHTML = '';
+    alerts.forEach(txt => els.alerts.append(h('div', {style:'margin:8px 0'}, txt)));
+  }
+
+  // ---------- READ ----------
+  function renderReadNav(chapters){
+    els.left.innerHTML = '';
+    chapters.forEach(ch=>{
+      els.left.append(h('h3', {}, ch.title || `Chapter ${ch._index}`));
+      const ul = h('ul');
+      ch.los.forEach(lo=>{
+        const btn = h('button', {
+          class:'lo',
+          'aria-current': (S.ch===lo._chIndex && S.lo===lo._loIndex) ? 'true':'false',
+          onclick: ()=>go(`#/read/ch${lo._chIndex}/lo${lo._loIndex}`)
+        }, formatLoLabel(lo));
+        ul.append(h('li', {}, btn));
+      });
+      els.left.append(ul);
+    });
+  }
+
+  function formatLoLabel(lo){
+    const t = (lo.title||'').trim();
+    const m = t.match(/(\d+\.\d+)/);
+    if(m){
+      const rest = t.replace(m[0],'').replace(/^[-—:\s]+/,'').trim();
+      return `${m[0]} — ${rest||''}`.trim();
+    }
+    return t || 'Untitled';
+  }
+
+  function renderReadMain(chapters){
+    const ch = chapters[S.ch-1];
+    const lo = ch?.los?.[S.lo-1];
+    els.main.innerHTML = '';
+    if(!ch||!lo){
+      els.main.append(
+        h('h1', {}, 'Welcome'),
+        h('p', {}, 'Select a learning objective from the left.'),
+        h('div',{class:'muted'}, 'If blank, check ', h('span',{class:'kbd'},'site.json'), ' in Network, then hard-reload.')
+      );
+      return;
+    }
+    els.main.append(
+      h('h1', {}, `${ch.title} — ${lo.title}`)
+    );
+    if(lo.preview) els.main.append(h('p', {class:'muted'}, lo.preview));
+
+    // Body from snippets
+    const snips = Array.isArray(lo.snippets) ? lo.snippets : [];
+    if(snips.length===0){
+      els.main.append(h('div',{class:'muted'},'No body yet. Importer can map first N paragraphs into snippets.'));
+    } else {
+      snips.forEach(s=>{
+        if(s.title) els.main.append(h('h2', {}, s.title));
+        if(s.body)  els.main.append(h('p', {}, s.body));
+        if(s.list && s.list.length){
+          const ul = h('ul');
+          s.list.forEach(li=>ul.append(h('li',{},li)));
+          els.main.append(ul);
+        }
+      });
+    }
+
+    // Completion toggle
+    const key = `${S.ch}-${S.lo}`;
+    const st = progress.get();
+    const checked = !!st[key];
+    const row = h('div', {style:'margin-top:18px;border-top:1px dashed #234;padding-top:10px;display:flex;gap:10px;align-items:center'},
+      h('input', {type:'checkbox', id:'doneBox', checked:checked?'':'', onchange: e=>{
+        const obj = progress.get();
+        if(e.target.checked) obj[key]=true; else delete obj[key];
+        progress.set(obj);
+        // optional toast
+      }}),
+      h('label', {for:'doneBox'}, 'Mark this LO complete'),
+      h('span',{class:'small'}, ' Stored locally in your browser')
+    );
+    els.main.append(row);
+  }
+
+  // ---------- MY DATA ----------
+  function renderData(chapters){
+    els.left.innerHTML = h('div',{class:'muted'},'Chapters hidden in this view.').outerHTML;
+    els.main.innerHTML = '';
+    els.main.append(h('h1', {}, 'My Data'));
+
+    const st = progress.get();
+
+    chapters.forEach(ch=>{
+      // compute chapter progress
+      const total = ch.los.length;
+      const done = ch.los.reduce((n,lo)=> n + (st[`${ch._index}-${lo._loIndex}`] ? 1:0), 0);
+      const pct = total ? Math.round(100*done/total) : 0;
+
+      const bar = h('div', {class:'bar'}, h('span',{style:`width:${pct}%;`}));
+      const row = h('div',{class:'progress'},
+        h('div',{}, h('strong',{}, ch.title || `Chapter ${ch._index}`), h('div',{class:'small'}, `${done}/${total} complete`)),
+        h('div',{style:'min-width:220px'}, bar)
+      );
+      els.main.append(row);
+
+      const ul = h('ul',{class:'lo-list'});
+      ch.los.forEach(lo=>{
+        const key = `${ch._index}-${lo._loIndex}`;
+        const checked = !!st[key];
+        ul.append(h('li',{},
+          h('input',{type:'checkbox', checked:checked?'':'', onchange:e=>{
+            const o = progress.get();
+            if(e.target.checked) o[key]=true; else delete o[key];
+            progress.set(o);
+            renderData(chapters); // refresh meters
+          }}),
+          h('div',{},
+            h('a',{href:`#/read/ch${ch._index}/lo${lo._loIndex}`}, formatLoLabel(lo)),
+            h('div',{class:'small'}, lo.preview || '')
+          )
+        ));
+      });
+      els.main.append(ul);
+    });
+
+    els.main.append(
+      h('div',{style:'margin-top:16px;display:flex;gap:8px'},
+        h('button',{class:'tab',onclick:()=>{progress.clear();renderData(chapters)}},'Clear progress (local)')
+      )
+    );
+  }
+
+  // ---------- EVENTS ----------
+  function renderEvents(){
+    els.left.innerHTML = h('div',{class:'muted'},'Chapters hidden in this view.').outerHTML;
+    els.main.innerHTML = '';
+    els.main.append(h('h1',{},'Events'));
+
+    const arr = Array.isArray(S.site?.events) ? S.site.events : [];
+    if(arr.length===0){
+      els.main.append(h('div',{class:'muted'},'No upcoming events.'));
       return;
     }
 
-    try { text = await res.text(); } catch {}
+    arr.forEach(ev=>{
+      const when = (ev.date||'') + (ev.time?` • ${ev.time}`:'');
+      els.main.append(
+        h('div',{class:'event'},
+          h('h4',{}, ev.title || 'Event'),
+          h('div',{class:'small'}, when, ev.tz?` ${ev.tz}`:'', ev.mode?` • ${ev.mode}`:''),
+          ev.ctaUrl ? h('div',{style:'margin-top:8px'},
+            h('a',{href:ev.ctaUrl,target:'_blank',rel:'noopener',class:'tab'}, ev.ctaLabel||'Learn more')
+          ) : null
+        )
+      );
+    });
+  }
 
-    if (!res.ok) {
-      show(`Fetch failed ${res.status} ${res.statusText}`, 'error',
-           `URL: ${res.url}\n\nHEADERS:\n${prettyHeaders(res)}\n\nBODY SAMPLE:\n${text.slice(0,1000)}`);
+  // ---------- PROFILE ----------
+  function renderProfile(){
+    els.left.innerHTML = h('div',{class:'muted'},'Chapters hidden in this view.').outerHTML;
+    els.main.innerHTML = '';
+    els.main.append(h('h1',{},'Profile'));
+
+    const p = S.site?.profile || {};
+    els.main.append(
+      h('div',{class:'event'},
+        h('h4',{}, p.name || '—'),
+        h('div',{class:'small'}, p.subtitle || ''),
+        p.siteUrl ? h('div',{style:'margin-top:6px'}, h('a',{href:p.siteUrl,target:'_blank',rel:'noopener'}, p.site||p.siteUrl)) : null,
+        p.office ? h('div',{style:'margin-top:6px'}, 'Office: ', p.office) : null,
+        p.email ? h('div',{style:'margin-top:6px'}, 'Contact: ', h('a',{href:`mailto:${p.email}`}, p.email)) : null
+      )
+    );
+  }
+
+  // ---------- TRANSPARENCY ----------
+  function renderTransparency(){
+    els.left.innerHTML = h('div',{class:'muted'},'Chapters hidden in this view.').outerHTML;
+    els.main.innerHTML = '';
+    els.main.append(h('h1',{},'Transparency'));
+
+    els.main.append(
+      h('div',{class:'sr'},
+        h('div',{}, 'This is a static site delivered via Cloudflare Pages. Access control (PIN) is enforced by Cloudflare Access at the domain level.'),
+        h('ul',{},
+          h('li',{}, 'We store your “My Data” completion locally in your browser (LocalStorage).'),
+          h('li',{}, 'No personal data leaves your device unless you click outbound links.'),
+          h('li',{}, 'Caching: assets cached aggressively; JSON is fetched with no-store for freshness.')
+        )
+      )
+    );
+  }
+
+  // ---------- SEARCH ----------
+  function searchAll(query, chapters){
+    const q = (query||'').toLowerCase().trim();
+    if(!q) return [];
+
+    const results = [];
+    // LO titles, previews
+    chapters.forEach(ch=>{
+      ch.los.forEach(lo=>{
+        const t = (lo.title||'').toLowerCase();
+        const p = (lo.preview||'').toLowerCase();
+        if(t.includes(q) || p.includes(q)){
+          results.push({
+            type:'LO',
+            title: lo.title || 'Untitled',
+            snippet: lo.preview || '',
+            href: `#/read/ch${ch._index}/lo${lo._loIndex}`
+          });
+        }
+      });
+    });
+
+    // RAG chunks (optional)
+    (S.chunks||[]).forEach(c=>{
+      const text = (c.text||'').toLowerCase();
+      if(text.includes(q)){
+        // You can store mapping in chunks to ch/lo; if not present, link to read root
+        const href = (c.ch && c.lo) ? `#/read/ch${c.ch}/lo${c.lo}` : '#/read';
+        results.push({
+          type:'Snippet',
+          title: c.title || 'Snippet',
+          snippet: c.text.slice(0,160)+'…',
+          href
+        });
+      }
+    });
+
+    return results.slice(0,50);
+  }
+
+  function renderSearch(chapters){
+    els.left.innerHTML = h('div',{class:'muted'},'Chapters hidden in this view.').outerHTML;
+    els.main.innerHTML = '';
+    els.main.append(h('h1',{}, 'Search'));
+    els.main.append(h('div',{class:'muted'}, `Results for “${S.q}”`));
+
+    const hits = searchAll(S.q, chapters);
+    if(hits.length===0){
+      els.main.append(h('div',{style:'margin-top:12px'}, 'No matches.'));
       return;
     }
 
-    const ct = (res.headers.get('content-type') || '').toLowerCase();
-    if (!ct.includes('application/json')) {
-      show('Non-JSON response', 'error',
-           `URL: ${res.url}\ncontent-type: ${ct || '(none)'}\n\nBODY SAMPLE:\n${text.slice(0,1000)}\n\nHINTS:\n• Ensure _redirects has explicit 200 rules for /site.json and /full/site.json.\n• Ensure _headers sets Content-Type: application/json and Cache-Control: no-store for those paths.`);
+    hits.forEach(r=>{
+      els.main.append(
+        h('div',{class:'sr'},
+          h('div',{}, h('a',{href:r.href}, r.title)),
+          r.snippet ? h('div',{class:'small',style:'margin-top:6px'}, r.snippet) : null,
+          h('div',{class:'path'}, r.type)
+        )
+      );
+    });
+  }
+
+  // ---------- router ----------
+  function setActiveTab(tab){
+    els.tabs.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-current','false'));
+    const btn = els.tabs.querySelector(`.tab[data-tab="${tab}"]`);
+    if(btn) btn.setAttribute('aria-current','true');
+  }
+
+  function go(hash){ location.hash = hash }
+
+  function parseHash(){
+    const h = location.hash || '#/read';
+    // Patterns:
+    // #/read
+    // #/read/ch1/lo2
+    // #/data
+    // #/events
+    // #/profile
+    // #/transparency
+    // #/search?q=...
+    const mRead = h.match(/^#\/read(?:\/ch(\d+)\/lo(\d+))?/);
+    const mQ = h.match(/^#\/search\??.*q=([^&]+)/);
+
+    if(mRead){
+      S.view = 'read';
+      S.ch = mRead[1] ? +mRead[1] : 1;
+      S.lo = mRead[2] ? +mRead[2] : 1;
       return;
     }
-
-    let json;
-    try { json = JSON.parse(text); }
-    catch (e) {
-      show('JSON parse error', 'error',
-           `${e.message}\n\nBODY SAMPLE:\n${text.slice(0,1000)}`);
+    if(h.startsWith('#/data')) { S.view='data'; return }
+    if(h.startsWith('#/events')) { S.view='events'; return }
+    if(h.startsWith('#/profile')) { S.view='profile'; return }
+    if(h.startsWith('#/transparency')) { S.view='transparency'; return }
+    if(h.startsWith('#/search')){
+      S.view='search';
+      S.q = mQ ? decodeURIComponent(mQ[1]) : '';
       return;
     }
+    S.view='read';
+  }
 
-    // expose in console for quick inspection
-    window.__SITE_DEBUG__ = {
-      url,
-      status: res.status,
-      headers: Object.fromEntries(res.headers.entries()),
-      textSample: text.slice(0,1000),
-      json
-    };
-    window.dispatchEvent(new CustomEvent('sitejson:debug', { detail: window.__SITE_DEBUG__ }));
+  function updateUI(){
+    const chapters = enumerateChapters(S.site||{});
+    setActiveTab(S.view);
 
-    const chapters = Array.isArray(json?.chapters) ? json.chapters.length : 0;
-    const bookName = (json?.book?.title || json?.book?.name || 'Book');
-    show('site.json OK', 'ok',
-         `URL: ${url}\nstatus: ${res.status}\ncontent-type: ${ct}\nbook: ${bookName}\nchapters: ${chapters}\n\nTip: add ?full=1 to the URL to force /full/site.json`, true);
+    // show/hide left column
+    if(S.view==='read'){
+      document.querySelector('.wrap').style.gridTemplateColumns = '300px 1fr 340px';
+      renderReadNav(chapters);
+      renderReadMain(chapters);
+    } else {
+      document.querySelector('.wrap').style.gridTemplateColumns = '1fr 1fr';
+      els.left.innerHTML = '';
+      if(S.view==='data') renderData(chapters);
+      if(S.view==='events') renderEvents();
+      if(S.view==='profile') renderProfile();
+      if(S.view==='transparency') renderTransparency();
+      if(S.view==='search') renderSearch(chapters);
+    }
 
-    // Auto-hide after a few seconds, leave it re-openable via console
-    setTimeout(() => { ui.box.style.display = 'none'; }, 6000);
-    // Reopen later: document.getElementById('__site_debug_overlay__').style.display='block'
-  })();
+    renderAlerts();
+  }
+
+  // ---------- wire up ----------
+  els.tabs.addEventListener('click', (e)=>{
+    const b = e.target.closest('.tab'); if(!b) return;
+    const tab = b.getAttribute('data-tab');
+    if(tab==='read') go('#/read'); else go(`#/${tab}`);
+  });
+
+  els.searchForm.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const q = (els.searchInput.value||'').trim();
+    if(q) go(`#/search?q=${encodeURIComponent(q)}`);
+  });
+
+  window.addEventListener('hashchange', ()=>{ parseHash(); updateUI() });
+
+  // init
+  try {
+    await loadSite();
+    await loadChunks();
+  } catch (e) {
+    els.left.innerHTML = '';
+    els.left.append(h('div',{class:'muted'}, 'Could not load site data. ', String(e)));
+  }
+  parseHash(); updateUI();
 })();
 </script>
-<!-- ===== /DEBUG OVERLAY ===== -->
+</body>
+</html>
