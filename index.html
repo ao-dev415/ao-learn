@@ -1,13 +1,13 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Advice Only™ Bookstore (Preview)</title>
-  <meta name="robots" content="noindex,nofollow" />
+  <meta name="robots" content="noindex,nofollow"/>
   <style>
-    :root { --bg:#0b0d10; --panel:#12151a; --muted:#8ea1b2; --fg:#e8eef3; --brand:#00d0b6; --border:#1e242c; --hover:#171c24; }
-    *{box-sizing:border-box} html,body{height:100%}
+    :root{--bg:#0b0d10;--panel:#12151a;--muted:#8ea1b2;--fg:#e8eef3;--brand:#00d0b6;--border:#1e242c;--hover:#171c24}
+    *{box-sizing:border-box}html,body{height:100%}
     body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,"Helvetica Neue",Arial,sans-serif}
     a{color:var(--brand);text-decoration:none}
     .wrap{display:grid;grid-template-columns:280px 1fr 320px;gap:16px;min-height:100vh;padding:16px}
@@ -29,7 +29,7 @@
     .alert{border:1px solid var(--border);padding:12px;border-radius:10px;color:#c7d7e6}
     .muted{color:var(--muted)}
     .kbd{font:12px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#0d1117;padding:1px 6px;border-radius:6px;border:1px solid #222a33;color:#a3b4c5}
-    @media (max-width:1100px){ .wrap{grid-template-columns:1fr;} .rail{order:3} .nav{order:1} .main{order:2} }
+    @media (max-width:1100px){.wrap{grid-template-columns:1fr}.rail{order:3}.nav{order:1}.main{order:2}}
   </style>
 </head>
 <body>
@@ -38,7 +38,7 @@
     <main class="card main" id="main">
       <h1>Welcome</h1>
       <p class="lead">Select a learning objective from the left.</p>
-      <div class="muted">If you see a blank page, open <span class="kbd">Console</span> and <span class="kbd">Network</span> to check <span class="kbd">site.json</span>.</div>
+      <div class="muted">If blank, check <span class="kbd">site.json</span> in Network, then hard-reload.</div>
     </main>
     <aside class="card rail">
       <h4>Alerts</h4>
@@ -47,141 +47,131 @@
   </div>
 
   <script>
-  (async function boot(){
+  (async () => {
     const navEl = document.getElementById('nav');
     const mainEl = document.getElementById('main');
 
-    // ---------- utils ----------
-    const $ = (sel, el=document) => el.querySelector(sel);
-    function h(tag, attrs={}, ...children){
-      const el = document.createElement(tag);
-      for (const [k,v] of Object.entries(attrs||{})){
-        if (k === 'class') el.className = v;
-        else if (k.startsWith('on') && typeof v === 'function') el.addEventListener(k.slice(2), v);
-        else el.setAttribute(k, v);
-      }
-      for (const c of children){
-        if (c == null) continue;
-        el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
-      }
-      return el;
-    }
+    // ---- helpers ----
+    const h = (t,a={},...c)=>{const e=document.createElement(t);for(const[k,v]of Object.entries(a)){if(k==='class')e.className=v;else if(k.startsWith('on')&&typeof v==='function')e.addEventListener(k.slice(2),v);else e.setAttribute(k,v)}for(const x of c){if(x!=null)e.appendChild(typeof x==='string'?document.createTextNode(x):x)}return e};
     const num = s => s ? parseInt(s,10) : NaN;
 
-    // Try hard to determine chapter order: explicit index, "Chapter N" prefix, or first LO like "3.1 …"
-    function chapterOrderIndex(ch, i){
+    // Extract “chapter index” robustly:
+    // 1) explicit ch.index (if we ever add it)
+    // 2) “Chapter N” prefix in chapter title
+    // 3) ANY N.N found in ANY LO title (use the MIN)
+    // 4) fallback: 1000+i (stable)
+    function chapterOrderIndex(ch, i) {
       if (typeof ch.index === 'number') return ch.index;
-      let m = /^Chapter\s+(\d+)/i.exec(ch.title||'');
+
+      const ct = (ch.title || '').trim();
+      let m = /^Chapter\s+(\d+)/i.exec(ct);
       if (m) return num(m[1]);
-      const lo = ch.los && ch.los[0];
-      if (lo){
-        const mm = /^(\d+)(?:\.\d+)?/.exec(lo.title||lo.id||'');
-        if (mm) return num(mm[1]);
-      }
-      return 1000 + i; // unknowns at end, stable
+
+      let best = Infinity;
+      (ch.los || []).forEach(lo => {
+        const t = (lo.title || '').trim();
+        // find ALL matches like “3.2” anywhere in the string
+        const matches = t.match(/\b(\d+\.\d+)\b/g);
+        if (matches) {
+          matches.forEach(mm => {
+            const major = parseInt(mm.split('.')[0], 10);
+            if (!Number.isNaN(major) && major < best) best = major;
+          });
+        }
+      });
+      if (best !== Infinity) return best;
+
+      return 1000 + i;
     }
 
-    function loLabel(lo){
+    // Make a friendly LO label, even if number appears mid-string
+    function loLabel(lo) {
       const t = (lo.title || '').trim();
-      const m = /^(\d+\.\d+)\s*[-—:]?\s*(.*)$/.exec(t);
-      return m ? `${m[1]} — ${m[2]||''}` : t;
+      const m = t.match(/(\d+\.\d+)/); // first occurrence anywhere
+      if (m) {
+        const rest = t.replace(m[0], '').replace(/^[-—:\s]+/, '').trim();
+        return `${m[0]} — ${rest || ''}`.trim();
+      }
+      return t || 'Untitled';
     }
 
-    // ---------- renderers ----------
-    function renderMain(ch, lo, snippet){
+    function setActive(btn){
+      navEl.querySelectorAll('button[aria-current="true"]').forEach(b=>b.setAttribute('aria-current','false'));
+      btn?.setAttribute('aria-current','true');
+      btn?.scrollIntoView({block:'nearest', inline:'nearest'});
+    }
+
+    function renderMain(ch, lo){
       mainEl.innerHTML = '';
       mainEl.append(
         h('h1', {}, `${ch.title} — ${lo.title}`),
         h('p', {class:'lead'}, lo.preview || 'This is preview text for this learning objective.')
       );
-      if (snippet){
-        if (snippet.title) mainEl.append(h('h2', {}, snippet.title));
-        if (snippet.body)  mainEl.append(h('p', {}, snippet.body));
+      const s = lo.snippets?.[0];
+      if (s) {
+        if (s.title) mainEl.append(h('h2', {}, s.title));
+        if (s.body)  mainEl.append(h('p', {}, s.body));
       } else {
         mainEl.append(h('div', {class:'muted'}, 'Data source: site.json.'));
       }
     }
 
-    function setActiveButton(btn){
-      navEl.querySelectorAll('button[aria-current="true"]').forEach(b => b.setAttribute('aria-current','false'));
-      btn?.setAttribute('aria-current','true');
-      // Ensure into view in tall menus
-      btn?.scrollIntoView({block:'nearest', inline:'nearest'});
-    }
-
-    function mountNav(site){
-      navEl.innerHTML = '';
-      const list = h('ul');
-
-      const chapters = site.chapters
-        .map((ch, i) => ({ ch, ord: chapterOrderIndex(ch, i), i }))
-        .sort((a,b) => a.ord - b.ord)
-        .map(x => x.ch);
-
-      chapters.forEach((ch, chIdx) => {
-        list.append(h('h3', {}, ch.title));
-        (ch.los || []).forEach((lo, loIdx) => {
-          const btn = h('button', {
-            class:'lo',
-            onclick: () => {
-              const s = (lo.snippets && lo.snippets[0]) || null;
-              renderMain(ch, lo, s);
-              location.hash = `#ch${chIdx+1}-lo${loIdx+1}`;
-              setActiveButton(btn);
-            }
-          }, loLabel(lo));
-          list.append(h('li', {}, btn));
-        });
-      });
-      navEl.append(list);
-    }
-
-    // ---------- load + route ----------
+    // ---- load site.json ----
     let site;
-    try{
-      const res = await fetch('site.json', {cache:'no-store', credentials:'same-origin'});
+    try {
+      const res = await fetch('site.json', { cache:'no-store', credentials:'same-origin' });
       if (!res.ok) throw new Error(`site.json ${res.status}`);
       site = await res.json();
-    }catch(err){
+    } catch (e) {
       navEl.innerHTML = '';
-      navEl.append(h('div', {class:'muted'}, `Could not load site.json (${String(err)}).`));
-      console.error('site.json load failed:', err);
+      navEl.append(h('div', {class:'muted'}, `Could not load site.json (${String(e)}).`));
+      console.error(e);
       return;
     }
 
-    mountNav(site);
+    // Sort chapters using robust index
+    const chapters = site.chapters
+      .map((ch,i)=>({ch,ord:chapterOrderIndex(ch,i),i}))
+      .sort((a,b)=>a.ord - b.ord)
+      .map(x=>x.ch);
+
+    // Build nav
+    navEl.innerHTML = '';
+    const list = h('ul');
+    chapters.forEach((ch, chIdx) => {
+      list.append(h('h3', {}, ch.title || `Chapter ${chIdx+1}`));
+      (ch.los||[]).forEach((lo, loIdx) => {
+        const btn = h('button', {
+          class:'lo',
+          onclick: () => {
+            renderMain(ch, lo);
+            location.hash = `#ch${chIdx+1}-lo${loIdx+1}`;
+            setActive(btn);
+          }
+        }, loLabel(lo));
+        list.append(h('li', {}, btn));
+      });
+    });
+    navEl.append(list);
 
     function openFromHash(){
       const m = location.hash.match(/^#ch(\d+)-lo(\d+)$/);
-      const chapters = site.chapters
-        .map((ch, i) => ({ ch, ord: chapterOrderIndex(ch, i), i }))
-        .sort((a,b) => a.ord - b.ord)
-        .map(x => x.ch);
-
-      const ch = chapters[ (m ? +m[1] : 1) - 1 ];
-      const lo = ch?.los?.[ (m ? +m[2] : 1) - 1 ];
-      if (ch && lo){
-        const s = (lo.snippets && lo.snippets[0]) || null;
-        renderMain(ch, lo, s);
-        // find and mark active button
+      const ch = chapters[(m?+m[1]:1)-1];
+      const lo = ch?.los?.[(m?+m[2]:1)-1];
+      if (ch && lo) {
+        renderMain(ch, lo);
+        // compute flat index to mark active
         const btns = navEl.querySelectorAll('button.lo');
-        // compute flat index the same way we built the list
-        let idx = 0, targetIdx = 0;
-        chapters.forEach((c, ci) => {
-          (c.los||[]).forEach((l, li) => {
-            if (c===ch && l===lo) targetIdx = idx;
-            idx++;
-          });
-        });
-        setActiveButton(btns[targetIdx]);
+        let flat = 0, target = 0;
+        chapters.forEach((c,ci)=>{(c.los||[]).forEach((l,li)=>{ if (c===ch && l===lo) target=flat; flat++; });});
+        setActive(btns[target]);
         return true;
       }
       return false;
     }
 
     window.addEventListener('hashchange', openFromHash);
-    if (!openFromHash()){
-      // Default to first LO of first chapter (after sort)
+    if (!openFromHash()) {
       location.hash = '#ch1-lo1';
       openFromHash();
     }
