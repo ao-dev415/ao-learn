@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>My Data — Advice Only™</title>
+  <meta name="robots" content="noindex,nofollow"/>
+  <link rel="stylesheet" href="static/css/ao-ui.css">
+</head>
+<body>
+  <div class="card topbar">
+    <div class="brand">
+      <img src="static/brand/ao-teal-logo.png" alt="Advice Only">
+      <div>My Data</div>
+    </div>
+    <nav>
+      <a class="btn" href="index.html">Read</a>
+      <a class="btn btn-brand" href="my-data.html">My Data</a>
+      <a class="btn" href="events.html">Events</a>
+      <a class="btn" href="profile.html">Profile</a>
+      <a class="btn" href="transparency.html">Transparency</a>
+    </nav>
+  </div>
+
+  <div class="wrap" style="grid-template-columns:1fr var(--rail);">
+    <main class="card main">
+      <h1>Exposure & Progress</h1>
+      <p class="lead">Badges based on time-on-objective in your browser only (localStorage).</p>
+      <div style="display:flex;gap:.5rem;margin:8px 0 12px">
+        <button id="btn-pause" class="btn">Pause tracking</button>
+        <button id="btn-clear" class="btn">Clear data</button>
+        <button id="btn-json" class="btn">Export JSON</button>
+        <button id="btn-csv"  class="btn btn-brand">Export CSV</button>
+      </div>
+      <div id="mydata"></div>
+    </main>
+    <aside class="card rail">
+      <h4>Notes</h4>
+      <div class="alert">
+        V1 stores data in your browser only. V2 will optionally sync under your control.
+      </div>
+    </aside>
+  </div>
+
+  <script src="static/js/ao-ui.js"></script>
+  <script>
+    (async function(){ await AO.initMyData(); })();
+  </script>
+</body>
+</html>
