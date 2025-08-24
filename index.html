@@ -1,6 +1,11 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Advice Only™ Bookstore (Preview)</title>
+  <meta name="robots" content="noindex,nofollow"/>
+  <link rel="stylesheet" href="static/css/ao-ui.css">
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Advice Only™ Bookstore</title>
@@ -88,6 +93,17 @@
 </style>
 </head>
 <body>
+  <div class="card topbar">
+    <div class="brand">
+      <img src="static/brand/ao-teal-logo.png" alt="Advice Only">
+      <div>Advice Only™ Bookstore</div>
+    </div>
+    <nav>
+      <a class="btn" href="index.html">Read</a>
+      <a class="btn" href="my-data.html">My Data</a>
+      <a class="btn" href="events.html">Events</a>
+      <a class="btn" href="profile.html">Profile</a>
+      <a class="btn" href="transparency.html">Transparency</a>
   <header class="appbar">
     <div class="brand">💧 <span>Advice Only™ Bookstore</span></div>
     <nav class="tabs" id="tabs">
@@ -97,6 +113,11 @@
       <button class="tab" data-tab="profile">Profile</button>
       <button class="tab" data-tab="transparency">Transparency</button>
     </nav>
+    <div class="search">
+      <input id="ao-search" type="search" placeholder="Search snippets, topics…"/>
+      <div id="ao-search-results" class="search-results"></div>
+    </div>
+  </div>
     <div class="spacer"></div>
     <form class="search" id="searchForm">
       <input id="searchInput" placeholder="Search snippets, topics…" aria-label="Search"/>
@@ -105,20 +126,31 @@
   </header>
 
   <div class="wrap">
+    <aside class="card nav" id="nav"><div class="muted">Loading…</div></aside>
+    <div class="gutter" aria-hidden="true"></div>
     <aside class="card left nav" id="left"><div class="muted">Loading…</div></aside>
 
     <main class="card main" id="main">
       <h1>Welcome</h1>
+      <p class="lead">Select a learning objective from the left.</p>
       <p>Select a learning objective from the left.</p>
       <div class="muted">If blank, check <span class="kbd">site.json</span> in Network, then hard-reload.</div>
     </main>
+    <aside class="card rail">
 
     <aside class="card rail" id="rail">
       <h4>Alerts</h4>
+      <div class="alert">“Site accessibility tutorial” lives here for now. Later: notifications for subscribed users.</div>
       <div id="alerts" class="alert">Loading…</div>
     </aside>
   </div>
 
+  <script src="static/js/ao-ui.js"></script>
+  <script>
+    (async function(){
+      await AO.initIndex();
+    })();
+  </script>
 <script>
 (async () => {
   // ---------- state ----------
@@ -153,51 +185,39 @@
     clear(){ localStorage.removeItem(LS_KEY) }
   };
 
-<script>
-(async () => {
-  const navEl = document.getElementById('nav');
-  const mainEl = document.getElementById('main');
-
-  const showDiag = (title, detail) => {
-    const box = document.createElement('div');
-    box.style.cssText = 'position:fixed;inset:20px auto auto 20px;max-width:560px;background:#11161e;color:#e8eef3;border:1px solid #3a4453;border-radius:10px;padding:12px;z-index:99999;box-shadow:0 10px 30px rgba(0,0,0,.4)';
-    box.innerHTML = `<div style="font-weight:600;margin-bottom:8px">${title}</div><pre style="white-space:pre-wrap;margin:0">${detail}</pre>`;
-    document.body.append(box);
-  };
-
-  const pickUrl = () => {
-    const u = new URL(location.href);
-    // Use ?full=1 to force full/site.json when testing
-    if (u.searchParams.get('full') === '1') return '/full/site.json';
-    return '/site.json';
-  };
-
-  let site, res, txt;
-  const url = pickUrl();
-  try {
-    res = await fetch(url, {credentials:'same-origin', cache:'no-store'});
-    txt = await res.text();
-    if (!res.ok) {
-      showDiag(`Fetch failed ${res.status} ${res.statusText}`, `URL: ${res.url}\n\nHEADERS:\n${[...res.headers.entries()].map(([k,v])=>k+': '+v).join('\n')}\n\nBODY SAMPLE:\n${txt.slice(0,1000)}`);
-      return;
-    }
-    try {
-      site = JSON.parse(txt);
-    } catch (e) {
-      showDiag('Received non-JSON from '+url, `HEADERS:\n${[...res.headers.entries()].map(([k,v])=>k+': '+v).join('\n')}\n\nBODY SAMPLE:\n${txt.slice(0,1000)}\n\nParse error: ${e.message}`);
-      return;
-    }
-  } catch (e) {
-    showDiag('Network error while fetching '+url, String(e && e.message || e));
-    return;
+  // ---------- data load ----------
+  async function loadSite(){
+    // Prefer /site.json; you can switch to /full/site.json behind Access
+    const res = await fetch('/site.json', {cache:'no-store', credentials:'same-origin'});
+    if(!res.ok) throw new Error('site.json '+res.status);
+    S.site = await res.json();
   }
 
-  // continue with your normal boot using "site"
-  // TODO: your existing nav/main render code here…
-  // renderSite(site);
-})();
-</script>
+  async function loadChunks(){
+    try{
+      const r = await fetch('/static/rag/chunks.json', {cache:'no-store'}); 
+      if(r.ok) S.chunks = await r.json();
+    }catch{}
+  }
 
+  // ---------- chapter/LO helpers ----------
+  function enumerateChapters(site){
+    // Builds normalized structure with indices and ids
+    const out = [];
+    (site.chapters||[]).forEach((ch, ci)=>{
+      const los = (ch.los||[]).map((lo, li)=>({
+        ...lo,
+        _chIndex: ci+1,
+        _loIndex: li+1,
+        _id: `ch${ci+1}-lo${li+1}`
+      }));
+      out.push({
+        ...ch,
+        _index: ci+1,
+        los
+      });
+    });
+    return out;
   }
 
   // ---------- render: alerts ----------
