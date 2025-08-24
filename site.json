@@ -1,4 +1,8 @@
 {
+  "title": "Advice Only™ Methodology (2024)",
+  "alerts": [
+    "“Site accessibility tutorial” lives here for now. Later: notifications for subscribed users."
+  ],
   "profile": {
     "name": "Quincy Hall, CFP®",
     "subtitle": "Objective retirement planning",
@@ -7,7 +11,6 @@
     "office": "Corte Madera, CA",
     "email": "hello@adviceonly.org"
   },
-
   "events": [
     {
       "title": "Online — Platform Walkthrough (Preview)",
@@ -17,117 +20,57 @@
       "mode": "Online",
       "ctaLabel": "Register",
       "ctaUrl": "https://example.com/register-walkthrough"
-    },
-    {
-      "title": "Advisor CE — Advice Only in Practice (Online)",
-      "date": "2025-10-01",
-      "time": "16:00",
-      "tz": "America/Los_Angeles",
-      "mode": "Online",
-      "ctaLabel": "Register",
-      "ctaUrl": "https://example.com/register-ce-online"
     }
   ],
-
-  "alerts": [
-    "“Site accessibility tutorial” lives here for now. Later: notifications for subscribed users."
-  ]
-  "book": "Advice Only™ Methodology (2024)",
   "chapters": [
-    {
-      "title": "Cash Flow & Net Worth",
-      "los": [
-        {
-          "title": "3.1: Key Planning Documents",
-          "preview": "TO GET a basic idea of a retirement plan’s sustainability, at least two documents are required:",
-          "snippets": [
-            {
-              "title": "Body",
-              "body": "TO GET a basic idea of a retirement plan’s sustainability, at least two documents are required:\n\nA Net Worth Statement (or Balance Sheet)\n\nA Cash Flow Statement\n\nNet Worth Statement: A document that shows a global overview of an individual’s financial situation. An up-to-date net worth statement helps clarify the specific components of the financial plan to any interested parties.\n\nA Net Worth statement will:\n\nProvide a basic sense of financial health\n\nHelp identify the overall savings available for sustainable distribution upon retirement\n\nCash Flow Statement: A document that shows annual (or monthly) inflows and outflows. A detailed cash flow statement allows for a deeper analysis beyond expenses alone. It identifies where money is coming and going and helps pinpoint possible improvements when finding new resources to improve planning outcomes.\n\nA cash flow statement summarizes income and expenses over a period. It combines budgeting with assumptions. Benefits include identifying areas for improvement or verifying the validity of planning assumptions.\n\nKey components include:\n\nCash inflows (income): Salary, investment income, rental income, business income, required minimum distributions (RMDs), and other income.\n\nCash outflows (expenses): Fixed expenses (housing, transportation, debt payments, utilities, insurance). Variable expenses (food, entertainment, personal care, medical care, and taxes).\n\nNet cash flow: Calculated by subtracting total cash outflows from total cash inflows\n\nA Cashflow Statement will:\n\nMeasure the amount of annual positive (or negative) cash flow\n\nHelp develop a realistic “vector” and identify the overall long-term sustainability of the financial plan\n\nHelp to chart financial potential\n\nHelp to identify potential tax efficiency, coordination tactics, and other financial planning opportunities.\n\nHaving professional help when analyzing financial planning documents is a good idea."
-            },
-            {
-              "title": "How can I estimate my net worth?",
-              "body": "A Net Worth statement, or Balance Sheet, is designed to be simple. It provides a comprehensive overview of your financial situation on a single page, clearly showing your net worth (assets - liabilities).\n\nStart by evaluating your financial life by jotting down your possessions: your home, car, retirement account, and even artwork. Assign a value to each item you think it could realistically fetch if sold. Next, think about your financial obligations: a mortgage, credit card debt, or loans against a 401(k). These are your liabilities.\n\nWhen filling out the balance sheet, start by entering the approximate gross values of your assets in the assets column. These are the values before any liabilities are deducted. Next, record any liabilities, which are the debts associated with your assets or separate financial obligations.\n\nTake greater control of your financial situation and track your net worth over time. Generally, the goal is to increase net worth as market investment performs, property values appreciate, and liabilities get paid off. However, it's also common (especially in retirement) for specific assets like investment accounts and cash reserves to decrease as money is spent.\n\nOver time, remember that the balance sheet is a flexible tool. It's important to keep it relevant, as it quickly and easily conveys your financial position to interested parties such as family or trusted professionals. A balance sheet also acts as a helpful resource when money needs to be raised for an unexpected event."
-            }
-          ]
-        },
-        {
-          "title": "Learning Objective 3.2 Positive Cash Flow",
-          "preview": "POSITIVE CASH FLOW is new money identified as being available to save or deploy in addition to what is already being spent or contributed towards savings. It is the ‘firepower” available after everything to increase or better coordinate additional money needed for tomorrow's retirement goals.",
-          "snippets": [
-            {
-              "title": "Body",
-              "body": "POSITIVE CASH FLOW is new money identified as being available to save or deploy in addition to what is already being spent or contributed towards savings. It is the ‘firepower” available after everything to increase or better coordinate additional money needed for tomorrow's retirement goals.\n\nTips to improve cash flow may include:\n\nEliminating or reducing non-essential expenses\n\nIncreasing income or working longer\n\nSelling or rethinking an existing asset’s strategy\n\nBeing more tax-efficient\n\nTaking (or delaying) social security or a pension\n\nRefinancing or tapping into a home’s equity\n\nOnce positive cash flow is identified, one can start determining and consistently setting aside savings. Assess how much can be saved, then decide where to save it. This savings location decision should be based on the appropriateness of the savings vehicle, eligibility to contribute, the correct type of contribution (e.g., pre or post-tax money), and tax savings today versus tomorrow.\n\nTypically, advisors suggest saving around 15% of gross income. However, this is a broad recommendation. Various factors collectively determine what’s needed to meet retirement needs."
-            },
-            {
-              "title": "How can I calculate my savings?",
-              "body": "Use this exercise to coordinate savings locations. Determine the current level of savings versus total gross income (or income before any deductions or taxes). Generally, retirement savings are money set aside for longer periods. These dollars are targeted for retirement income or to supplement future retirement expenses and likely have a much different strategy than more near-term dollars.\n\nStart by researching your various savings accounts. These could be employer retirement plans, such as a 401(k), or supplemental accounts, like a Roth or post-tax account. Typically, bank checking accounts are money set aside for emergencies or planned expenses, so contributions may not be part of retirement-oriented savings.\n\nNext, finalize the spreadsheet by adding the account name, type of account, taxable nature (e.g., Traditional or Roth), and contribution amount (bi-monthly, monthly, quarterly, or annual). If a participant has access to multiple plans, ensure the accuracy of contributions and that there is no overfunding. The spreadsheet should automatically validate total savings and then convert this total to a percentage relative to gross income. The beauty of this exercise is its flexibility. Our general guideline is to save approximately 15% of gross income; however, this can vary significantly depending on savings requirements and life stage.\n\nConsider other areas for savings, such as reducing discretionary spending, cutting down on unnecessary subscriptions, or finding ways to save on utilities. If needed, use our budget worksheet, a tool designed to help you track your income and expenses, to help identify these areas of improvement. You can then redirect these dollars toward savings.\n\nCommit to revisiting this worksheet periodically to ensure the current level of retirement savings is on pace. Remember to update gross income and individual savings amounts to reflect your overall savings accurately."
-            }
-          ]
-        },
-        {
-          "title": "3.3: Compounding Interest",
-          "preview": "COMPOUNDING INTEREST uses the reinvestment of interest to grow an investment over time. It is the key to offsetting long-term inflation and building foundational wealth, essential for any financial plan’s long-term stability.",
-          "snippets": [
-            {
-              "title": "Body",
-              "body": "COMPOUNDING INTEREST uses the reinvestment of interest to grow an investment over time. It is the key to offsetting long-term inflation and building foundational wealth, essential for any financial plan’s long-term stability.\n\nThe essence of wealth creation is setting money aside for a very long time.\n\nInvestment results will vary from those shown here. Investing involves risk, inconsistent returns, and the possibility of a loss of principal. The investment results shown are hypothetical and are for illustrative purposes only. The calculations do not consider any taxes, inflation, or fees. The figures do not represent past or future investment results and do not represent any specific product.\n\nDisclosure: The Securities and Exchange Commission has not approved or reviewed the content of this application. By clicking, you are linking to an external S.E.C. website."
-            }
-          ]
-        }
-      ]
-    },
     {
       "title": "My Perfect Plan",
       "los": [
         {
           "title": "1.1: What's The Perfect Plan?",
-          "preview": "THE INDIVIDUAL holds the power to define what is the “perfect” financial plan. It’s their money, and they are the ones best equipped to make personal financial decisions, instilling a sense of control and confidence.",
+          "preview": "Why a defined, rational planning process matters.",
           "snippets": [
-            {
-              "title": "Body",
-              "body": "THE INDIVIDUAL holds the power to define what is the “perfect” financial plan. It’s their money, and they are the ones best equipped to make personal financial decisions, instilling a sense of control and confidence.\n\nMost recognize “The Perfect Plan” when they see it.\n\nThe Perfect Plan tends to:\n\nBe sustainable using realistic assumptions"
-            }
+            { "title": "Body", "body": "The individual defines the 'perfect' financial plan..." }
           ]
         },
         {
           "title": "1.2: Why Be Rational?",
-          "preview": "WHILE A plan is never truly “finished,” having a rational process does help maintain focus and reduce uncertainty and confusion, ensuring that all parties are on the same page.",
+          "preview": "Objectivity reduces uncertainty.",
           "snippets": [
-            {
-              "title": "Body",
-              "body": "WHILE A plan is never truly “finished,” having a rational process does help maintain focus and reduce uncertainty and confusion, ensuring that all parties are on the same page.\n\nA rational process translates to efficiency, spending more money with less frustration.\n\nFurthermore, a rational process should allow one to internalize any planning subjectivity and view the totality of the financial planning landscape before deciding what or if to implement anything.\n\nHaving a specified plan of approach helps individuals stay on track and accomplish financial goals in a less stressful way. A plan constructed in this fashion is more organized, never rushed, and should be motivated by self-interest.\n\nNo one should ever care more about your money than you.\n\nOnce complete, the totality of the financial planning landscape should become apparent. At this moment, a genuinely rational decision can be made and executed with full confidence.\n\nThe benefits of having a rational planning process include the following:\n\nPlan recall, or the ability to pick up where one left off\n\nHigher decision confidence\n\nOpportune pace building\n\nMore cooperative and substantial discussions\n\nGetting to the \"truth\"\n\nIdentification of complex or time-consuming tasks\n\nBetter coordination and greater efficiency\n\nMore authority over the implementation process\n\nThe Future of Financial Advice Is Today\n\nFinancial planning is becoming much more about you, the client. For the first time in history, the landscape for objective financial guidance is finally taking shape."
-            },
-            {
-              "title": "Why seek the objective truth?",
-              "body": "We define objectivity as the concept of truth independent of individual subjectivity. It is the process of reaching independent conclusions distinct from any end product or service. It is a personal interpretation guided by a process in pursuit of truth through knowledge. Objectivity is about embracing a rational process, seeing what follows, and drawing independent conclusions.\n\nObjectivity is “thinking for yourself,” without it, uncertainty thrives."
-            },
-            {
-              "title": "How can I prioritize my lifestyle?",
-              "body": "The lifestyle planner exercise is a crucial tool providing essential qualitative insights about yourself and your loved ones. This exercise will introduce the most common personal objectives in retirement planning, all tailored to your unique circumstances. Remember, it's not just about the numbers; understanding what truly matters to you is equally, if not more, important. So, while the financial aspects are crucial, maintaining a rich and fulfilling experience in retirement is equally important.\n\nTake a moment to reflect deeply on retirement objectives. Engage with the various aspects of the exercise, one by one, and start contemplating what holds the most significance and potential priorities over others. Some may be necessities, while others may be lifestyle choices. Remember, there are no right or wrong answers; embrace your unique perspective.\n\nExercise your freedom to assign a value to each of the categories. This process involves controlling your retirement planning and prioritizing according to your values. Consider adding notes for future reference to monitor how your priorities evolve, providing you with a sense of empowerment throughout the retirement journey.\n\nRemember, the lifestyle planner is not a one-time task. It's a dynamic tool that should reflect your evolving priorities. Feel free to add or adjust the values of the exercise. Your circumstances are unique, and general categories may benefit from specificity. The aim is to identify your current priorities and reevaluate them as retirement approaches or even after retirement. This process will assist you in gaining deeper insights into your qualitative priorities today and over time.\n\nIt's important to understand that priorities can shift once retired, and the actual landscape of formal retirement becomes clear. Retirement planning is a complex process, and your priorities may change as you navigate different stages of retirement. Embrace this fluidity and be prepared to adapt your plans accordingly.\n\nThe future of advice is an objective and personalized experience. But ultimately, that's up to you.\n\nBenefits of objective financial planning include:\n\nGreater confidence with personal decisions\n\nSimplicity and reduced anxiety\n\nBetter organization and higher participation\n\nGreater financial stamina\n\nReduced “sales pitch” fatigue\n\nHigher trust in end decisions and professional insight\n\nMore control and understanding over consequential decisions"
-            }
+            { "title": "Body", "body": "Objectivity is thinking for yourself, guided by knowledge..." }
           ]
         },
         {
           "title": "1.3: Me, Myself and I",
-          "preview": "FINANCIAL DECISIONS are only sometimes predictable or transparent. Additionally, many financial subjects change annually and are not static objects. Financial decisions regarding tax, investments, income, health, and personal affinities are often highly subjective.",
+          "preview": "Personal objectives shape the plan.",
           "snippets": [
-            {
-              "title": "Body",
-              "body": "FINANCIAL DECISIONS are only sometimes predictable or transparent. Additionally, many financial subjects change annually and are not static objects. Financial decisions regarding tax, investments, income, health, and personal affinities are often highly subjective."
-            },
-            {
-              "title": "Life is not math.",
-              "body": "Financial and personal preferences often clash. These conflicts potentially result in disjointed and rushed decisions, requiring more context and frequently manifesting into uninformed guesswork.\n\nThe culprit is frequently the unknowable subjectivity of the financial plan. If planning were simply a mathematical equation to “solve,” the process would be finite and much less subjective."
-            },
-            {
-              "title": "Having a Battle Plan",
-              "body": "The perfect financial planning strategy will not materialize through happenstance. It requires context and an in-depth analysis of all possible outcomes. A cohesive strategy forms and a plan of attack ensues.\n\nIn planning strategy serves as a roadmap to guide financial decisions and actions, aligning them with long-term goals and aspirations.\n\nThis strategy should encompass various elements, including savings and investments, debt management, insurance coverage, tax planning, and retirement planning. Each component is carefully considered and integrated into the overall plan to ensure alignment with your financial objectives.\n\nWith a cohesive strategy in place, one can develop the best plan of attack. This involves setting specific, measurable, achievable, relevant, and time-bound methods. Preparations should also include identifying the steps necessary for maximum effect, such as adjusting a savings rate, targeting certain debt, modifying investment selections, or modeling buy/sell scenarios.\n\nFinancial decisions today can reverberate for generations. How are the financial planning game pieces distributed, and are my pieces best positioned to win the game?\n\nFinancial planning is not merely a mathematical problem; it is subjective. These critical decisions can have consequential, long-lasting effects on the viability of financial success.\n\nMany variables may not be known or easily predictable, and certain complications may be unavoidable. Retirees should familiarize themselves (at least once) with as many financial concepts as possible so that only the unknowable “wildcards” remain, reducing the number of unknown variables that can potentially disrupt the plan.\n\nIt’s called planning for a reason."
-            },
-            {
-              "title": "When to consider professional help",
-              "body": "Retirement decisions are often the most consequential decisions a person can make. They affect all aspects of life, happiness, and long-term financial success in retirement. Sound financial decisions will come with assurances and a reasonable certainty of success.\n\nThere is no better motivator or confidence builder than knowing what will probably happen financially.\n\nThere is value in the financial professional. This value is the direct, hands-on experience working with a multitude of clients. That experience includes evaluating how others accomplish goals, avoid failure, settle subjective matters, and ultimately bring those experiences to the discussion.\n\nWouldn’t someone who does plans and educates the public have the best insight into financial planning?\n\nAt some point, the individual must make the best judgment possible and ideally base these decisions on as much qualitative and quantitative information as possible. This is the critical moment when it makes the most sense to seek the counsel of a qualified, ideally objective, financial, tax, and estate planning professional(s).\n\nAs the landscape for objective advice begins to shape for the first time in history, opportunities to find professionals who offer this service will become more widely available.\n\nSituations when to consider professional advice include:\n\nAs a mediator or when seeking an outside perspective\n\nAnytime one is feeling misinformed, overwhelmed, unclear, or unsure regarding important financial decisions\n\nWhen seeking inspiration\n\nTo confirm whether an existing strategy is viable or if there needs to be a change"
-            }
+            { "title": "Body", "body": "Your values and priorities drive tradeoffs..." }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Expenses",
+      "los": [
+        {
+          "title": "2.1: Being Real",
+          "preview": "Ground your plan in realistic spending.",
+          "snippets": [
+            { "title": "Body", "body": "Start with honest baselines..." }
+          ]
+        },
+        {
+          "title": "2.2: My Expenses",
+          "preview": "Track, categorize, iterate.",
+          "snippets": [
+            { "title": "Body", "body": "Build categories that match your life..." }
+          ]
+        },
+        {
+          "title": "2.3: Understanding Inflation",
+          "preview": "Plan for purchasing power.",
+          "snippets": [
+            { "title": "Body", "body": "Inflation impacts long-term goals and cash flow..." }
           ]
         }
       ]
