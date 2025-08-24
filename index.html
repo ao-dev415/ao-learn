@@ -200,26 +200,6 @@
 
   }
 
-  // ---------- chapter/LO helpers ----------
-  function enumerateChapters(site){
-    // Builds normalized structure with indices and ids
-    const out = [];
-    (site.chapters||[]).forEach((ch, ci)=>{
-      const los = (ch.los||[]).map((lo, li)=>({
-        ...lo,
-        _chIndex: ci+1,
-        _loIndex: li+1,
-        _id: `ch${ci+1}-lo${li+1}`
-      }));
-      out.push({
-        ...ch,
-        _index: ci+1,
-        los
-      });
-    });
-    return out;
-  }
-
   // ---------- render: alerts ----------
   function renderAlerts(){
     const alerts = S.site?.alerts && S.site.alerts.length ? S.site.alerts : [
