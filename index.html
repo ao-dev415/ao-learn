@@ -5,36 +5,30 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Advice Only™ Bookstore (Preview)</title>
   <meta name="robots" content="noindex,nofollow"/>
-  <style>
-    :root{--bg:#0b0d10;--panel:#12151a;--muted:#8ea1b2;--fg:#e8eef3;--brand:#00d0b6;--border:#1e242c;--hover:#171c24}
-    *{box-sizing:border-box}html,body{height:100%}
-    body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,"Helvetica Neue",Arial,sans-serif}
-    a{color:var(--brand);text-decoration:none}
-    .wrap{display:grid;grid-template-columns:280px 1fr 320px;gap:16px;min-height:100vh;padding:16px}
-    .card{background:var(--panel);border:1px solid var(--border);border-radius:10px}
-    .nav{padding:12px;overflow:auto;max-height:calc(100vh - 32px)}
-    .nav h3{margin:12px 8px 6px;color:#bcd0e0;font-weight:600;font-size:13px}
-    .nav ul{list-style:none;margin:0;padding:0}
-    .nav li{margin:0}
-    .nav button{display:block;width:100%;text-align:left;background:transparent;border:0;color:var(--fg);padding:8px 10px;border-radius:8px;cursor:pointer}
-    .nav button:hover{background:var(--hover)}
-    .nav .lo{padding-left:18px;color:#cfe0ee}
-    .nav button[aria-current="true"]{background:#0e2723;outline:1px solid #11433b}
-    .main{padding:16px;overflow:auto}
-    .main h1{margin:0 0 14px;font-size:22px}
-    .main h2{margin:20px 0 8px;font-size:16px}
-    .main .lead{margin:0 0 16px;color:#c7d7e6}
-    .rail{padding:12px}
-    .rail h4{margin:0 0 8px;color:#bcd0e0;font-weight:600}
-    .alert{border:1px solid var(--border);padding:12px;border-radius:10px;color:#c7d7e6}
-    .muted{color:var(--muted)}
-    .kbd{font:12px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#0d1117;padding:1px 6px;border-radius:6px;border:1px solid #222a33;color:#a3b4c5}
-    @media (max-width:1100px){.wrap{grid-template-columns:1fr}.rail{order:3}.nav{order:1}.main{order:2}}
-  </style>
+  <link rel="stylesheet" href="static/css/ao-ui.css">
 </head>
 <body>
+  <div class="card topbar">
+    <div class="brand">
+      <img src="static/brand/ao-teal-logo.png" alt="Advice Only">
+      <div>Advice Only™ Bookstore</div>
+    </div>
+    <nav>
+      <a class="btn" href="index.html">Read</a>
+      <a class="btn" href="my-data.html">My Data</a>
+      <a class="btn" href="events.html">Events</a>
+      <a class="btn" href="profile.html">Profile</a>
+      <a class="btn" href="transparency.html">Transparency</a>
+    </nav>
+    <div class="search">
+      <input id="ao-search" type="search" placeholder="Search snippets, topics…"/>
+      <div id="ao-search-results" class="search-results"></div>
+    </div>
+  </div>
+
   <div class="wrap">
     <aside class="card nav" id="nav"><div class="muted">Loading…</div></aside>
+    <div class="gutter" aria-hidden="true"></div>
     <main class="card main" id="main">
       <h1>Welcome</h1>
       <p class="lead">Select a learning objective from the left.</p>
@@ -46,136 +40,11 @@
     </aside>
   </div>
 
+  <script src="static/js/ao-ui.js"></script>
   <script>
-  (async () => {
-    const navEl = document.getElementById('nav');
-    const mainEl = document.getElementById('main');
-
-    // ---- helpers ----
-    const h = (t,a={},...c)=>{const e=document.createElement(t);for(const[k,v]of Object.entries(a)){if(k==='class')e.className=v;else if(k.startsWith('on')&&typeof v==='function')e.addEventListener(k.slice(2),v);else e.setAttribute(k,v)}for(const x of c){if(x!=null)e.appendChild(typeof x==='string'?document.createTextNode(x):x)}return e};
-    const num = s => s ? parseInt(s,10) : NaN;
-
-    // Extract “chapter index” robustly:
-    // 1) explicit ch.index (if we ever add it)
-    // 2) “Chapter N” prefix in chapter title
-    // 3) ANY N.N found in ANY LO title (use the MIN)
-    // 4) fallback: 1000+i (stable)
-    function chapterOrderIndex(ch, i) {
-      if (typeof ch.index === 'number') return ch.index;
-
-      const ct = (ch.title || '').trim();
-      let m = /^Chapter\s+(\d+)/i.exec(ct);
-      if (m) return num(m[1]);
-
-      let best = Infinity;
-      (ch.los || []).forEach(lo => {
-        const t = (lo.title || '').trim();
-        // find ALL matches like “3.2” anywhere in the string
-        const matches = t.match(/\b(\d+\.\d+)\b/g);
-        if (matches) {
-          matches.forEach(mm => {
-            const major = parseInt(mm.split('.')[0], 10);
-            if (!Number.isNaN(major) && major < best) best = major;
-          });
-        }
-      });
-      if (best !== Infinity) return best;
-
-      return 1000 + i;
-    }
-
-    // Make a friendly LO label, even if number appears mid-string
-    function loLabel(lo) {
-      const t = (lo.title || '').trim();
-      const m = t.match(/(\d+\.\d+)/); // first occurrence anywhere
-      if (m) {
-        const rest = t.replace(m[0], '').replace(/^[-—:\s]+/, '').trim();
-        return `${m[0]} — ${rest || ''}`.trim();
-      }
-      return t || 'Untitled';
-    }
-
-    function setActive(btn){
-      navEl.querySelectorAll('button[aria-current="true"]').forEach(b=>b.setAttribute('aria-current','false'));
-      btn?.setAttribute('aria-current','true');
-      btn?.scrollIntoView({block:'nearest', inline:'nearest'});
-    }
-
-    function renderMain(ch, lo){
-      mainEl.innerHTML = '';
-      mainEl.append(
-        h('h1', {}, `${ch.title} — ${lo.title}`),
-        h('p', {class:'lead'}, lo.preview || 'This is preview text for this learning objective.')
-      );
-      const s = lo.snippets?.[0];
-      if (s) {
-        if (s.title) mainEl.append(h('h2', {}, s.title));
-        if (s.body)  mainEl.append(h('p', {}, s.body));
-      } else {
-        mainEl.append(h('div', {class:'muted'}, 'Data source: site.json.'));
-      }
-    }
-
-    // ---- load site.json ----
-    let site;
-    try {
-      const res = await fetch('/site.json', { cache:'no-store', credentials:'same-origin' });
-      if (!res.ok) throw new Error(`site.json ${res.status}`);
-      site = await res.json();
-    } catch (e) {
-      navEl.innerHTML = '';
-      navEl.append(h('div', {class:'muted'}, `Could not load site.json (${String(e)}).`));
-      console.error(e);
-      return;
-    }
-
-    // Sort chapters using robust index
-    const chapters = site.chapters
-      .map((ch,i)=>({ch,ord:chapterOrderIndex(ch,i),i}))
-      .sort((a,b)=>a.ord - b.ord)
-      .map(x=>x.ch);
-
-    // Build nav
-    navEl.innerHTML = '';
-    const list = h('ul');
-    chapters.forEach((ch, chIdx) => {
-      list.append(h('h3', {}, ch.title || `Chapter ${chIdx+1}`));
-      (ch.los||[]).forEach((lo, loIdx) => {
-        const btn = h('button', {
-          class:'lo',
-          onclick: () => {
-            renderMain(ch, lo);
-            location.hash = `#ch${chIdx+1}-lo${loIdx+1}`;
-            setActive(btn);
-          }
-        }, loLabel(lo));
-        list.append(h('li', {}, btn));
-      });
-    });
-    navEl.append(list);
-
-    function openFromHash(){
-      const m = location.hash.match(/^#ch(\d+)-lo(\d+)$/);
-      const ch = chapters[(m?+m[1]:1)-1];
-      const lo = ch?.los?.[(m?+m[2]:1)-1];
-      if (ch && lo) {
-        renderMain(ch, lo);
-        // compute flat index to mark active
-        const btns = navEl.querySelectorAll('button.lo');
-        let flat = 0, target = 0;
-        chapters.forEach((c,ci)=>{(c.los||[]).forEach((l,li)=>{ if (c===ch && l===lo) target=flat; flat++; });});
-        setActive(btns[target]);
-        return true;
-      }
-      return false;
-    }
-
-    window.addEventListener('hashchange', openFromHash);
-    if (!openFromHash()) {
-      location.hash = '#ch1-lo1';
-      openFromHash();
-    }
-  })();
+    (async function(){
+      await AO.initIndex();
+    })();
   </script>
 </body>
 </html>
