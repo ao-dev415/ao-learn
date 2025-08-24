@@ -1,4 +1,3 @@
-<script>
 window.AO = (function(){
   const AO = {};
 
@@ -365,4 +364,3 @@ window.AO = (function(){
 
   return AO;
 })();
-</script>
