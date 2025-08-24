@@ -1,280 +1,251 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-import_docx.py (v2)
-- Ingests all .docx in a folder
-- H1 = Chapter, H2 = Learning Objective, H3 = Snippet (fallback: bold-only paragraph)
-- Extracts images from DOCX and associates them to nearest LO
-- Writes:
-    site.json                (drives the UI)
-    static/rag/chunks.json   (drives snippet search)
-    tmp_html/*.html         (quick visual sanity check)
+import_docx.py  —  Build site.json + RAG from DOCX (H1/H2/H3 model)
+
+- H1   => Chapter
+- H2   => LO
+- H3   => Optional snippet title inside an LO
+- Body => Paragraphs under an LO (before the next H2/H1). If no H3s are present
+          we take the first N paragraphs and place them in one snippet.
+
+Usage (same flags you’re already using):
+
+python3 scripts/import_docx.py \
+  --src source \
+  --out site.json \
+  --rag static/rag/chunks.json \
+  --media static/media \
+  --book "Advice Only™ Methodology (2024)" \
+  --max-paras 4 \
+  --verbose
 """
-import argparse, json, os, re, shutil, zipfile, html
+
+import argparse
+import json
+import os
+import re
 from pathlib import Path
-from collections import defaultdict
-from datetime import datetime
 
-from docx import Document
-from docx.opc.constants import RELATIONSHIP_TYPE
+try:
+    from docx import Document
+except Exception as e:
+    raise SystemExit(
+        "Missing dependency: python-docx\n"
+        "Install:  python3 -m pip install python-docx\n"
+    )
 
-# ---------- helpers
+ROOT = Path(__file__).resolve().parent.parent
+TMP_HTML = ROOT / "tmp_html"       # previews (lightweight)
+DEFAULT_MAX_PARAS = 4              # first N paragraphs per LO when no H3s
 
-def slugify(s: str) -> str:
-    s = s.strip().lower()
-    s = re.sub(r'[^a-z0-9]+', '-', s).strip('-')
-    return s or 'x'
+HEADING_RE = re.compile(r"^Heading\s+(\d+)$", re.I)
+NUM_LO_RE  = re.compile(r"\b(\d+\.\d+)\b")
 
-def is_heading(p, level: int) -> bool:
-    name = (p.style.name or '').lower()
-    return name in {f'heading {level}', f'heading{level}'}
+def norm(s: str) -> str:
+    return (s or "").strip()
 
-def is_bold_line(p) -> bool:
-    # Treat a paragraph as a "bold H3" if all text runs are bold (your H3-as-bold pattern)
-    has_text = False
-    for r in p.runs:
-        if r.text.strip():
-            has_text = True
-            if not (r.bold or (r.font and r.font.bold)):
-                return False
-    return has_text
+def is_heading(p):
+    """Return heading level int if paragraph is Heading 1/2/3..., else 0."""
+    try:
+        st = p.style.name or ""
+    except Exception:
+        return 0
+    m = HEADING_RE.match(st)
+    return int(m.group(1)) if m else 0
 
-def para_to_html(p):
-    # Preserve line-level italics/bold minimally
-    parts = []
-    for r in p.runs:
-        t = html.escape(r.text)
-        if not t:
-            continue
-        if r.bold or (r.font and r.font.bold):
-            t = f"<strong>{t}</strong>"
-        if r.italic or (r.font and r.font.italic):
-            t = f"<em>{t}</em>"
-        parts.append(t)
-    return "<p>" + "".join(parts) + "</p>"
+def para_text(p):
+    t = p.text.replace("\xa0", " ").strip()
+    # ignore pure whitespace or page-number like decorations
+    return t
 
-def docx_copy_images(docx_path: Path, media_out: Path) -> dict:
-    """
-    Copy /word/media/* to media_out. Returns a map of rId->filename for inline mapping attempts.
-    (We also expose a simple list; exact inline positions are hard; we attach to nearest LO below.)
-    """
-    media_out.mkdir(parents=True, exist_ok=True)
-    rId_to_name = {}
-    with zipfile.ZipFile(docx_path, 'r') as z:
-        # Copy media
-        for name in z.namelist():
-            if name.startswith('word/media/'):
-                fn = Path(name).name
-                with z.open(name) as src, open(media_out / fn, 'wb') as dst:
-                    shutil.copyfileobj(src, dst)
-    # Best-effort map rId -> target image filename
-    # Walk relationships in document part
-    doc = Document(docx_path)
-    part = doc.part
-    for rel in part.rels.values():
-        if rel.reltype == RELATIONSHIP_TYPE.IMAGE:
-            target = Path(rel._target.partname).name  # e.g., image1.png
-            rId_to_name[rel.rId] = target
-    return rId_to_name
+def chunker(text: str, size: int = 500, overlap: int = 60):
+    """Simple character-based chunker for RAG; conservative overlap."""
+    text = re.sub(r"\s+", " ", text).strip()
+    if not text:
+        return []
+    out, i = [], 0
+    while i < len(text):
+        out.append(text[i:i+size])
+        i += (size - overlap)
+    return out
 
-def collect_inline_images(doc):
-    """
-    Build a list of inline images per paragraph index.
-    We rely on low-level relationship IDs stored in drawings.
-    """
-    para_idx_to_imgs = defaultdict(list)
+def parse_docx(fp: Path, max_paras: int, verbose: bool=False):
+    """Return a list of (chapter dicts) extracted from a single docx."""
+    doc = Document(str(fp))
 
-    for bi, b in enumerate(doc.element.body.iter()):
-        # Limit scan to w:p (paragraph) elements
-        if b.tag.endswith('}p'):
-            # find drawings in this paragraph
-            drawings = list(b.iterfind('.//{http://schemas.openxmlformats.org/drawingml/2006/main}blip'))
-            imgs = []
-            for d in drawings:
-                rId = d.attrib.get('{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed')
-                if rId:
-                    imgs.append(rId)
-            if imgs:
-                para_idx_to_imgs[bi].extend(imgs)
-    return para_idx_to_imgs
-
-# ---------- parser
-
-def parse_docx(docx_path: Path, ch_num: int, media_root: Path):
-    doc = Document(docx_path)
-    # map para element index to inline rIds
-    para_idx_to_imgs = collect_inline_images(doc)
-    # copy images out
-    ch_media_dir = media_root / f'ch{ch_num}'
-    rId_to_name = docx_copy_images(docx_path, ch_media_dir)
-
-    chapter_title = None
-    los = []
+    chapters = []
+    cur_ch = None
     cur_lo = None
-    cur_lo_html = []
-    cur_lo_imgs = []
+    cur_snip = None
 
-    # used for rag snippets (H3)
-    snippets = []
+    # helpers
+    def start_ch(title):
+        nonlocal cur_ch, cur_lo, cur_snip
+        if verbose: print(f"… new chapter: {title}")
+        cur_ch = {"title": norm(title), "los": []}
+        chapters.append(cur_ch)
+        cur_lo = None
+        cur_snip = None
 
-    # Walk body paragraphs with a parallel body index (to attach inline images near content)
-    body_paras = [p for p in doc.paragraphs]
-    for i, p in enumerate(body_paras):
-        if is_heading(p, 1):
-            # Chapter title
-            chapter_title = p.text.strip() or f"Chapter {ch_num}"
+    def start_lo(title):
+        nonlocal cur_lo, cur_snip
+        if verbose: print(f"    … LO: {title}")
+        cur_lo = {"title": norm(title), "preview": "", "snippets": []}
+        cur_ch["los"].append(cur_lo)
+        cur_snip = None
+
+    def start_snip(title):
+        nonlocal cur_snip
+        cur_snip = {"title": norm(title) or "Body", "body": ""}
+        cur_lo["snippets"].append(cur_snip)
+
+    # pass 1: walk paragraphs
+    for p in doc.paragraphs:
+        lvl = is_heading(p)
+        txt = para_text(p)
+        if not (txt or lvl):
             continue
 
-        if is_heading(p, 2):
-            # New LO
-            if cur_lo:
-                # flush previous
-                los.append({
-                    "title": cur_lo,
-                    "slug": slugify(cur_lo),
-                    "html": "\n".join(cur_lo_html).strip(),
-                    "images": cur_lo_imgs[:]
-                })
-            cur_lo = p.text.strip() or f"LO — {len(los)+1}"
-            cur_lo_html, cur_lo_imgs = [], []
+        if lvl == 1:                     # Chapter
+            start_ch(txt)
             continue
 
-        # H3 snippet OR bold-only line => stash snippet and include as <h3>
-        if is_heading(p, 3) or is_bold_line(p):
-            h3_text = p.text.strip()
-            if h3_text:
-                cur_lo_html.append(f"<h3>{html.escape(h3_text)}</h3>")
-                # capture snippet for rag
-                snippets.append({
-                    "chapter": chapter_title or f"Chapter {ch_num}",
-                    "lo": cur_lo or "",
-                    "title": h3_text,
-                    "text": h3_text,  # short; we’ll also add nearby body
-                    "url": f"#ch{ch_num}-{slugify(cur_lo or '')}"
-                })
+        if lvl == 2:                     # LO
+            if cur_ch is None:           # safety: LO before any chapter
+                start_ch("Untitled Chapter")
+            start_lo(txt)
             continue
 
-        # normal paragraph
-        if p.text.strip():
-            cur_lo_html.append(para_to_html(p))
+        if lvl == 3 and cur_lo is not None:  # Snippet title
+            start_snip(txt)
+            continue
 
-        # attach any inline images found at this paragraph
-        if i in para_idx_to_imgs:
-            for rId in para_idx_to_imgs[i]:
-                img_name = rId_to_name.get(rId)
-                if img_name:
-                    rel_path = f"/static/media/ch{ch_num}/{img_name}"
-                    cur_lo_imgs.append(rel_path)
-                    cur_lo_html.append(f'<figure><img src="{rel_path}" alt=""><figcaption></figcaption></figure>')
+        # plain paragraph
+        if cur_lo is None:
+            # ignore text outside an LO
+            continue
 
-    # flush last LO
-    if cur_lo:
-        los.append({
-            "title": cur_lo,
-            "slug": slugify(cur_lo),
-            "html": "\n".join(cur_lo_html).strip(),
-            "images": cur_lo_imgs[:]
-        })
+        if not cur_lo["preview"]:        # first text inside LO becomes preview
+            cur_lo["preview"] = txt
 
-    # chapter fallback
-    if not chapter_title:
-        chapter_title = f"Chapter {ch_num}"
+        if cur_snip is None:
+            # we haven't seen an H3; put paragraph under implicit "Body"
+            if not cur_lo["snippets"]:
+                start_snip("Body")
+            cur_snip = cur_lo["snippets"][-1]
 
-    return {
-        "chapter_title": chapter_title,
-        "chapter_slug": f"ch{ch_num}",
-        "los": los,
-        "snippets": snippets
-    }
+        # append with newlines between paragraphs
+        cur_snip["body"] = (cur_snip["body"] + "\n\n" + txt).strip()
 
-# ---------- main
+    # pass 2: if an LO ended up with huge body and no H3s, keep first N paras
+    for ch in chapters:
+        for lo in ch["los"]:
+            if not lo["snippets"]:
+                continue
+            only = (len(lo["snippets"]) == 1 and lo["snippets"][0]["title"] == "Body")
+            if only:
+                paras = [x.strip() for x in lo["snippets"][0]["body"].split("\n\n") if x.strip()]
+                kept = paras[:max_paras]
+                lo["snippets"][0]["body"] = "\n\n".join(kept)
+
+    # optional: write tiny HTML previews for sanity
+    try:
+        TMP_HTML.mkdir(parents=True, exist_ok=True)
+        for i, ch in enumerate(chapters, 1):
+            safe = re.sub(r"[^a-z0-9]+", "-", ch["title"].lower()).strip("-") or f"ch{i}"
+            out = TMP_HTML / f"({i:04d}) {safe}.html"
+            with out.open("w", encoding="utf-8") as f:
+                f.write(f"<h1>{ch['title']}</h1>\n")
+                for lo in ch["los"]:
+                    f.write(f"<h2>{lo['title']}</h2>\n<p><em>{lo['preview']}</em></p>\n")
+                    for s in lo["snippets"]:
+                        if s["title"]:
+                            f.write(f"<h3>{s['title']}</h3>\n")
+                        f.write(f"<p>{s['body']}</p>\n")
+    except Exception:
+        pass
+
+    return chapters
+
+def build_rag(chapters):
+    items = []
+    idx = 0
+    for ci, ch in enumerate(chapters, 1):
+        for li, lo in enumerate(ch["los"], 1):
+            base_meta = {
+                "chapter": ch["title"],
+                "lo": lo["title"],
+                "loc": f"ch{ci}-lo{li}",
+            }
+            # Include preview
+            if lo.get("preview"):
+                for c in chunker(lo["preview"]):
+                    items.append({"id": f"snip-{idx}", "text": c, **base_meta})
+                    idx += 1
+            # Include snippets
+            for s in lo.get("snippets", []):
+                payload = s.get("body", "")
+                for c in chunker(payload):
+                    obj = {"id": f"snip-{idx}", "text": c, **base_meta}
+                    if s.get("title"):
+                        obj["snippet"] = s["title"]
+                    items.append(obj)
+                    idx += 1
+    return {"count": len(items), "items": items}
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--src", required=True, help="Folder with .docx files")
-    ap.add_argument("--out", default="site.json", help="Path to site.json to write")
-    ap.add_argument("--rag", default="static/rag/chunks.json", help="Path to rag chunks json")
-    ap.add_argument("--media", default="static/media", help="Root for extracted media")
+    ap.add_argument("--src", required=True, help="folder containing .docx")
+    ap.add_argument("--out", required=True, help="site.json output path")
+    ap.add_argument("--rag", required=True, help="rag json output path")
+    ap.add_argument("--media", required=False, help="(reserved) media folder")
     ap.add_argument("--book", default="Advice Only™ Methodology (2024)")
+    ap.add_argument("--max-paras", type=int, default=DEFAULT_MAX_PARAS)
     ap.add_argument("--verbose", action="store_true")
     args = ap.parse_args()
 
     src = Path(args.src)
-    media_root = Path(args.media)
-    tmp_html = Path("tmp_html"); tmp_html.mkdir(exist_ok=True)
+    out = Path(args.out)
+    rag = Path(args.rag)
 
-    files = sorted(src.glob("*.docx"))
-    if not files:
-        print(f"[!] No .docx in {src}")
+    docx_paths = []
+    if src.is_dir():
+        for p in sorted(src.glob("*.docx")):
+            docx_paths.append(p)
+        # also support nested: source/2024-test/*.docx
+        for p in sorted(src.glob("*/*.docx")):
+            docx_paths.append(p)
+
+    if not docx_paths:
+        print("[!] No .docx in source")
         return
 
+    if args.verbose:
+        for i, p in enumerate(docx_paths, 1):
+            print(f"… parsing ch{i}: {p.name}")
+
     chapters = []
-    all_snips = []
-    for idx, f in enumerate(files, start=1):
-        print(f"… parsing ch{idx}: {f.name}")
-        data = parse_docx(f, idx, media_root)
-        chapters.append({
-            "title": data["chapter_title"],
-            "slug": data["chapter_slug"],
-            "los": [{"title": lo["title"], "slug": lo["slug"]} for lo in data["los"]]
-        })
+    for p in docx_paths:
+        chapters.extend(parse_docx(p, args.max_paras, verbose=args.verbose))
 
-        # write per-chapter preview
-        html_path = tmp_html / f"({datetime.now().year}) {data['chapter_title']}.html"
-        with open(html_path, "w", encoding="utf-8") as w:
-            w.write(f"<h1>{html.escape(data['chapter_title'])}</h1>")
-            for lo in data["los"]:
-                w.write(f"<h2 id='{data['chapter_slug']}-{lo['slug']}'>{html.escape(lo['title'])}</h2>")
-                w.write(lo["html"])
-
-        # stash detailed content into site_details to embed in site.json (UI will read it)
-        data_for_json = {
-            "title": data["chapter_title"],
-            "slug": data["chapter_slug"],
-            "los": data["los"]
-        }
-        # temporarily store the full detail; we will build final site.json below
-        chapters[-1]["__detail"] = data_for_json
-
-        # rag snippets: enrich short text with nearby LO body first paragraph (if exists)
-        for sn in data["snippets"]:
-            # Find LO body first paragraph (strip tags)
-            lo = next((x for x in data["los"] if slugify(x["title"]) == sn["url"].split('#')[-1].split('-')[-1]), None)
-            body_txt = ""
-            if lo and lo["html"]:
-                first_p = re.search(r"<p>(.*?)</p>", lo["html"], re.S)
-                if first_p:
-                    bt = re.sub(r"<.*?>", "", first_p.group(1))
-                    body_txt = ": " + bt[:300]
-            all_snips.append({
-                "id": f"ch{idx}-{slugify(sn['title'])}",
-                "title": f"{data['chapter_title']} • {sn['title']}",
-                "text": (sn["text"] + body_txt).strip(),
-                "url": sn["url"]
-            })
-
-    # Build final site.json (include full per-LO HTML)
     site = {
-        "title": args.book,
-        "generated": datetime.utcnow().isoformat() + "Z",
-        "chapters": []
+        "book": args.book,
+        "chapters": chapters
     }
-    for ch in chapters:
-        det = ch.pop("__detail")
-        site["chapters"].append(det)
 
-    with open(args.out, "w", encoding="utf-8") as w:
-        json.dump(site, w, ensure_ascii=False, indent=2)
-    Path(args.rag).parent.mkdir(parents=True, exist_ok=True)
-    with open(args.rag, "w", encoding="utf-8") as w:
-        json.dump(all_snips, w, ensure_ascii=False, indent=2)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with out.open("w", encoding="utf-8") as f:
+        json.dump(site, f, ensure_ascii=False, indent=2)
+    print(f"[ok] Wrote {out}: {len(chapters)} chapters, {sum(len(c['los']) for c in chapters)} LOs")
 
-    # Summary
-    tot_los = sum(len(c["los"]) for c in site["chapters"])
-    print(f"[ok] Wrote {args.out}: {len(site['chapters'])} chapters, {tot_los} LOs")
-    print(f"[ok] Wrote {args.rag}: {len(all_snips)} snippets")
-    print(f"[i] Previews in {tmp_html.absolute()}")
-    print("[i] Images copied under", media_root)
+    rag.parent.mkdir(parents=True, exist_ok=True)
+    rag_obj = build_rag(chapters)
+    with rag.open("w", encoding="utf-8") as f:
+        json.dump(rag_obj, f, ensure_ascii=False, indent=2)
+    print(f"[ok] Wrote {rag}: {rag_obj['count']} snippets")
+
+    print(f"[i] Previews in {TMP_HTML}")
 
 if __name__ == "__main__":
     main()
