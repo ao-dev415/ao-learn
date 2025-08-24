@@ -119,6 +119,32 @@
       SITE = { book:{title:'(invalid inline JSON)'}, chapters:[] };
     }
 
+
+// After: SITE = JSON.parse(raw);
+
+// Normalize chapter shape (handles los/LOs/learningObjectives + default lock policy)
+(function normalize(){
+  const deepClone = x => (window.structuredClone ? structuredClone(x) : JSON.parse(JSON.stringify(x)));
+  const s = deepClone(SITE);
+
+  s.chapters = (s.chapters || []).map((ch, idx) => {
+    const los =
+      Array.isArray(ch.los) ? ch.los :
+      Array.isArray(ch.LOs) ? ch.LOs :
+      Array.isArray(ch.learningObjectives) ? ch.learningObjectives :
+      [];
+
+    // Preview policy: first 2 chapters open, the rest locked (adjust if you like)
+    const locked = (typeof ch.locked === 'boolean') ? ch.locked : (idx >= 2);
+
+    return { ...ch, los, locked };
+  });
+
+  SITE = s;
+})();
+
+
+    
     // ---- simple router ----
     function setTab(view){
       tabsEl.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-current', String(b.dataset.view===view)));
