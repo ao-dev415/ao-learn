@@ -102,29 +102,20 @@
     }
 
     function renderMain(ch, lo){
-  mainEl.innerHTML = '';
-  mainEl.append(
-    h('h1', {}, `${ch.title} — ${lo.title}`),
-    h('p', {class:'lead'}, lo.preview || 'This is preview text for this learning objective.')
-  );
-
-  const hasSnips = lo.snippets && lo.snippets.length;
-  if (hasSnips) {
-    lo.snippets.forEach(s => {
-      if (s.title) mainEl.append(h('h2', {}, s.title));
-      if (s.body)  mainEl.append(h('p', {}, s.body));
-      if (s.image) {
-        // optional: if your importer populates image {src, alt}
-        const fig = h('figure', {style:'margin:12px 0'});
-        fig.append(h('img', {src: s.image.src, alt: s.image.alt || '', style:'max-width:100%;border-radius:8px'}));
-        if (s.image.caption) fig.append(h('figcaption', {class:'muted'}, s.image.caption));
-        mainEl.append(fig);
+      mainEl.innerHTML = '';
+      mainEl.append(
+        h('h1', {}, `${ch.title} — ${lo.title}`),
+        h('p', {class:'lead'}, lo.preview || 'This is preview text for this learning objective.')
+      );
+      const s = lo.snippets?.[0];
+      if (s) {
+        if (s.title) mainEl.append(h('h2', {}, s.title));
+        if (s.body)  mainEl.append(h('p', {}, s.body));
+      } else {
+        mainEl.append(h('div', {class:'muted'}, 'Data source: site.json.'));
       }
-    });
-  } else {
-    mainEl.append(h('div', {class:'muted'}, 'Data source: site.json.'));
-  }
-}
+    }
+
     // ---- load site.json ----
     let site;
     try {
