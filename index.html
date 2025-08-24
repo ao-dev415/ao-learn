@@ -1,5 +1,134 @@
 <!doctype html>
 <html lang="en">
+
+ <!-- ===== DEBUG OVERLAY FOR site.json / full/site.json ===== -->
+<script>
+(() => {
+  if (window.__SITE_DEBUG_INIT__) return; // guard against duplicates
+  window.__SITE_DEBUG_INIT__ = true;
+
+  // --- tiny overlay UI ---
+  function makeOverlay() {
+    const box = document.createElement('div');
+    box.id = '__site_debug_overlay__';
+    box.style.cssText = [
+      'position:fixed','left:20px','top:20px','z-index:999999',
+      'max-width:680px','min-width:360px',
+      'background:#0e141c','color:#e8eef3',
+      'border:1px solid #374458','border-radius:12px',
+      'box-shadow:0 12px 28px rgba(0,0,0,.45)',
+      'font:13px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif'
+    ].join(';');
+    box.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #263140">
+        <div id="__sd_title" style="font-weight:700">site.json debug</div>
+        <div id="__sd_status" style="margin-left:auto;padding:2px 8px;border-radius:999px;background:#2a3a4d;color:#cfe0ee">checking…</div>
+        <button id="__sd_close" title="Close" style="all:unset;cursor:pointer;color:#9fb3c6">✕</button>
+      </div>
+      <pre id="__sd_detail" style="margin:0;padding:12px;white-space:pre-wrap;max-height:48vh;overflow:auto"></pre>
+      <div style="display:flex;gap:8px;padding:10px 12px;border-top:1px solid #263140">
+        <button id="__sd_copy" style="all:unset;cursor:pointer;background:#1a2430;color:#cfe0ee;border:1px solid #2b3b4f;border-radius:8px;padding:6px 10px">Copy detail</button>
+        <button id="__sd_hide" style="all:unset;cursor:pointer;background:#1a2430;color:#cfe0ee;border:1px solid #2b3b4f;border-radius:8px;padding:6px 10px">Hide</button>
+      </div>
+    `;
+    document.body.appendChild(box);
+    const title  = box.querySelector('#__sd_title');
+    const status = box.querySelector('#__sd_status');
+    const detail = box.querySelector('#__sd_detail');
+    box.querySelector('#__sd_close').onclick = () => box.remove();
+    box.querySelector('#__sd_hide').onclick  = () => box.style.display = 'none';
+    box.querySelector('#__sd_copy').onclick  = async () => {
+      try { await navigator.clipboard.writeText(detail.textContent); status.textContent = 'copied'; }
+      catch { status.textContent = 'copy failed'; }
+      setTimeout(()=>status.textContent='ok', 900);
+    };
+    return { box, title, status, detail };
+  }
+  const ui = makeOverlay();
+
+  const pickUrl = () => {
+    try {
+      const u = new URL(location.href);
+      return u.searchParams.get('full') === '1' ? '/full/site.json' : '/site.json';
+    } catch { return '/site.json'; }
+  };
+
+  const prettyHeaders = res =>
+    [...res.headers.entries()].map(([k,v]) => `${k}: ${v}`).join('\n');
+
+  function show(title, badge, body, ok=false) {
+    ui.title.textContent  = title;
+    ui.status.textContent = badge;
+    ui.status.style.background = ok ? '#123f2c' : '#3b2930';
+    ui.status.style.color      = ok ? '#a8f0c7' : '#f7c0c7';
+    ui.detail.textContent = body;
+    ui.box.style.display  = 'block';
+  }
+
+  (async () => {
+    const url = pickUrl();
+    ui.title.textContent = `site.json debug — ${url}`;
+
+    let res, text = '';
+    try {
+      res = await fetch(url, {
+        credentials: 'same-origin',
+        cache: 'no-store',
+        headers: { 'Accept': 'application/json' }
+      });
+    } catch (e) {
+      show('Network error', 'error',
+           `URL: ${url}\n\n${String(e && e.message || e)}`);
+      return;
+    }
+
+    try { text = await res.text(); } catch {}
+
+    if (!res.ok) {
+      show(`Fetch failed ${res.status} ${res.statusText}`, 'error',
+           `URL: ${res.url}\n\nHEADERS:\n${prettyHeaders(res)}\n\nBODY SAMPLE:\n${text.slice(0,1000)}`);
+      return;
+    }
+
+    const ct = (res.headers.get('content-type') || '').toLowerCase();
+    if (!ct.includes('application/json')) {
+      show('Non-JSON response', 'error',
+           `URL: ${res.url}\ncontent-type: ${ct || '(none)'}\n\nBODY SAMPLE:\n${text.slice(0,1000)}\n\nHINTS:\n• Ensure _redirects has explicit 200 rules for /site.json and /full/site.json.\n• Ensure _headers sets Content-Type: application/json and Cache-Control: no-store for those paths.`);
+      return;
+    }
+
+    let json;
+    try { json = JSON.parse(text); }
+    catch (e) {
+      show('JSON parse error', 'error',
+           `${e.message}\n\nBODY SAMPLE:\n${text.slice(0,1000)}`);
+      return;
+    }
+
+    // expose in console for quick inspection
+    window.__SITE_DEBUG__ = {
+      url,
+      status: res.status,
+      headers: Object.fromEntries(res.headers.entries()),
+      textSample: text.slice(0,1000),
+      json
+    };
+    window.dispatchEvent(new CustomEvent('sitejson:debug', { detail: window.__SITE_DEBUG__ }));
+
+    const chapters = Array.isArray(json?.chapters) ? json.chapters.length : 0;
+    const bookName = (json?.book?.title || json?.book?.name || 'Book');
+    show('site.json OK', 'ok',
+         `URL: ${url}\nstatus: ${res.status}\ncontent-type: ${ct}\nbook: ${bookName}\nchapters: ${chapters}\n\nTip: add ?full=1 to the URL to force /full/site.json`, true);
+
+    // Auto-hide after a few seconds, leave it re-openable via console
+    setTimeout(() => { ui.box.style.display = 'none'; }, 6000);
+    // Reopen later: document.getElementById('__site_debug_overlay__').style.display='block'
+  })();
+})();
+</script>
+<!-- ===== /DEBUG OVERLAY ===== -->
+ 
+  
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
