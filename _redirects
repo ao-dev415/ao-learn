@@ -1,0 +1,12 @@
+# Never rewrite JSON or static assets
+/site.json               /site.json              200
+/full/site.json          /full/site.json         200
+/static/*                /static/:splat          200
+/favicon.ico             /favicon.ico            200
+/robots.txt              /robots.txt             200
+
+# SPA fallback ONLY for non-file paths (prevents loops)
+# (Requests that actually map to a file above are left alone)
+# If Cloudflare flags this rule, you can remove the line entirely;
+# Pages can serve index.html at root without it.
+/*                       /index.html             200
