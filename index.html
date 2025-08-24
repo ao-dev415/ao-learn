@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Advice Only™ Bookstore (Preview)</title>
+  <meta name="robots" content="noindex,nofollow" />
+  <style>
+    :root { --bg:#0b0d10; --panel:#12151a; --muted:#8ea1b2; --fg:#e8eef3; --brand:#00d0b6; --border:#1e242c; }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,"Helvetica Neue",Arial,sans-serif}
+    a{color:var(--brand);text-decoration:none}
+    .wrap{display:grid;grid-template-columns:280px 1fr 320px;gap:16px;min-height:100vh;padding:16px}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:10px}
+    .nav{padding:12px;overflow:auto;max-height:calc(100vh - 32px)}
+    .nav h3{margin:12px 8px 6px;color:#bcd0e0;font-weight:600;font-size:13px}
+    .nav ul{list-style:none;margin:0;padding:0}
+    .nav li{margin:0}
+    .nav button{display:block;width:100%;text-align:left;background:transparent;border:0;color:var(--fg);padding:8px 10px;border-radius:8px}
+    .nav button:hover{background:#171c24}
+    .nav .lo{padding-left:18px;color:var(--muted)}
+    .main{padding:16px;overflow:auto}
+    .main h1{margin:0 0 14px;font-size:22px}
+    .main h2{margin:20px 0 8px;font-size:16px}
+    .main .lead{margin:0 0 16px;color:#c7d7e6}
+    .rail{padding:12px}
+    .rail h4{margin:0 0 8px;color:#bcd0e0;font-weight:600}
+    .alert{border:1px solid var(--border);padding:12px;border-radius:10px;color:#c7d7e6}
+    .muted{color:var(--muted)}
+    .kbd{font:12px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#0d1117;padding:1px 6px;border-radius:6px;border:1px solid #222a33;color:#a3b4c5}
+    @media (max-width:1100px){ .wrap{grid-template-columns:1fr; } .rail{order:3} .nav{order:1} .main{order:2} }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <aside class="card nav" id="nav"><div class="muted">Loading…</div></aside>
+    <main class="card main" id="main">
+      <h1>Welcome</h1>
+      <p class="lead">Select a learning objective from the left.</p>
+      <div class="muted">If you see a blank page later, open <span class="kbd">Console</span> and <span class="kbd">Network</span> to check <span class="kbd">site.json</span> and any JS errors.</div>
+    </main>
+    <aside class="card rail">
+      <h4>Alerts</h4>
+      <div class="alert">“Site accessibility tutorial” lives here for now. Later: notifications for subscribed users.</div>
+    </aside>
+  </div>
+
+  <script>
+  (async function boot(){
+    const nav = document.getElementById('nav');
+    const main = document.getElementById('main');
+
+    function h(tag, attrs={}, ...children){
+      const el = document.createElement(tag);
+      for (const [k,v] of Object.entries(attrs||{})){
+        if (k === 'class') el.className = v;
+        else if (k.startsWith('on') && typeof v === 'function') el.addEventListener(k.slice(2), v);
+        else el.setAttribute(k, v);
+      }
+      for (const c of children){
+        if (c == null) continue;
+        el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+      }
+      return el;
+    }
+
+    function renderMain(ch, lo, snippet){
+      main.innerHTML = '';
+      main.append(
+        h('h1', {}, `${ch.title} — ${lo.title}`),
+        h('p', {class:'lead'}, lo.preview || 'This is preview text for this learning objective.'),
+      );
+      if (snippet){
+        main.append(h('h2', {}, snippet.title || 'Why am I doing this?'));
+        main.append(h('p', {}, snippet.body || 'Body text…'));
+      }
+      main.append(
+        h('div', {class:'muted'}, 'Data source: site.json.'),
+      );
+    }
+
+    function mountNav(site){
+      nav.innerHTML = '';
+      const ul = h('ul');
+      site.chapters.forEach((ch, chIdx) => {
+        ul.append(
+          h('h3', {}, ch.title),
+          ...ch.los.map((lo, loIdx) => {
+            return h('li', {},
+              h('button', {class:'lo', onclick: () => {
+                const s = (lo.snippets && lo.snippets[0]) || null;
+                renderMain(ch, lo, s);
+                location.hash = `#ch${chIdx+1}-lo${loIdx+1}`;
+              }}, lo.title)
+            );
+          })
+        );
+      });
+      nav.append(ul);
+    }
+
+    // Load site.json (no-store to avoid Access+cache oddities)
+    let site;
+    try{
+      const res = await fetch('site.json', {cache:'no-store', credentials:'same-origin'});
+      if (!res.ok) throw new Error(`site.json ${res.status}`);
+      site = await res.json();
+    }catch(err){
+      nav.innerHTML = '';
+      nav.append(h('div', {class:'muted'}, `Could not load site.json (${String(err)}).`));
+      console.error('site.json load failed:', err);
+      return;
+    }
+
+    // Expect shape: { bookTitle, chapters:[{title, los:[{title, preview, snippets:[{title, body}], ...}]}] }
+    mountNav(site);
+
+    // Deep link (#ch1-lo2)
+    const m = location.hash.match(/^#ch(\d+)-lo(\d+)$/);
+    if (m){
+      const ch = site.chapters[+m[1]-1];
+      const lo = ch?.los?.[+m[2]-1];
+      if (ch && lo){
+        renderMain(ch, lo, lo.snippets?.[0]);
+        return;
+      }
+    }
+    // default: first LO if available
+    if (site.chapters?.[0]?.los?.[0]){
+      renderMain(site.chapters[0], site.chapters[0].los[0], site.chapters[0].los[0].snippets?.[0]);
+    }
+  })();
+  </script>
+</body>
+</html>
