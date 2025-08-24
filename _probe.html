@@ -1,0 +1,52 @@
+<!doctype html>
+<meta charset="utf-8"/>
+<title>AO Probe</title>
+<style>
+  body{font:14px system-ui;background:#0b0d10;color:#e8eef3;margin:20px}
+  pre{white-space:pre-wrap;background:#11161e;border:1px solid #1e242c;padding:12px;border-radius:8px}
+  b{color:#7bd6c4}
+</style>
+<h1>AO Fetch Probe</h1>
+<p>This page fetches <code>site.json</code> and <code>full/site.json</code> with <code>credentials:"same-origin"</code> and dumps status, headers, and first 1,000 bytes.</p>
+
+<div id="out"></div>
+
+<script>
+async function probe(url){
+  const out = document.getElementById('out');
+  const sec = document.createElement('section');
+  sec.innerHTML = `<h2>GET <code>${url}</code></h2><pre>Loading…</pre>`;
+  out.append(sec);
+  const pre = sec.querySelector('pre');
+
+  try {
+    const res = await fetch(url, {credentials:'same-origin', cache:'no-store'});
+    const headers = [...res.headers.entries()].map(([k,v])=>`${k}: ${v}`).join('\n');
+    const ct = res.headers.get('content-type') || '';
+    const txt = await res.text();
+    const sample = txt.slice(0,1000);
+
+    pre.textContent =
+`<status> ${res.status} ${res.statusText}
+<content-type> ${ct}
+<url> ${res.url}
+
+<headers>
+${headers}
+
+<body sample (first 1000 bytes)>
+${sample}
+
+<json check>
+${(() => {
+  try { JSON.parse(txt); return 'OK (valid JSON)'; }
+  catch (e) { return 'NOT JSON: ' + e.message; }
+})()}`;
+  } catch (e) {
+    pre.textContent = 'FETCH ERROR: ' + (e && e.message || e);
+  }
+}
+
+probe('/site.json');
+probe('/full/site.json');
+</script>
