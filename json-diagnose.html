@@ -1,0 +1,38 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>JSON Diagnose</title>
+<style>
+  body{background:#0b0d10;color:#e8eef3;font:14px/1.45 system-ui;margin:0;padding:16px}
+  .card{background:#12151a;border:1px solid #1e242c;border-radius:10px;padding:12px;margin:0 0 12px}
+  pre{white-space:pre-wrap;margin:8px 0 0}
+  code{background:#0d1117;border:1px solid #222a33;border-radius:6px;padding:1px 6px}
+</style>
+<h1>JSON Diagnose</h1>
+<div id="out"></div>
+<script>
+(async () => {
+  const out = document.getElementById('out');
+  const test = async (label, url) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'card';
+    wrap.innerHTML = `<b>${label}</b> <code>${url}</code>`;
+    out.append(wrap);
+    try {
+      const res = await fetch(url, {credentials:'same-origin', cache:'no-store', redirect:'follow'});
+      const headers = [...res.headers.entries()].map(([k,v]) => k+': '+v).join('\n');
+      const text = await res.text();
+      const sample = text.slice(0, 800);
+      const pass = res.ok && (res.headers.get('content-type')||'').includes('application/json');
+      wrap.insertAdjacentHTML('beforeend',
+        `<pre>Status: ${res.status}\nContent-Type: ${res.headers.get('content-type')}\n\nHeaders:\n${headers}\n\nBody (first 800):\n${sample}</pre>` +
+        `<div style="margin-top:8px;color:${pass?'#00d0b6':'#ff9aa2'}">${pass?'✓ Looks like JSON':'✗ Not JSON or non-200'}</div>`
+      );
+    } catch (e) {
+      wrap.insertAdjacentHTML('beforeend', `<pre>Fetch error: ${String(e && e.message || e)}</pre>`);
+    }
+  };
+  const bust = Date.now();
+  await test('Preview', `/site.json?v=${bust}`);
+  await test('Full', `/full/site.json?v=${bust}`);
+})();
+</script>
