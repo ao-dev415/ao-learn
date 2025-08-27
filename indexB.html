@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Advice-Only® Bookstore (Preview)</title>
+<meta name="robots" content="noindex,nofollow"/>
+
+<style>
+  :root{
+    --bg:#0b0d10;--panel:#12151a;--muted:#8ea1b2;--fg:#e8eef3;--brand:#00d0b6;
+    --border:#1e242c;--hover:#171c24;--danger:#ff5d5d;--warn:#ffcc66;--ok:#25d18a
+  }
+  *{box-sizing:border-box}html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,"Helvetica Neue",Arial,sans-serif}
+  a{color:var(--brand);text-decoration:none}
+
+  /* Top bar */
+  .top{position:sticky;top:0;z-index:50;background:#0c1015;border-bottom:1px solid var(--border)}
+  .top-wrap{display:grid;grid-template-columns:220px 1fr 380px;gap:12px;align-items:center;padding:10px 16px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800}
+  .logo img{height:26px;width:auto;display:block}
+  .menu{display:flex;gap:6px;flex-wrap:wrap}
+  .menu a{padding:6px 10px;border-radius:8px;color:#cfe0ee}
+  .menu a[aria-current="page"], .menu a:hover{background:var(--hover)}
+  .search{position:relative}
+  .search input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #233041;background:#0d131a;color:var(--fg)}
+  .search .dd{position:absolute;inset:auto 0 auto 0;top:42px;background:#0f141b;border:1px solid #223042;border-radius:10px;max-height:50vh;overflow:auto;box-shadow:0 10px 30px rgba(0,0,0,.35);display:none}
+  .search .dd.show{display:block}
+  .search .res{padding:10px;border-bottom:1px dashed #223042;cursor:pointer}
+  .search .res:hover{background:#131a23}
+  .search .res small{display:block;color:#98a9ba;margin-top:4px}
+  .search mark{background:transparent;color:#e4faff;border-bottom:1px solid #2c4655}
+
+  /* Layout columns */
+  .wrap{display:grid;grid-template-columns:280px 1fr 320px;gap:16px;min-height:calc(100vh - 58px);padding:16px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:10px}
+  .nav{padding:12px;overflow:auto;max-height:calc(100vh - 98px)}
+  .main{padding:16px;overflow:auto}
+  .rail{padding:12px}
+
+  /* Left nav */
+  .nav h3{margin:12px 8px 6px;color:#bcd0e0;font-weight:600;font-size:13px}
+  .nav ul{list-style:none;margin:0;padding:0}
+  .nav li{margin:0}
+  .nav button{display:block;width:100%;text-align:left;background:transparent;border:0;color:var(--fg);padding:8px 10px;border-radius:8px;cursor:pointer}
+  .nav button:hover{background:var(--hover)}
+  .nav .lo{padding-left:18px;color:#cfe0ee}
+  .nav button[aria-current="true"]{background:#0e2723;outline:1px solid #11433b}
+  .nav .meta-link{margin:12px 8px 6px;display:block;color:var(--muted);font-size:13px}
+
+  /* Reader */
+  .main h1{margin:0 0 14px;font-size:22px}
+  .main h2{margin:20px 0 8px;font-size:16px}
+  .main .lead{margin:0 0 16px;color:#c7d7e6}
+
+  /* Small components */
+  .muted{color:var(--muted)}
+  .kbd{font:12px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#0d1117;padding:2px 6px;border-radius:6px;border:1px solid #222a33;color:#a3b4c5}
+  .btn{display:inline-block;padding:8px 10px;border-radius:8px;border:1px solid #11433b;background:#0e2723;color:#e8eef3;text-decoration:none;font-weight:600;cursor:pointer}
+  .btn:hover{filter:brightness(1.08)}
+  .pill{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #2a3340;background:#0d1117;color:#9ab0c3}
+  .cardlet{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px;margin:0 0 12px}
+  .cardlet h4{margin:0 0 8px;color:#bcd0e0;font-weight:600;font-size:14px}
+  .progress{height:10px;background:#0d1117;border:1px solid #222a33;border-radius:999px;overflow:hidden}
+  .progress>i{display:block;height:100%;width:0%;background:linear-gradient(90deg,#00d0b6,#35e0a5)}
+
+  /* My Data (time, competency) */
+  .data-grid{display:grid;grid-template-columns:1fr;gap:12px}
+  .data-table{width:100%;border-collapse:collapse;font-size:14px}
+  .data-table th,.data-table td{padding:8px;border-bottom:1px dashed #2a3340}
+  .data-table th{border-bottom:1px solid #2a3340;color:#bcd0e0;font-weight:600;text-align:left}
+  .data-table td:last-child,.data-table th:last-child{text-align:right}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:-1px;margin-right:6px}
+  .dot.red{background:var(--danger)}
+  .dot.yellow{background:var(--warn)}
+  .dot.green{background:var(--ok)}
+  .legend{display:flex;gap:12px;align-items:center}
+  .legend span{display:inline-flex;align-items:center;gap:6px;color:#9ab0c3;font-size:12px}
+
+  /* Events list */
+  .event{padding:10px;border:1px solid var(--border);border-radius:10px;margin:0 0 10px}
+  .event h3{margin:0 0 4px;font-size:16px}
+  .event .meta{color:#9ab0c3;font-size:12px}
+
+  @media (max-width:1100px){
+    .top-wrap{grid-template-columns:1fr}
+    .wrap{grid-template-columns:1fr}
+    .nav{order:1}.main{order:2}.rail{order:3}
+  }
+</style>
+</head>
+<body>
+
+  <!-- Top bar -->
+  <header class="top" id="top">
+    <div class="top-wrap">
+      <div class="logo">
+        <!-- Replace /logo.svg with your actual logo; if missing, text remains -->
+        <img src="/logo.svg" alt="" onerror="this.remove()"/>
+        <a href="#home" id="brand">Advice-Only®</a>
+      </div>
+      <nav class="menu" id="menu">
+        <a href="#home" data-route="home">Home</a>
+        <a href="#data" data-route="data">My Data</a>
+        <a href="#events" data-route="events">Events</a>
+        <a href="#privacy" data-route="privacy">Privacy</a>
+        <a href="#about" data-route="about">About</a>
+      </nav>
+      <div class="search" id="search">
+        <input id="q" placeholder="Search or ask (Enter to view all)…" autocomplete="off"/>
+        <div class="dd" id="dd"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Columns -->
+  <div class="wrap">
+    <aside class="card nav" id="nav"><div class="muted">Loading…</div></aside>
+
+    <main class="card main" id="main">
+      <h1>Welcome</h1>
+      <p class="lead">Select a learning objective from the left. Use the search above to jump to content.</p>
+      <div class="muted">Data comes from <span class="kbd">site.json</span>. Add <span class="kbd">?full=1</span> to load <span class="kbd">full/site.json</span>.</div>
+    </main>
+
+    <aside class="card rail" id="rail"><div class="muted">Loading cards…</div></aside>
+  </div>
+
+<script>
+/* ===========================================================
+   Advice-Only® Reader + Menu Pages + Rail + Search + Timing
+   Local-only; reads site.json (or full/site.json with ?full=1)
+   =========================================================== */
+(function(){
+  // ---------- DOM refs ----------
+  const NAV  = document.getElementById('nav');
+  const MAIN = document.getElementById('main');
+  const RAIL = document.getElementById('rail');
+  const MENU = document.getElementById('menu');
+  const SEARCH_BOX = document.getElementById('q');
+  const SEARCH_DD  = document.getElementById('dd');
+
+  // ---------- Config / constants ----------
+  const LS_SEEN = 'ao.v2.seen';
+  const LS_TIME = 'ao.v2.time';   // { "1.2": seconds, ... }
+  const LS_LAST = 'ao.v2.last';   // last LO key for in-flight timing
+  const COMP_THRESH = { red:20, yellow:60 }; // seconds; <20 red, <60 yellow, else green
+  const HASH_LO = /^#ch(\d+)-lo(\d+)$/;
+
+  // Subpath-safe loader: resolves next to this HTML file
+  const pickUrl = () => {
+    const base = location.pathname.replace(/[^/]*$/, ''); // directory of this HTML
+    const full = new URL(location.href).searchParams.get('full') === '1';
+    return base + (full ? 'full/site.json' : 'site.json');
+  };
+
+  // ---------- Tiny helpers ----------
+  const h=(t,a={},...c)=>{const e=document.createElement(t);
+    for(const[k,v]of Object.entries(a)){
+      if(k==='class')e.className=v;
+      else if(k==='html')e.innerHTML=v;
+      else if(k.startsWith('on')&&typeof v==='function')e.addEventListener(k.slice(2),v);
+      else e.setAttribute(k,v);
+    }
+    c.forEach(x=>{ if(x!=null) e.appendChild(typeof x==='string'?document.createTextNode(x):x) });
+    return e;
+  };
+  const num = s => s ? parseInt(s,10) : NaN;
+  const tokenize = s => (s||'').toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(Boolean);
+  const fmtDate=(iso,tz,time)=>{
+    try{const dt=new Date(`${iso}T${time||'00:00'}:00`);
+      const opt={dateStyle:'medium',timeStyle:time?'short':undefined};
+      if(tz) opt.timeZone = tz;
+      const s=new Intl.DateTimeFormat(undefined,opt).format(dt);
+      return s + (tz?` (${(tz.split('/')[1]||tz)})`:'');
+    }catch{ return iso+(time?` ${time}`:''); }
+  };
+
+  // ---------- State (localStorage-backed) ----------
+  const loadJSON=(k,def)=>{ try{const v=JSON.parse(localStorage.getItem(k)||''); return v??def;}catch{ return def; } };
+  const saveJSON=(k,v)=>localStorage.setItem(k, JSON.stringify(v));
+  const seen = new Set(loadJSON(LS_SEEN, []));
+  const timeMap = loadJSON(LS_TIME, {}); // key "c.l" -> seconds
+  let currentTimer = null; // {key,start}
+
+  // ---------- Timing: start/stop per LO ----------
+  function startTiming(key){
+    stopTiming(); // close any previous
+    currentTimer = { key, start: Date.now() };
+    localStorage.setItem(LS_LAST, key);
+  }
+  function stopTiming(){
+    if(!currentTimer) return;
+    const dt = Math.max(0, Math.round((Date.now() - currentTimer.start)/1000));
+    timeMap[currentTimer.key] = (timeMap[currentTimer.key] || 0) + dt;
+    saveJSON(LS_TIME, timeMap);
+    currentTimer = null;
+    localStorage.removeItem(LS_LAST);
+  }
+  // Safety: ensure timer is flushed on unload/visibility change
+  window.addEventListener('beforeunload', stopTiming);
+  document.addEventListener('visibilitychange', ()=>{ if(document.hidden) stopTiming(); });
+
+  (function recoverTimer(){
+    const key = localStorage.getItem(LS_LAST);
+    if(!key) return;
+    seen.add(key);
+    saveJSON(LS_SEEN, [...seen]);
+    localStorage.removeItem(LS_LAST);
+  })();
+
+  // ---------- Data load / sort ----------
+  let site=null, chapters=[], docs=[];
+  function chapterOrderIndex(ch, i) {
+    if (typeof ch.index === 'number') return ch.index;
+    const ct = (ch.title || '').trim();
+    let m = /^Chapter\s+(\d+)/i.exec(ct);
+    if (m) return num(m[1]);
+    let best = Infinity;
+    (ch.los||[]).forEach(lo=>{
+      const t=(lo.title||'').trim();
+      const matches = t.match(/\b(\d+\.\d+)\b/g);
+      if(matches){matches.forEach(mm=>{
+        const major=parseInt(mm.split('.')[0],10);
+        if(!Number.isNaN(major)&&major<best)best=major;
+      })};
+    });
+    return best !== Infinity ? best : 1000+i;
+  }
+
+  // ---------- Left nav + reader ----------
+  function loLabel(lo){
+    const t=(lo.title||'').trim();
+    const m=t.match(/(\d+\.\d+)/);
+    if(m){
+      const rest=t.replace(m[0],'').replace(/^[-—:\s]+/,'').trim();
+      return `${m[0]} — ${rest||''}`.trim();
+    }
+    return t||'Untitled';
+  }
+  function setActiveLO(btn){
+    NAV.querySelectorAll('button[aria-current="true"]').forEach(b=>b.setAttribute('aria-current','false'));
+    btn?.setAttribute('aria-current','true');
+    btn?.scrollIntoView({block:'nearest', inline:'nearest'});
+  }
+  function renderMain(ch, lo, chIdx, loIdx){
+    const key = `${chIdx+1}.${loIdx+1}`;
+    if(!seen.has(key)){ seen.add(key); saveJSON(LS_SEEN, [...seen]); }
+    stopTiming(); startTiming(key);
+
+    MAIN.innerHTML='';
+    MAIN.append(
+      h('h1',{}, `${ch.title || 'Chapter'} — ${lo.title || 'Learning Objective'}`),
+      h('p',{class:'lead'}, lo.preview || 'This is preview text for this learning objective.')
+    );
+    const s = lo.snippets && lo.snippets[0];
+    if(s){
+      if(s.title) MAIN.append(h('h2',{}, s.title));
+      if(s.body)  MAIN.append(h('p',{}, s.body));
+    } else {
+      MAIN.append(h('div',{class:'muted'}, 'Data source: site.json.'));
+    }
+  }
+  function buildLeftNav(){
+    NAV.innerHTML='';
+    const list=h('ul');
+    chapters.forEach((ch,chIdx)=>{
+      list.append(h('h3',{}, ch.title || `Chapter ${chIdx+1}`));
+      (ch.los||[]).forEach((lo,loIdx)=>{
+        const btn=h('button',{
+          class:'lo',
+          onclick:()=>{
+            renderMain(ch,lo,chIdx,loIdx);
+            location.hash=`#ch${chIdx+1}-lo${loIdx+1}`;
+            setActiveLO(btn);
+            refreshRail();
+          }
+        }, loLabel(lo));
+        list.append(h('li',{}, btn));
+      });
+    });
+    NAV.append(list, h('a',{href:'#data',class:'meta-link'},'→ Open My Data'));
+  }
+  function openFromHash(){
+    const m=location.hash.match(/^#ch(\d+)-lo(\d+)$/);
+    const ch=chapters[(m?+m[1]:1)-1];
+    const lo=ch?.los?.[(m?+m[2]:1)-1];
+    if(ch && lo){
+      renderMain(ch,lo,(m?+m[1]:1)-1,(m?+m[2]:1)-1);
+      const btns = NAV.querySelectorAll('button.lo');
+      let flat=0,target=0;
+      chapters.forEach((c)=>{(c.los||[]).forEach((l)=>{ if(c===ch&&l===lo) target=flat; flat++; });});
+      setActiveLO(btns[target]);
+      return true;
+    }
+    return false;
+  }
+
+  // ---------- Rail cards (profile removed as requested) ----------
+  function totals(){
+    let total=0; (chapters||[]).forEach(ch=> total+=(ch.los?.length||0));
+    let done=0; for(const k of seen){
+      const [ci,li]=(k||'').split('.').map(Number);
+      if(chapters?.[ci-1]?.los?.[li-1]) done++;
+    }
+    return {done,total,pct: total? Math.round((done/total)*100) : 0};
+  }
+  function railAlerts(){
+    const msg=(site.alerts && site.alerts[0]) || 'This panel is a placeholder for progress, recent items, etc.';
+    return h('div',{class:'cardlet'}, h('h4',{},'Alerts'), h('div',{class:'muted'}, msg));
+  }
+  function railNextEvent(){
+    const list=Array.isArray(site.events)?site.events.slice():[];
+    if(!list.length) return null;
+    const now=new Date();
+    list.sort((a,b)=> new Date(`${a.date}T${a.time||'00:00'}:00`) - new Date(`${b.date}T${b.time||'00:00'}:00`));
+    const ev=list.find(e=> new Date(`${e.date}T${e.time||'00:00'}:00`)>=now) || list[0];
+    return h('div',{class:'cardlet'},
+      h('h4',{},'Next event'),
+      h('div',{class:'muted'}, fmtDate(ev.date, ev.tz, ev.time)),
+      h('div',{style:'font-weight:600;margin-top:4px'}, ev.title || 'Event'),
+      ev.mode ? h('div',{class:'muted',style:'margin-top:2px'}, ev.mode) : null,
+      (ev.ctaUrl && ev.ctaLabel) ? h('div',{style:'margin-top:8px'}, h('a',{href:ev.ctaUrl,class:'btn',target:'_blank',rel:'noopener'}, ev.ctaLabel)) : null
+    );
+  }
+  function railProgress(){
+    const {done,total,pct}=totals();
+    return h('div',{class:'cardlet'},
+      h('h4',{},'Your progress'),
+      h('div',{class:'muted'}, `${done} of ${total} (${pct}%)`),
+      h('div',{class:'progress',style:'margin-top:6px'}, h('i',{style:`width:${pct}%;`}))
+    );
+  }
+  function refreshRail(){
+    RAIL.innerHTML='';
+    RAIL.appendChild(railAlerts());
+    const nxt=railNextEvent(); if(nxt) RAIL.appendChild(nxt);
+    RAIL.appendChild(railProgress());
+  }
+
+  // ---------- Menu routing ----------
+  function setActiveMenu(){
+    const r = (location.hash.replace('#','') || 'home').split(':')[0];
+    MENU.querySelectorAll('a').forEach(a=>{
+      a.setAttribute('aria-current', a.dataset.route===r ? 'page' : 'false');
+    });
+  }
+  function renderHome(){
+    stopTiming();
+    MAIN.innerHTML='';
+    MAIN.append(
+      h('h1',{}, site.title || site.book || 'Advice-Only®'),
+      h('p',{class:'lead'}, 'Welcome. Browse chapters on the left, or use search above.')
+    );
+    const {done,total,pct}=totals();
+    MAIN.append(
+      h('div',{class:'cardlet'},
+        h('h4',{},'At a glance'),
+        h('div',{class:'muted'}, `${done} of ${total} learning objectives viewed`),
+        h('div',{class:'progress',style:'margin-top:6px'}, h('i',{style:`width:${pct}%;`})),
+        h('div',{style:'margin-top:10px;display:flex;gap:8px;flex-wrap:wrap'},
+          h('a',{href:'#data',class:'btn'},'Open My Data'),
+          h('a',{href:'#events',class:'btn'},'View Events')
+        )
+      )
+    );
+  }
+  function renderEvents(){
+    stopTiming();
+    MAIN.innerHTML='';
+    MAIN.append(h('h1',{},'Events'), h('p',{class:'lead'},'Upcoming and past sessions.'));
+    const list=Array.isArray(site.events)?site.events.slice():[];
+    if(!list.length){ MAIN.append(h('div',{class:'muted'},'No events found.')); return; }
+    list.sort((a,b)=> new Date(`${a.date}T${a.time||'00:00'}:00`) - new Date(`${b.date}T${b.time||'00:00'}:00`));
+    list.forEach(e=>{
+      MAIN.append(h('div',{class:'event'},
+        h('h3',{}, e.title || 'Event'),
+        h('div',{class:'meta'}, fmtDate(e.date, e.tz, e.time)),
+        e.mode ? h('div',{class:'meta'}, e.mode): null,
+        (e.ctaUrl && e.ctaLabel) ? h('div',{style:'margin-top:6px'}, h('a',{href:e.ctaUrl,class:'btn',target:'_blank',rel:'noopener'}, e.ctaLabel)) : null
+      ));
+    });
+  }
+  function renderPrivacy(){
+    stopTiming();
+    MAIN.innerHTML='';
+    MAIN.append(
+      h('h1',{},'Privacy'),
+      h('p',{class:'lead'}, 'How your data is handled here.')
+    );
+    MAIN.append(
+      h('div',{class:'cardlet'},
+        h('h4',{},'Local-only analytics'),
+        h('p',{},'Time on each learning objective and completion status are stored in your browser (localStorage). Nothing is sent to a server.'),
+        h('p',{},'Manage or clear your data from My Data → Clear progress/time.')
+      )
+    );
+  }
+  function renderAbout(){
+    stopTiming();
+    MAIN.innerHTML='';
+    MAIN.append(h('h1',{},'About'));
+    const a = site.about || site.profile || null;
+    if(!a){
+      MAIN.append(h('div',{class:'muted'},'No about/profile information found in site.json.'));
+      return;
+    }
+    const name = a.name || '';
+    const location = a.location || a.address || '';
+    const bio = a.bio || a.subtitle || '';
+    const specialties = Array.isArray(a.specialties) ? a.specialties : (a.specialty ? [a.specialty] : []);
+    const top = h('div',{class:'cardlet'},
+      h('div',{style:'font-size:18px;font-weight:700'}, name),
+      location ? h('div',{class:'muted',style:'margin-top:2px'}, location) : null,
+      bio ? h('p',{style:'margin-top:8px'}, bio) : null,
+      specialties.length ? h('div', {style:'margin-top:6px'}, h('span',{class:'pill'}, `Specialties: ${specialties.join(', ')}`)) : null,
+      (a.ctaUrl && a.ctaLabel) ? h('div',{style:'margin-top:12px'}, h('a',{href:a.ctaUrl,class:'btn',target:'_blank',rel:'noopener'}, a.ctaLabel)) : null
+    );
+    MAIN.append(top);
+  }
+
+  // ---------- My Data (with time colors) ----------
+  const compColor = secs => secs < COMP_THRESH.red ? 'red' : (secs < COMP_THRESH.yellow ? 'yellow' : 'green');
+  function renderMyData(){
+    stopTiming();
+    const agg = Object.entries(timeMap).reduce((acc,[,s])=>{
+      const c=compColor(s);
+      acc[c]++; acc.totalSecs+=s; return acc;
+    }, {red:0,yellow:0,green:0,totalSecs:0});
+
+    const {done,total,pct} = totals();
+    MAIN.innerHTML='';
+    MAIN.append(
+      h('h1',{},'My Data'),
+      h('p',{class:'lead'},'Local-only engagement data (per learning objective).')
+    );
+
+    const sum = h('div',{class:'data-grid'},
+      h('div',{class:'cardlet'},
+        h('h4',{},'Overall progress'),
+        h('div',{class:'muted'}, `${done} of ${total} viewed (${pct}%)`),
+        h('div',{class:'progress',style:'margin-top:6px'}, h('i',{style:`width:${pct}%;`}))
+      ),
+      h('div',{class:'cardlet'},
+        h('h4',{},'Engagement balance'),
+        h('div',{class:'legend',style:'margin-top:4px'},
+          h('span',{}, h('i',{class:'dot red'}),'Under 20s'),
+          h('span',{}, h('i',{class:'dot yellow'}),'20–59s'),
+          h('span',{}, h('i',{class:'dot green'}),'60s+'),
+        ),
+        h('div',{class:'muted',style:'margin-top:8px'}, `Items by competency:`),
+        h('div',{style:'margin-top:4px'}, 
+          h('span',{class:'pill'}, `Red ${agg.red}`), ' ',
+          h('span',{class:'pill'}, `Yellow ${agg.yellow}`), ' ',
+          h('span',{class:'pill'}, `Green ${agg.green}`)
+        ),
+        h('div',{class:'muted',style:'margin-top:8px'}, `Total time: ${Math.round(agg.totalSecs/60)} min`)
+      )
+    );
+    MAIN.append(sum);
+
+    const table=h('table',{class:'data-table', style:'margin-top:8px'});
+    table.innerHTML=`<thead>
+      <tr>
+        <th>Chapter / LO</th>
+        <th style="text-align:right">Time (s)</th>
+        <th style="text-align:right">Status</th>
+      </tr></thead><tbody></tbody>`;
+    const tb=table.querySelector('tbody');
+
+    (chapters||[]).forEach((ch,ci)=>{
+      const title = ch.title || `Chapter ${ci+1}`;
+      let chTime=0;
+      (ch.los||[]).forEach((_,li)=>{ chTime += (timeMap[`${ci+1}.${li+1}`]||0); });
+      const trC = h('tr',{}, 
+        h('td',{style:'font-weight:600'}, title),
+        h('td',{style:'text-align:right'}, String(chTime)),
+        h('td',{style:'text-align:right'}, '')
+      );
+      tb.appendChild(trC);
+
+      (ch.los||[]).forEach((lo,li)=>{
+        const key=`${ci+1}.${li+1}`, secs=(timeMap[key]||0);
+        const color=compColor(secs);
+        tb.appendChild(h('tr',{},
+          h('td',{}, h('span',{class:'muted'}, `${key} `), lo.title || `LO ${li+1}`),
+          h('td',{style:'text-align:right'}, String(secs)),
+          h('td',{style:'text-align:right'}, h('i',{class:`dot ${color}`},''))
+        ));
+      });
+    });
+    MAIN.append(table);
+
+    MAIN.append(h('div',{style:'margin-top:12px;display:flex;gap:8px;flex-wrap:wrap'},
+      h('button',{class:'btn',onclick:()=>{ localStorage.removeItem(LS_SEEN); seen.clear(); refreshRail(); renderMyData(); }},'Clear progress'),
+      h('button',{class:'btn',onclick:()=>{ localStorage.removeItem(LS_TIME); for(const k in timeMap) delete timeMap[k]; renderMyData(); }},'Clear time'),
+      h('a',{href:'#home',class:'btn'},'Back to Home')
+    ));
+  }
+
+  // ---------- RAG-style search ----------
+  function buildDocs(){
+    docs = [];
+    (chapters||[]).forEach((ch,ci)=>{
+      (ch.los||[]).forEach((lo,li)=>{
+        const key = `${ci+1}.${li+1}`;
+        const fields = [];
+        if (lo.title)   fields.push({text:lo.title, w:3});
+        if (lo.preview) fields.push({text:lo.preview, w:2});
+        (lo.snippets||[]).forEach(s=>{
+          if (s.title) fields.push({text:s.title, w:2});
+          if (s.body)  fields.push({text:s.body,  w:1});
+        });
+        docs.push({ key, ci, li, chTitle: ch.title||`Chapter ${ci+1}`, loTitle: lo.title||`LO ${li+1}`, fields });
+      });
+    });
+  }
+  function scoreDoc(qTokens, doc){
+    let score=0;
+    for(const f of doc.fields){
+      const fTokens = tokenize(f.text);
+      for(const qt of qTokens){
+        const hits = fTokens.filter(t=>t===qt).length;
+        if (hits) score += hits * f.w;
+      }
+    }
+    const lt=(doc.loTitle||'').toLowerCase();
+    if(qTokens.some(q=>lt.includes(q))) score+=2;
+    return score;
+  }
+  function hilite(text, qTokens){
+    if(!text) return '';
+    let out = text;
+    qTokens.forEach(q=>{
+      const esc = q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+      out = out.replace(new RegExp(`(${esc})`,'ig'), '<mark>$1</mark>');
+    });
+    return out;
+  }
+  function showSearchDD(results, qTokens){
+    SEARCH_DD.innerHTML='';
+    if(!results.length){ SEARCH_DD.classList.remove('show'); return; }
+    results.slice(0,8).forEach(r=>{
+      SEARCH_DD.appendChild(
+        h('div',{class:'res', onclick:()=>{ location.hash = `#ch${r.ci+1}-lo${r.li+1}`; SEARCH_DD.classList.remove('show'); SEARCH_BOX.blur(); }},
+          h('div',{html: hilite(`${r.chTitle} — ${r.loTitle}`, qTokens)}),
+          h('small',{html: hilite(r.preview || '', qTokens)})
+        )
+      );
+    });
+    SEARCH_DD.classList.add('show');
+  }
+  function runSearch(q, mode){
+    const qTokens = tokenize(q);
+    if(!qTokens.length){ SEARCH_DD.classList.remove('show'); return; }
+    const results = docs.map(d=>{
+      const pv = (chapters[d.ci].los[d.li].snippets?.[0]?.body) || (chapters[d.ci].los[d.li].preview) || '';
+      return { ...d, score: scoreDoc(qTokens, d), preview: pv };
+    }).filter(r=>r.score>0).sort((a,b)=>b.score-a.score);
+
+    if(mode==='dd'){ showSearchDD(results, qTokens); return; }
+    stopTiming();
+    SEARCH_DD.classList.remove('show');
+    MAIN.innerHTML='';
+    MAIN.append(h('h1',{},'Search'), h('p',{class:'lead'}, `Results for “${q}”`));
+    if(!results.length){ MAIN.append(h('div',{class:'muted'},'No matches.')); return; }
+    results.slice(0,30).forEach(r=>{
+      MAIN.append(h('div',{class:'event'},
+        h('h3',{html: hilite(`${r.chTitle} — ${r.loTitle}`, qTokens)}),
+        h('p',{class:'muted',html: hilite(r.preview || '', qTokens)}),
+        h('div',{}, h('a',{href:`#ch${r.ci+1}-lo${r.li+1}`,class:'btn'},'Open'))
+      ));
+    });
+  }
+  SEARCH_BOX.addEventListener('input', e=>{
+    const q=e.target.value.trim();
+    if(!q){ SEARCH_DD.classList.remove('show'); return; }
+    runSearch(q,'dd');
+  });
+  SEARCH_BOX.addEventListener('keydown', e=>{
+    if(e.key==='Enter'){
+      const q=SEARCH_BOX.value.trim();
+      if(q){ location.hash = '#search:' + encodeURIComponent(q); }
+    }else if(e.key==='Escape'){
+      SEARCH_DD.classList.remove('show');
+    }
+  });
+  document.addEventListener('click', (e)=>{
+    if(!document.getElementById('search').contains(e.target)){ SEARCH_DD.classList.remove('show'); }
+  });
+
+  // ---------- Boot & routing ----------
+  async function boot(){
+    try{
+      const res=await fetch(pickUrl(), {cache:'no-store', credentials:'same-origin'});
+      const txt=await res.text();
+      site=JSON.parse(txt);
+    }catch(e){
+      NAV.innerHTML=''; NAV.append(h('div',{class:'muted'},'Could not load site.json')); return;
+    }
+    chapters=(site.chapters||[])
+      .map((ch,i)=>({ch,ord:chapterOrderIndex(ch,i)}))
+      .sort((a,b)=>a.ord-b.ord)
+      .map(x=>x.ch);
+
+    buildLeftNav();
+    buildDocs();
+    refreshRail();
+
+    route();
+    window.addEventListener('hashchange', route);
+  }
+
+  function route(){
+    setActiveMenu();
+
+    const hash = location.hash || '#home';
+    if (/^#ch\d+-lo\d+$/.test(hash)) { openFromHash(); return; }
+
+    if (hash.startsWith('#home'))     { renderHome(); return; }
+    if (hash.startsWith('#data'))     { renderMyData(); return; }
+    if (hash.startsWith('#events'))   { renderEvents(); return; }
+    if (hash.startsWith('#privacy'))  { renderPrivacy(); return; }
+    if (hash.startsWith('#about'))    { renderAbout(); return; }
+    if (hash.startsWith('#search:'))  { runSearch(decodeURIComponent(hash.split(':')[1]||''),'page'); return; }
+
+    if(!openFromHash()){
+      location.hash = '#ch1-lo1';
+      openFromHash();
+    }
+  }
+
+  boot();
+})();
+</script>
+
+</body>
+</html>
