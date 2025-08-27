@@ -1,55 +1,103 @@
-# AO Local Preview (Docx → Local static site)
-This folder lets you build and view a **fully local** preview of your book without Hugo or GitHub.
+# Advice-Only® Bookstore (Preview)
 
-## What it does
-- Converts your `.docx` chapters (H1/H2/H3) into a single `site.json` nav + HTML.
-- Extracts images to `static/media/` and rewrites links in the HTML.
-- Builds a lightweight **RAG index** (`static/rag/chunks.json`) from H3 sections for the Ask bar.
-- Renders everything in `index.html` with a left tree, top Ask bar (book vs web), right Alerts rail, dark mode, A/A+ font-size, and local-only “My Data” badges.
+A single-file, static reader for chaptered learning content with:
+- left-side **chapter/LO navigation**
+- **RAG-style search** over titles, previews, and snippet bodies
+- right rail **Alerts / Next event / Progress**
+- local-only **time-on-page** tracking with red/yellow/green competency
+- menu pages: **Home · My Data · Events · Privacy · About**
 
-## You need (one-time)
-- **Pandoc** (for docx → html):  
-  macOS: `brew install pandoc`  
-  Windows: download from https://pandoc.org/installing.html
-- **Python 3.9+**
+No build tools required; serves as plain HTML + JSON.
 
-## Put your chapters
-Create a folder, e.g. `./source/2024`, and drop your DOCX files like:
-```
-(2024) Chapter 1 - My Perfect Plan.docx
-(2024) Chapter 2 - Expenses.docx
-...
-(2024) Chapter 9 - Estate Planning.docx
-```
-Headings inside must be:
-- **H1** = Chapter title (once per file)
-- **H2** = Learning objective title (LO 1.1, LO 1.2, …)
-- **H3** = Snippet lines (the bolded leads you described)
+---
 
-## Build
-From this folder run:
-```
-python3 scripts/import_docx.py source/2024
-```
-This will produce:
-```
-site.json
-static/media/… (images)
-static/rag/chunks.json
-```
+## Quick start
 
-## View locally
-Just double-click `index.html`. (Or right-click → Open With → your browser)
+1. Place `index.html` at your site root.
+2. Add a `site.json` next to it (see schema below).
+3. (Optional) Add `/logo.svg` for the brand mark. The brand text reads **Advice-Only®**.
 
-Tip: if the browser blocks local fetches, you can serve it:
-```
-# Python
-python3 -m http.server 8080
-# then open http://localhost:8080/
-```
+Open `index.html` in a browser or serve from any static host.
+Append `?full=1` to the URL to load `/full/site.json` instead of `/site.json`.
 
-## Notes
-- The importer keeps **chapter order** by the numeric chapter in the filename.
-- Images are converted to `<img>` and copied to `static/media/chX/`. Keep originals in Docx, we extract them.
-- The RAG index uses H3 sections and their following paragraphs as the snippet text.
-- Everything is local. Nothing uploads anywhere.
+---
+
+## Routes
+
+- `#home` — welcome and at-a-glance stats
+- `#data` — _My Data_ page with time-on-page and competency status
+- `#events` — list of events from `site.json`
+- `#privacy` — app privacy notes (local-only analytics)
+- `#about` — about/profile info (from `site.json`)
+
+Learning objectives use hash routes like `#ch1-lo2`.
+
+---
+
+## Time / competency model
+
+- Timing starts when an LO loads and stops on navigation or route change.
+- Data is stored in `localStorage`:
+  - `ao.v2.seen` — array of `"chapterIdx.loIdx"` keys
+  - `ao.v2.time` — map `{ "chapter.lo": seconds }`
+- Competency colors (adjust inside `index.html`):
+  - **Red** `< 20s`, **Yellow** `20–59s`, **Green** `≥ 60s`
+- _My Data_ provides:
+  - overall progress
+  - distribution by color
+  - per-chapter totals and per-LO seconds + dot
+  - **Clear progress** / **Clear time** buttons
+
+> Nothing is sent to a server. All analytics are local to the browser.
+
+---
+
+## Search (RAG-style lite)
+
+- Tokenizes the query and ranks documents by token overlap across weighted fields:
+  - LO title (×3), preview (×2), snippet title (×2), snippet body (×1)
+- Type to get a top-8 dropdown; **Enter** opens a results page.
+
+---
+
+## `site.json` schema (minimal)
+
+```json
+{
+  "title": "Advice-Only® Methodology",
+  "alerts": ["Welcome to the preview."],
+  "about": {
+    "name": "Your Name, CFP®",
+    "location": "City, ST",
+    "bio": "Short professional bio here.",
+    "specialties": ["Retirement income", "Tax efficiency"],
+    "ctaLabel": "Work with me",
+    "ctaUrl": "https://example.com/contact"
+  },
+  "events": [
+    {
+      "title": "Advisor CE — Online",
+      "date": "2025-10-01",
+      "time": "16:00",
+      "tz": "America/Los_Angeles",
+      "mode": "Online",
+      "ctaLabel": "Register",
+      "ctaUrl": "https://example.com/register"
+    }
+  ],
+  "chapters": [
+    {
+      "title": "My Perfect Plan",
+      "index": 1,
+      "los": [
+        {
+          "title": "1.1 — What's The Perfect Plan?",
+          "preview": "…",
+          "snippets": [
+            {"title":"Body","body":"…"}
+          ]
+        }
+      ]
+    }
+  ]
+}
