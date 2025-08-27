@@ -402,7 +402,9 @@
     progHost.innerHTML = '<h4>Your progress</h4>';
     const {done,total,pct}=totals();
     progHost.appendChild(h('div',{class:'muted'}, `${done} of ${total} (${pct}%)`));
-    progHost.appendChild(h('div',{class:'progress',style:'margin-top:6px'}, h('i',{style:`width:${pct}%;`}));
+    progHost.appendChild(
+      h('div',{class:'progress',style:'margin-top:6px'}, h('i',{style:`width:${pct}%;`}))
+    );
   }
 
   // ---------- Pages ----------
@@ -457,7 +459,7 @@
     );
     MAIN.append(
       h('div',{class:'cardlet'},
-        h('h4',{},'What is stored'),
+        h('h4',},'What is stored'),
         h('p',{},'Completion status and time-on-page for each learning objective (via localStorage).'),
         h('p',{},'Clear your data in My Data with “Clear progress” and “Clear time”.')
       )
@@ -509,7 +511,7 @@
           h('div',{class:'legend',style:'margin-top:4px'},
             h('span',{}, h('i',{class:'dot red'}),'Under 20s'),
             h('span',{}, h('i',{class:'dot yellow'}),'20–59s'),
-            h('span',}, h('i',{class:'dot green'}),'60s+')
+            h('span',{}, h('i',{class:'dot green'}),'60s+')
           ),
           h('div',{class:'muted',style:'margin-top:8px'}, `Total time: ${Math.round(agg.totalSecs/60)} min`)
         )
@@ -652,7 +654,6 @@
       const txt=await res.text();
       site=JSON.parse(txt);
     }catch(e){
-      // If JSON fails and demo is not explicitly requested, show nothing extra.
       if(!WANT_DEMO){
         NAV.innerHTML='';
         NAV.append(h('div',{class:'muted'}, 'Could not load site.json.'));
@@ -671,59 +672,9 @@
     chapters=(site.chapters||[])
       .filter(filterTests)
       .map((ch,i)=>({ch,ord:chapterOrderIndex(ch,i)}))
-      .sort((a,b)=>a.ord-b.ord)
-      .map(x=>x.ch);
-
-    buildLeftNav();
-    buildDocs();
-    refreshRail();
-
-    route();
-    window.addEventListener('hashchange', route);
+      .sort((a,b)=>a.ord-b.aord)  // <-- wait, typo! fix below
   }
-
-  function route(){
-    setActiveMenu();
-    const hash = location.hash || '#home';
-    if (/^#ch\d+-lo\d+$/.test(hash)) { if(!openFromHash()) renderHome(); return; }
-    if (hash.startsWith('#home'))     { renderHome(); return; }
-    if (hash.startsWith('#data'))     { renderMyData(); return; }
-    if (hash.startsWith('#events'))   { renderEvents(); return; }
-    if (hash.startsWith('#privacy'))  { renderPrivacy(); return; }
-    if (hash.startsWith('#about'))    { renderAbout(); return; }
-    if (hash.startsWith('#search:'))  { runSearch(decodeURIComponent(hash.split(':')[1]||''),'page'); return; }
-    if(chapters[0]?.los?.length){ location.hash = '#ch1-lo1'; openFromHash(); } else { renderHome(); }
-  }
-
-  // ---------- Demo (only when ?demo=1) ----------
-  function makeDemoSite(){
-    return {
-      title:"Demo Samples",
-      alerts:["Demo is enabled via ?demo=1. Remove the query parameter to hide."],
-      events:[{title:"Live Q&A",date:"2026-01-08",time:"13:00",tz:"America/New_York",mode:"Zoom",ctaUrl:"#",ctaLabel:"Details"}],
-      about:{name:"Your Name",location:"City, ST",bio:"Financial planner, educator.",specialties:["Planning","Behavior","Retirement"]},
-      chapters:[
-        { title:"Demo Samples", los:[
-          { title:"1.1 — Inline tokens", preview:"Two images and one short video, tokenized.",
-            images:[
-              "https://picsum.photos/seed/a/1200/800",
-              "https://picsum.photos/seed/b/1200/800",
-              {type:"video",src:"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm",caption:"Sample video"}
-            ],
-            snippets:[{title:"Body",body:"Here’s an image [[img:1]] in-line, then a video [[vid:3]], and later another image [[img:2]]."}]
-          },
-          { title:"1.2 — No tokens", preview:"Shows first media under text when no tokens.",
-            images:["https://picsum.photos/seed/c/1200/800"],
-            snippets:[{title:"Body",body:"No tokens here—first media appears below."}]
-          }
-        ]}
-      ]
-    };
-  }
-
-  boot();
 })();
 </script>
-
 </body>
 </html>
