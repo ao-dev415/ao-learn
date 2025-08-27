@@ -32,13 +32,14 @@
   .search .res small{display:block;color:#98a9ba;margin-top:4px}
   .search mark{background:transparent;color:#e4faff;border-bottom:1px solid #2c4655}
 
-  /* Layout columns */
+  /* Columns */
   .wrap{display:grid;grid-template-columns:280px 1fr 320px;gap:16px;min-height:calc(100vh - 58px);padding:16px}
   .card{background:var(--panel);border:1px solid var(--border);border-radius:10px}
+  .nav{padding:12px;overflow:auto;max-height:calc(100vh - 98px)}
+  .main{padding:16px;overflow:auto}
+  .rail{padding:12px}
 
-  /* Left nav as a column with pinned footer */
-  .nav{padding:12px;display:flex;flex-direction:column;height:calc(100vh - 98px)}
-  .nav .list{overflow:auto;min-height:0}
+  /* Left nav */
   .nav h3{margin:12px 8px 6px;color:#bcd0e0;font-weight:600;font-size:13px}
   .nav ul{list-style:none;margin:0;padding:0}
   .nav li{margin:0}
@@ -47,14 +48,16 @@
   .nav .lo{padding-left:18px;color:#cfe0ee}
   .nav button[aria-current="true"]{background:#0e2723;outline:1px solid #11433b}
   .nav .meta-link{margin:12px 8px 6px;display:block;color:var(--muted);font-size:13px}
-  .nav .foot{margin-top:8px;padding-top:8px;border-top:1px dashed #2a3340;font-size:12px;color:var(--muted)}
-  .nav .foot a{color:var(--muted);text-decoration:underline}
+  .foot{margin:14px 8px 4px;color:var(--muted);font-size:12px;border-top:1px dashed #2a3340;padding-top:10px}
+  .foot a{color:#9ab0c3;text-decoration:underline}
 
   /* Reader */
-  .main{padding:16px;overflow:auto}
   .main h1{margin:0 0 14px;font-size:22px}
   .main h2{margin:20px 0 8px;font-size:16px}
   .main .lead{margin:0 0 16px;color:#c7d7e6}
+  figure{margin:10px 0}
+  figure img, figure video{display:block;max-width:100%;height:auto;border:1px solid var(--border);border-radius:10px;background:#000}
+  figure figcaption{font-size:12px;color:#9ab0c3;margin-top:4px;line-height:1.3}
 
   /* Small components */
   .muted{color:var(--muted)}
@@ -67,7 +70,7 @@
   .progress{height:10px;background:#0d1117;border:1px solid #222a33;border-radius:999px;overflow:hidden}
   .progress>i{display:block;height:100%;width:0%;background:linear-gradient(90deg,#00d0b6,#35e0a5)}
 
-  /* My Data */
+  /* Data table */
   .data-grid{display:grid;grid-template-columns:1fr;gap:12px}
   .data-table{width:100%;border-collapse:collapse;font-size:14px}
   .data-table th,.data-table td{padding:8px;border-bottom:1px dashed #2a3340}
@@ -77,24 +80,6 @@
   .dot.red{background:var(--danger)} .dot.yellow{background:var(--warn)} .dot.green{background:var(--ok)}
   .legend{display:flex;gap:12px;align-items:center}
   .legend span{display:inline-flex;align-items:center;gap:6px;color:#9ab0c3;font-size:12px}
-
-  /* Events */
-  .event{padding:10px;border:1px solid var(--border);border-radius:10px;margin:0 0 10px}
-  .event h3{margin:0 0 4px;font-size:16px}
-  .event .meta{color:#9ab0c3;font-size:12px}
-
-  /* Inline media */
-  figure{margin:10px 0}
-  figure img, figure video{display:block;max-width:100%;height:auto;border:1px solid var(--border);border-radius:10px;background:#000}
-  figure figcaption{font-size:12px;color:#9ab0c3;margin-top:4px}
-
-  /* Lightbox (for zoom) */
-  .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:100}
-  .lightbox.show{display:flex}
-  .lightbox img,.lightbox video{max-width:92vw;max-height:92vh;object-fit:contain;border-radius:10px}
-  .lightbox .close{position:absolute;top:14px;right:14px}
-  .lightbox .arrow{position:absolute;top:50%;transform:translateY(-50%);padding:10px 12px;border-radius:10px;background:rgba(0,0,0,.35);border:1px solid #2a3340;cursor:pointer}
-  .lightbox .prev{left:12px}.lightbox .next{right:12px}
 
   @media (max-width:1100px){
     .top-wrap{grid-template-columns:1fr}
@@ -128,9 +113,7 @@
 
   <!-- Columns -->
   <div class="wrap">
-    <aside class="card nav" id="nav">
-      <div class="muted">Loading…</div>
-    </aside>
+    <aside class="card nav" id="nav"><div class="muted">Loading…</div></aside>
 
     <main class="card main" id="main">
       <h1>Welcome</h1>
@@ -141,52 +124,40 @@
     <aside class="card rail" id="rail">
       <div class="cardlet">
         <h4>Alerts</h4>
-        <div class="muted">This panel is a placeholder for progress, recent items, etc.</div>
+        <div class="muted">This panel is a placeholder for progress and events.</div>
       </div>
-      <div class="cardlet"><h4>Next event</h4><div class="muted">—</div></div>
-      <div class="cardlet"><h4>Your progress</h4><div class="muted">—</div></div>
+      <div class="cardlet" id="rail-events"></div>
+      <div class="cardlet" id="rail-progress"></div>
     </aside>
   </div>
 
   <!-- Lightbox (for zoom) -->
-  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Media viewer">
-    <button class="btn close" id="lbClose">Close</button>
-    <button class="arrow prev" id="lbPrev">‹</button>
-    <div id="lbSlot"></div>
-    <button class="arrow next" id="lbNext">›</button>
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Zoom">
+    <button class="btn close" id="lbClose" style="position:absolute;top:14px;right:14px">Close</button>
+    <div id="lbSlot" style="max-width:92vw;max-height:92vh;margin:auto"></div>
   </div>
 
 <script>
-/* ===========================================================
-   Clean Reader: chapters + inline media + simple lightbox
-   =========================================================== */
 (function(){
-  // ---------- Feature flags ----------
-  // Toggle this to true if you want a temporary helper card in the right rail:
-  const SHOW_PLACEHOLDER_CARD = false; // ← set to true to display "How to add images" card
-
-  // ---------- DOM refs ----------
+  // ---------- DOM ----------
   const NAV  = document.getElementById('nav');
   const MAIN = document.getElementById('main');
   const RAIL = document.getElementById('rail');
   const MENU = document.getElementById('menu');
   const SEARCH_BOX = document.getElementById('q');
   const SEARCH_DD  = document.getElementById('dd');
-
-  // Lightbox refs
   const LB = document.getElementById('lightbox');
   const LB_SLOT = document.getElementById('lbSlot');
   const LB_CLOSE = document.getElementById('lbClose');
-  const LB_PREV = document.getElementById('lbPrev');
-  const LB_NEXT = document.getElementById('lbNext');
 
   // ---------- Config ----------
   const LS_SEEN = 'ao.v2.seen';
   const LS_TIME = 'ao.v2.time';
   const LS_LAST = 'ao.v2.last';
   const COMP_THRESH = { red:20, yellow:60 };
-  const HASH_LO = /^#ch(\d+)-lo(\d+)$/;
-  const pickUrl = () => new URL(location.href).searchParams.get('full')==='1'? '/full/site.json' : '/site.json';
+  const params = new URLSearchParams(location.search);
+  const WANT_DEMO = params.get('demo') === '1';
+  const WANT_FULL = params.get('full') === '1'; // loads /full/site.json
 
   // ---------- Helpers ----------
   const h=(t,a={},...c)=>{const e=document.createElement(t);
@@ -217,16 +188,15 @@
   const timeMap = loadJSON(LS_TIME, {});
   let currentTimer = null;
   let site=null, chapters=[], docs=[];
-  let currentChIdx=0, currentLoIdx=0;
 
-  // Timing
+  // ---------- Timing ----------
   function startTiming(key){ stopTiming(); currentTimer={key,start:Date.now()}; localStorage.setItem(LS_LAST,key); }
   function stopTiming(){ if(!currentTimer) return; const dt=Math.max(0,Math.round((Date.now()-currentTimer.start)/1000)); timeMap[currentTimer.key]=(timeMap[currentTimer.key]||0)+dt; saveJSON(LS_TIME,timeMap); currentTimer=null; localStorage.removeItem(LS_LAST); }
   window.addEventListener('beforeunload', stopTiming);
   document.addEventListener('visibilitychange', ()=>{ if(document.hidden) stopTiming(); });
   (function recover(){ const last=localStorage.getItem(LS_LAST); if(last){ seen.add(last); saveJSON(LS_SEEN,[...seen]); localStorage.removeItem(LS_LAST); } })();
 
-  // Sort chapters robustly
+  // ---------- Ordering + labels ----------
   function chapterOrderIndex(ch, i) {
     if (typeof ch.index === 'number') return ch.index;
     const ct = (ch.title || '').trim();
@@ -243,8 +213,6 @@
     });
     return best !== Infinity ? best : 1000+i;
   }
-
-  // Left nav helpers
   function loLabel(lo){
     const t=(lo.title||'').trim();
     const m=t.match(/(\d+\.\d+)/);
@@ -254,60 +222,46 @@
     }
     return t||'Untitled';
   }
-  function setActiveLO(btn){
-    NAV.querySelectorAll('button[aria-current="true"]').forEach(b=>b.setAttribute('aria-current','false'));
-    btn?.setAttribute('aria-current','true');
-    btn?.scrollIntoView({block:'nearest', inline:'nearest'});
-  }
 
-  // Media normalization + figure render
+  // ---------- Inline media (tokens) ----------
   function normalizeMedia(raw){
     const toItem = (x)=>{
-      if(typeof x==='string') return /\.(mp4|webm|ogg)(\?|$)/i.test(x) ? {kind:'video',src:x} : {kind:'image',src:x};
+      if(typeof x==='string'){
+        if(/^https?:/i.test(x) && (/\.(mp4|webm|ogg)(\?|$)/i).test(x)) return {kind:'video',src:x};
+        return {kind:'image',src:x};
+      }
       if(x && typeof x==='object'){
-        const kind = x.type==='video' || x.video ? 'video' : (/\.(mp4|webm|ogg)(\?|$)/i.test(x.src||'') ? 'video' : 'image');
+        const kind = x.type==='video' || x.video ? 'video' : ((x.src||'').match(/\.(mp4|webm|ogg)(\?|$)/i) ? 'video':'image');
         return { kind, src:x.src, alt:x.alt||'', caption:x.caption||x.title||'' };
       }
       return null;
     };
     if(Array.isArray(raw)) return raw.map(toItem).filter(Boolean);
-    if(raw==null) return [];
-    const one=toItem(raw);
-    return one? [one] : [];
+    if(!raw) return [];
+    const one=toItem(raw); return one? [one] : [];
   }
-  function renderFigure(item){
-    const fig=h('figure');
-    if(item.kind==='image'){
-      fig.appendChild(h('img',{src:item.src, alt:item.alt||'', onclick:()=>openLightbox([{...item}],0)}));
-    }else{
-      fig.appendChild(h('video',{src:item.src, controls:true}));
+  function extractTokenIndices(text, token){
+    const re = token==='img' ? /\[\[img:(\d+)\]\]/gi : /\[\[vid:(\d+)\]\]/gi;
+    const inds=[]; (text||'').replace(re,(_,n)=>{ inds.push(Math.max(1,parseInt(n,10))-1); return ''; });
+    return inds;
+  }
+  function openZoom(node){
+    LB_SLOT.innerHTML='';
+    if(node.tagName==='IMG'){
+      LB_SLOT.appendChild(h('img',{src:node.src, alt:node.alt||'', style:'max-width:92vw;max-height:92vh;border-radius:10px'}));
+    }else if(node.tagName==='VIDEO'){
+      const v = h('video',{src:node.currentSrc||node.src, controls:true, autoplay:true, style:'max-width:92vw;max-height:92vh;border-radius:10px'});
+      LB_SLOT.appendChild(v);
     }
-    if(item.caption) fig.appendChild(h('figcaption',{}, item.caption));
-    return fig;
+    LB.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:100';
   }
+  function closeZoom(){ LB.style.display='none'; LB_SLOT.innerHTML=''; }
+  LB_CLOSE.addEventListener('click', closeZoom);
+  LB.addEventListener('click', (e)=>{ if(e.target===LB) closeZoom(); });
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeZoom(); });
 
-  // Body renderer with [[img:N]] tokens
-  // Tokens are 1-indexed into the *snippet* images array.
-  function renderBodyWithTokens(text, snipMedia){
-    const frag = document.createDocumentFragment();
-    if(!text){ return frag; }
-    const parts = String(text).split(/\[\[img:(\d+)\]\]/i); // keeps numbers in array
-    for(let i=0;i<parts.length;i++){
-      if(i%2===0){
-        const chunk = parts[i];
-        if(chunk) frag.appendChild(h('p',{}, chunk));
-      }else{
-        const idx = Math.max(1, parseInt(parts[i],10)) - 1;
-        const item = snipMedia[idx];
-        if(item) frag.appendChild(renderFigure(item));
-      }
-    }
-    return frag;
-  }
-
-  // Main renderer
+  // ---------- Reader ----------
   function renderMain(ch, lo, chIdx, loIdx){
-    currentChIdx = chIdx; currentLoIdx = loIdx;
     const key = `${chIdx+1}.${loIdx+1}`;
     if(!seen.has(key)){ seen.add(key); saveJSON(LS_SEEN,[...seen]); }
     stopTiming(); startTiming(key);
@@ -318,40 +272,61 @@
       h('p',{class:'lead'}, lo.preview || 'This is preview text for this learning objective.')
     );
 
-    const s = lo.snippets && lo.snippets[0];
-    if (s) {
-      const snipMedia = normalizeMedia(s.images || s.image || s.img);
-      if (s.title) MAIN.append(h('h2',{}, s.title));
-      // parse body with tokens; any images not tokened will be appended after body
-      if (s.body) MAIN.append(renderBodyWithTokens(s.body, snipMedia));
-      // append any unreferenced snippet media
-      if (snipMedia.length){
-        // find tokened indexes
-        const used = new Set();
-        String(s.body||'').replace(/\[\[img:(\d+)\]\]/ig,(_,n)=>{ used.add(Math.max(1,parseInt(n,10))-1); });
-        snipMedia.forEach((m,i)=>{ if(!used.has(i)) MAIN.append(renderFigure(m)); });
-      }
-    } else {
-      MAIN.append(h('div',{class:'muted'}, 'Data source: site.json.'));
-    }
-
-    // LO-level media (always appended after snippet content unless you switch to tokens there too)
-    const loMedia = [
+    // media pool (LO + snippet media)
+    const pool = [
       ...normalizeMedia(lo.images),
       ...normalizeMedia(lo.image||lo.img)
     ];
-    loMedia.forEach(m=> MAIN.append(renderFigure(m)));
+    (lo.snippets||[]).forEach(s=>{
+      pool.push(...normalizeMedia(s.images), ...normalizeMedia(s.image||s.img));
+    });
 
-    refreshRail(); // keep progress current
+    // Render first snippet text
+    const s = (lo.snippets||[])[0];
+    let body = s?.body || '';
+    if (s?.title) MAIN.append(h('h2',{}, s.title));
+
+    // Tokens: [[img:n]] and [[vid:n]]
+    const imgTokens = extractTokenIndices(body,'img').filter(i=>pool[i] && pool[i].kind==='image');
+    const vidTokens = extractTokenIndices(body,'vid').filter(i=>pool[i] && pool[i].kind==='video');
+
+    // Strip tokens from text and append
+    const stripped = body.replace(/\[\[(img|vid):\d+\]\]/gi,'').replace(/\s{2,}/g,' ').trim();
+    if(stripped) MAIN.append(h('p',{}, stripped));
+
+    // Insert tokened media in order
+    const addFigure = (item)=>{
+      const fig=h('figure');
+      if(item.kind==='image'){
+        const im = h('img',{src:item.src, alt:item.alt||''});
+        im.addEventListener('dblclick', ()=>openZoom(im));
+        fig.appendChild(im);
+      }else{
+        const v = h('video',{src:item.src, controls:true});
+        v.addEventListener('dblclick', ()=>openZoom(v));
+        fig.appendChild(v);
+      }
+      if(item.caption) fig.appendChild(h('figcaption',{}, item.caption));
+      MAIN.appendChild(fig);
+    };
+
+    [...imgTokens.map(i=>({i,kind:'img'})), ...vidTokens.map(i=>({i,kind:'vid'}))]
+      .sort((a,b)=>a.i-b.i)
+      .forEach(t => addFigure(pool[t.i]));
+
+    // If no tokens, but media exists, show the first media once
+    if(imgTokens.length===0 && vidTokens.length===0 && pool[0]) addFigure(pool[0]);
+
+    // Fallback copy
+    if(!s && !pool.length){
+      MAIN.append(h('div',{class:'muted'}, 'Data source: site.json.'));
+    }
   }
 
-  // Build left nav (chapters only, no experimental menu)
   function buildLeftNav(){
     NAV.innerHTML='';
-    const inner = h('div',{class:'nav-inner'});
-    const listWrap = h('div',{class:'list'});
     const list=h('ul');
-    (chapters||[]).forEach((ch,chIdx)=>{
+    chapters.forEach((ch,chIdx)=>{
       list.append(h('h3',{}, ch.title || `Chapter ${chIdx+1}`));
       (ch.los||[]).forEach((lo,loIdx)=>{
         const btn=h('button',{
@@ -360,30 +335,33 @@
             renderMain(ch,lo,chIdx,loIdx);
             location.hash=`#ch${chIdx+1}-lo${loIdx+1}`;
             setActiveLO(btn);
+            refreshRail();
           }
         }, loLabel(lo));
         list.append(h('li',{}, btn));
       });
     });
-    listWrap.append(list, h('a',{href:'#data',class:'meta-link'},'→ Open My Data'));
+    NAV.append(list, h('a',{href:'#data',class:'meta-link'},'→ Open My Data'));
 
+    // Footer (copyright + privacy)
     const year = new Date().getFullYear();
-    const foot = h('div',{class:'foot'},
-      `©${year} Hall Financial Services, Inc. d/b/a ADVICE ONLY. `,
-      h('a',{href:'https://adviceonly.info/important-disclosures-and-privacy/', target:'_blank', rel:'noopener'}, 'Privacy')
-    );
-
-    inner.append(listWrap, foot);
-    NAV.append(inner);
+    const foot = h('div',{class:'foot',id:'foot'});
+    foot.appendChild(h('div',{html:`©${year} Hall Financial Services, Inc. d/b/a ADVICE ONLY.`}));
+    foot.appendChild(h('div',{}, h('a',{href:'https://adviceonly.info/important-disclosures-and-privacy/',target:'_blank',rel:'noopener'}, 'Privacy')));
+    NAV.appendChild(foot);
   }
 
+  function setActiveLO(btn){
+    NAV.querySelectorAll('button[aria-current="true"]').forEach(b=>b.setAttribute('aria-current','false'));
+    btn?.setAttribute('aria-current','true');
+    btn?.scrollIntoView({block:'nearest', inline:'nearest'});
+  }
   function openFromHash(){
-    const m=location.hash.match(HASH_LO);
+    const m=location.hash.match(/^#ch(\d+)-lo(\d+)$/);
     const ch=chapters[(m?+m[1]:1)-1];
     const lo=ch?.los?.[(m?+m[2]:1)-1];
     if(ch && lo){
-      renderMain(ch, lo, (m?+m[1]:1)-1, (m?+m[2]:1)-1);
-      // mark matching button active
+      renderMain(ch,lo,(m?+m[1]:1)-1,(m?+m[2]:1)-1);
       const btns = NAV.querySelectorAll('button.lo');
       let flat=0,target=0;
       chapters.forEach((c)=>{(c.los||[]).forEach((l)=>{ if(c===ch&&l===lo) target=flat; flat++; });});
@@ -393,7 +371,7 @@
     return false;
   }
 
-  // Rail (alerts, next event, progress, optional helper card)
+  // ---------- Rail ----------
   function totals(){
     let total=0; (chapters||[]).forEach(ch=> total+=(ch.los?.length||0));
     let done=0; for(const k of seen){
@@ -402,53 +380,29 @@
     }
     return {done,total,pct: total? Math.round((done/total)*100) : 0};
   }
-  function railAlerts(){
-    const msg=(site.alerts && site.alerts[0]) || 'This panel is a placeholder for progress, recent items, etc.';
-    return h('div',{class:'cardlet'}, h('h4',{},'Alerts'), h('div',{class:'muted'}, msg));
-  }
-  function railNextEvent(){
-    const list=Array.isArray(site.events)?site.events.slice():[];
-    if(!list.length) return null;
-    const now=new Date();
-    list.sort((a,b)=> new Date(`${a.date}T${a.time||'00:00'}:00`) - new Date(`${b.date}T${b.time||'00:00'}:00`));
-    const ev=list.find(e=> new Date(`${e.date}T${e.time||'00:00'}:00`)>=now) || list[0];
-    return h('div',{class:'cardlet'},
-      h('h4',{},'Next event'),
-      h('div',{class:'muted'}, fmtDate(ev.date, ev.tz, ev.time)),
-      h('div',{style:'font-weight:600;margin-top:4px'}, ev.title || 'Event'),
-      ev.mode ? h('div',{class:'muted',style:'margin-top:2px'}, ev.mode) : null,
-      (ev.ctaUrl && ev.ctaLabel) ? h('div',{style:'margin-top:8px'}, h('a',{href:ev.ctaUrl,class:'btn',target:'_blank',rel:'noopener'}, ev.ctaLabel)) : null
-    );
-  }
-  function railProgress(){
-    const {done,total,pct}=totals();
-    return h('div',{class:'cardlet'},
-      h('h4',{},'Your progress'),
-      h('div',{class:'muted'}, `${done} of ${total} (${pct}%)`),
-      h('div',{class:'progress',style:'margin-top:6px'}, h('i',{style:`width:${pct}%;`}))
-    );
-  }
-  function railHelperCard(){
-    return h('div',{class:'cardlet'},
-      h('h4',{},'How to add images (placeholder)'),
-      h('div',{class:'muted'},
-        'Put images on the snippet as an array, then place tokens like ',
-        h('span',{class:'kbd'},'[[img:1]]'),
-        ' inside the body where you want each figure. Remove this card by setting ',
-        h('span',{class:'kbd'},'SHOW_PLACEHOLDER_CARD=false'),
-        ' near the top of the script.'
-      )
-    );
-  }
   function refreshRail(){
-    RAIL.innerHTML='';
-    if (SHOW_PLACEHOLDER_CARD) RAIL.appendChild(railHelperCard());
-    RAIL.appendChild(railAlerts());
-    const nxt=railNextEvent(); if(nxt) RAIL.appendChild(nxt);
-    RAIL.appendChild(railProgress());
+    const evHost = document.getElementById('rail-events');
+    const progHost = document.getElementById('rail-progress');
+    // Events
+    evHost.innerHTML = '<h4>Next event</h4>';
+    const list=Array.isArray(site?.events)?site.events.slice():[];
+    if(!list.length){ evHost.appendChild(h('div',{class:'muted'},'No events')); }
+    else{
+      list.sort((a,b)=> new Date(`${a.date}T${a.time||'00:00'}:00`) - new Date(`${b.date}T${b.time||'00:00'}:00`));
+      const ev=list.find(e=> new Date(`${e.date}T${e.time||'00:00'}:00`)>=new Date()) || list[0];
+      evHost.appendChild(h('div',{class:'muted'}, fmtDate(ev.date, ev.tz, ev.time)));
+      evHost.appendChild(h('div',{style:'font-weight:600;margin-top:4px'}, ev.title || 'Event'));
+      if(ev.mode) evHost.appendChild(h('div',{class:'muted',style:'margin-top:2px'}, ev.mode));
+      if(ev.ctaUrl && ev.ctaLabel) evHost.appendChild(h('div',{style:'margin-top:8px'}, h('a',{href:ev.ctaUrl,class:'btn',target:'_blank',rel:'noopener'}, ev.ctaLabel)));
+    }
+    // Progress
+    progHost.innerHTML = '<h4>Your progress</h4>';
+    const {done,total,pct}=totals();
+    progHost.appendChild(h('div',{class:'muted'}, `${done} of ${total} (${pct}%)`));
+    progHost.appendChild(h('div',{class:'progress',style:'margin-top:6px'}, h('i',{style:`width:${pct}%;`})));
   }
 
-  // Menu pages
+  // ---------- Pages ----------
   function setActiveMenu(){
     const r = (location.hash.replace('#','') || 'home').split(':')[0];
     MENU.querySelectorAll('a').forEach(a=>{
@@ -459,7 +413,7 @@
     stopTiming();
     MAIN.innerHTML='';
     MAIN.append(
-      h('h1',{}, site.title || site.book || 'Advice-Only®'),
+      h('h1',{}, site?.title || site?.book || 'Advice-Only®'),
       h('p',{class:'lead'}, 'Welcome. Browse chapters on the left, or use search above.')
     );
     const {done,total,pct}=totals();
@@ -479,14 +433,14 @@
     stopTiming();
     MAIN.innerHTML='';
     MAIN.append(h('h1',{},'Events'), h('p',{class:'lead'},'Upcoming and past sessions.'));
-    const list=Array.isArray(site.events)?site.events.slice():[];
+    const list=Array.isArray(site?.events)?site.events.slice():[];
     if(!list.length){ MAIN.append(h('div',{class:'muted'},'No events found.')); return; }
     list.sort((a,b)=> new Date(`${a.date}T${a.time||'00:00'}:00`) - new Date(`${b.date}T${b.time||'00:00'}:00`));
     list.forEach(e=>{
-      MAIN.append(h('div',{class:'event'},
-        h('h3',{}, e.title || 'Event'),
-        h('div',{class:'meta'}, fmtDate(e.date, e.tz, e.time)),
-        e.mode ? h('div',{class:'meta'}, e.mode): null,
+      MAIN.append(h('div',{class:'cardlet'},
+        h('div',{style:'font-weight:600'}, e.title || 'Event'),
+        h('div',{class:'muted'}, fmtDate(e.date, e.tz, e.time)),
+        e.mode ? h('div',{class:'muted'}, e.mode): null,
         (e.ctaUrl && e.ctaLabel) ? h('div',{style:'margin-top:6px'}, h('a',{href:e.ctaUrl,class:'btn',target:'_blank',rel:'noopener'}, e.ctaLabel)) : null
       ));
     });
@@ -496,13 +450,13 @@
     MAIN.innerHTML='';
     MAIN.append(
       h('h1',{},'Privacy'),
-      h('p',{class:'lead'}, 'How your data is handled here.')
+      h('p',{class:'lead'}, 'Local-only analytics; nothing leaves your browser.')
     );
     MAIN.append(
       h('div',{class:'cardlet'},
-        h('h4',{},'Local-only analytics'),
-        h('p',{},'Time on each learning objective and completion status are stored in your browser (localStorage). Nothing is sent to a server.'),
-        h('p',{},'Manage or clear your data from My Data → Clear progress/time.')
+        h('h4',{},'What is stored'),
+        h('p',{},'Completion status and time-on-page for each learning objective (via localStorage).'),
+        h('p',{},'Clear your data in My Data with “Clear progress” and “Clear time”.')
       )
     );
   }
@@ -510,26 +464,22 @@
     stopTiming();
     MAIN.innerHTML='';
     MAIN.append(h('h1',{},'About'));
-    const a = site.about || site.profile || null;
-    if(!a){
-      MAIN.append(h('div',{class:'muted'},'No about/profile information found in site.json.'));
-      return;
-    }
+    const a = site?.about || site?.profile || null;
+    if(!a){ MAIN.append(h('div',{class:'muted'},'No about/profile information in site.json.')); return; }
     const name = a.name || '';
     const location = a.location || a.address || '';
     const bio = a.bio || a.subtitle || '';
     const specialties = Array.isArray(a.specialties) ? a.specialties : (a.specialty ? [a.specialty] : []);
-    const top = h('div',{class:'cardlet'},
-      h('div',{style:'font-size:18px;font-weight:700'}, name),
-      location ? h('div',{class:'muted',style:'margin-top:2px'}, location) : null,
-      bio ? h('p',{style:'margin-top:8px'}, bio) : null,
-      specialties.length ? h('div', {style:'margin-top:6px'}, h('span',{class:'pill'}, `Specialties: ${specialties.join(', ')}`)) : null,
-      (a.ctaUrl && a.ctaLabel) ? h('div',{style:'margin-top:12px'}, h('a',{href:a.ctaUrl,class:'btn',target:'_blank',rel:'noopener'}, a.ctaLabel)) : null
+    MAIN.append(
+      h('div',{class:'cardlet'},
+        h('div',{style:'font-size:18px;font-weight:700'}, name),
+        location ? h('div',{class:'muted',style:'margin-top:2px'}, location) : null,
+        bio ? h('p',{style:'margin-top:8px'}, bio) : null,
+        specialties.length ? h('div',{style:'margin-top:6px'}, h('span',{class:'pill'}, `Specialties: ${specialties.join(', ')}`)) : null,
+        (a.ctaUrl && a.ctaLabel) ? h('div',{style:'margin-top:12px'}, h('a',{href:a.ctaUrl,class:'btn',target:'_blank',rel:'noopener'}, a.ctaLabel)) : null
+      )
     );
-    MAIN.append(top);
   }
-
-  // My Data
   const compColor = secs => secs < COMP_THRESH.red ? 'red' : (secs < COMP_THRESH.yellow ? 'yellow' : 'green');
   function renderMyData(){
     stopTiming();
@@ -557,12 +507,6 @@
             h('span',{}, h('i',{class:'dot red'}),'Under 20s'),
             h('span',{}, h('i',{class:'dot yellow'}),'20–59s'),
             h('span',{}, h('i',{class:'dot green'}),'60s+')
-          ),
-          h('div',{class:'muted',style:'margin-top:8px'}, `Items by competency:`),
-          h('div',{style:'margin-top:4px'},
-            h('span',{class:'pill'}, `Red ${agg.red}`), ' ',
-            h('span',{class:'pill'}, `Yellow ${agg.yellow}`), ' ',
-            h('span',{class:'pill'}, `Green ${agg.green}`)
           ),
           h('div',{class:'muted',style:'margin-top:8px'}, `Total time: ${Math.round(agg.totalSecs/60)} min`)
         )
@@ -603,7 +547,7 @@
     ));
   }
 
-  // Search (light RAG)
+  // ---------- Search ----------
   function buildDocs(){
     docs = [];
     (chapters||[]).forEach((ch,ci)=>{
@@ -670,8 +614,8 @@
     MAIN.append(h('h1',{},'Search'), h('p',{class:'lead'}, `Results for “${q}”`));
     if(!results.length){ MAIN.append(h('div',{class:'muted'},'No matches.')); return; }
     results.slice(0,30).forEach(r=>{
-      MAIN.append(h('div',{class:'event'},
-        h('h3',{html: hilite(`${r.chTitle} — ${r.loTitle}`, qTokens)}),
+      MAIN.append(h('div',{class:'cardlet'},
+        h('div',{style:'font-weight:600',html: hilite(`${r.chTitle} — ${r.loTitle}`, qTokens)}),
         h('p',{class:'muted',html: hilite(r.preview || '', qTokens)}),
         h('div',{}, h('a',{href:`#ch${r.ci+1}-lo${r.li+1}`,class:'btn'},'Open'))
       ));
@@ -680,10 +624,7 @@
   SEARCH_BOX.addEventListener('input', e=>{
     const q=e.target.value.trim();
     if(!q){ SEARCH_DD.classList.remove('show'); return; }
-    const qTokens = tokenize(q);
-    const results = docs.map(d=>({ ...d, score: scoreDoc(qTokens, d) }))
-      .filter(r=>r.score>0).sort((a,b)=>b.score-a.score);
-    showSearchDD(results, qTokens);
+    runSearch(q,'dd');
   });
   SEARCH_BOX.addEventListener('keydown', e=>{
     if(e.key==='Enter'){
@@ -697,73 +638,25 @@
     if(!document.getElementById('search').contains(e.target)){ SEARCH_DD.classList.remove('show'); }
   });
 
-  // Lightbox (simple)
-  let lbItems = []; let lbIndex = 0;
-  function openLightbox(items, idx){
-    lbItems = items; lbIndex = idx||0;
-    LB_SLOT.innerHTML='';
-    const it = lbItems[lbIndex];
-    if(it.kind==='video'){
-      LB_SLOT.appendChild(h('video',{src:it.src, controls:true, autoplay:true}));
-    } else {
-      LB_SLOT.appendChild(h('img',{src:it.src, alt:it.alt||''}));
-    }
-    LB.classList.add('show');
-    updateLbArrows();
-  }
-  function closeLightbox(){ LB.classList.remove('show'); LB_SLOT.innerHTML=''; }
-  function navLightbox(dir){
-    if(!lbItems.length) return;
-    lbIndex = (lbIndex + dir + lbItems.length) % lbItems.length;
-    openLightbox(lbItems, lbIndex);
-  }
-  function updateLbArrows(){
-    const many = lbItems.length>1;
-    LB_PREV.style.display = many ? '' : 'none';
-    LB_NEXT.style.display = many ? '' : 'none';
-  }
-  LB_CLOSE.addEventListener('click', closeLightbox);
-  LB_PREV.addEventListener('click', ()=>navLightbox(-1));
-  LB_NEXT.addEventListener('click', ()=>navLightbox(1));
-  LB.addEventListener('click', (e)=>{ if(e.target===LB) closeLightbox(); });
-  document.addEventListener('keydown', (e)=>{
-    if(!LB.classList.contains('show')) return;
-    if(e.key==='Escape') closeLightbox();
-    else if(e.key==='ArrowLeft') navLightbox(-1);
-    else if(e.key==='ArrowRight') navLightbox(1);
-  });
-
-  // Boot & routing (with minimal fallback)
+  // ---------- Boot ----------
   async function boot(){
-    const FALLBACK = {
-      title:"Advice-Only® Book Preview",
-      alerts:["Welcome."],
-      events:[{title:"Live Q&A",date:"2026-01-08",time:"13:00",tz:"America/New_York",mode:"Zoom",ctaUrl:"#",ctaLabel:"Details"}],
-      about:{name:"Your Name",location:"City, ST",bio:"Financial planner, educator.",specialties:["Planning","Behavior","Retirement"]},
-      chapters:[
-        { title:"My Perfect Plan", los:[
-          { title:"1.1 — What's The Perfect Plan?", preview:"Overview.",
-            snippets:[{title:"Body",body:"We’ll start broad and then narrow. This is standard inline content; add images to the snippet and place tokens like [[img:1]] where you want them."}] },
-          { title:"1.2 — Why Be Rational?", preview:"Objectivity reduces uncertainty.",
-            snippets:[{title:"Body",body:"Objectivity favors methods over products."}] },
-          { title:"1.3 — Me, Myself and I", preview:"Identity & preferences.",
-            snippets:[{title:"Body",body:"Consider your personal context."}] }
-        ]},
-        { title:"Expenses", los:[
-          { title:"2.1 — Being Real", preview:"Own your numbers.",
-            snippets:[{title:"Body",body:"Let’s be honest about cash flow."}] },
-          { title:"2.2 — My Expenses", preview:"Map your spend.",
-            snippets:[{title:"Body",body:"Categorize and prioritize."}] },
-          { title:"2.3 — Understanding Inflation", preview:"Rates and reality.",
-            snippets:[{title:"Body",body:"Inflation changes the baseline."}] }
-        ]}
-      ]
-    };
+    const base = location.pathname.replace(/[^/]*$/, '');
+    const url = base + (WANT_FULL ? 'full/site.json' : 'site.json');
 
     try{
-      const res=await fetch(pickUrl(), {cache:'no-store', credentials:'same-origin'});
-      const txt=await res.text(); site=JSON.parse(txt);
-    }catch{ site = FALLBACK; }
+      const res=await fetch(url, {cache:'no-store', credentials:'same-origin'});
+      if(!res.ok) throw new Error(res.status);
+      const txt=await res.text();
+      site=JSON.parse(txt);
+    }catch(e){
+      if(!WANT_DEMO){
+        NAV.innerHTML='';
+        NAV.append(h('div',{class:'muted'}, 'Could not load site.json. (No demo content is shown unless you add ?demo=1)'));
+        site = { title:'', chapters:[], events:[] };
+      }else{
+        site = makeDemoSite();
+      }
+    }
 
     chapters=(site.chapters||[])
       .map((ch,i)=>({ch,ord:chapterOrderIndex(ch,i)}))
@@ -781,15 +674,41 @@
   function route(){
     setActiveMenu();
     const hash = location.hash || '#home';
-    if (HASH_LO.test(hash)) { openFromHash(); return; }
+    if (/^#ch\d+-lo\d+$/.test(hash)) { if(!openFromHash()) renderHome(); return; }
     if (hash.startsWith('#home'))     { renderHome(); return; }
     if (hash.startsWith('#data'))     { renderMyData(); return; }
     if (hash.startsWith('#events'))   { renderEvents(); return; }
     if (hash.startsWith('#privacy'))  { renderPrivacy(); return; }
     if (hash.startsWith('#about'))    { renderAbout(); return; }
     if (hash.startsWith('#search:'))  { runSearch(decodeURIComponent(hash.split(':')[1]||''),'page'); return; }
-    // default
-    location.hash = '#ch1-lo1';
+    // default: jump to first LO if present
+    if(chapters[0]?.los?.length){ location.hash = '#ch1-lo1'; openFromHash(); } else { renderHome(); }
+  }
+
+  // ---------- Demo (only when ?demo=1) ----------
+  function makeDemoSite(){
+    return {
+      title:"Demo Samples",
+      alerts:["Demo is enabled via ?demo=1. Remove the query parameter to hide."],
+      events:[{title:"Live Q&A",date:"2026-01-08",time:"13:00",tz:"America/New_York",mode:"Zoom",ctaUrl:"#",ctaLabel:"Details"}],
+      about:{name:"Your Name",location:"City, ST",bio:"Financial planner, educator.",specialties:["Planning","Behavior","Retirement"]},
+      chapters:[
+        { title:"Demo Samples", los:[
+          { title:"1.1 — Inline tokens", preview:"Two images and one short video, tokenized.",
+            images:[
+              "https://picsum.photos/seed/a/1200/800",
+              "https://picsum.photos/seed/b/1200/800",
+              {type:"video",src:"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm",caption:"Sample video"}
+            ],
+            snippets:[{title:"Body",body:"Here’s an image [[img:1]] in-line, then a video [[vid:3]], and later another image [[img:2]]."}]
+          },
+          { title:"1.2 — No tokens", preview:"Shows first media under text when no tokens.",
+            images:["https://picsum.photos/seed/c/1200/800"],
+            snippets:[{title:"Body",body:"No tokens here—first media appears below."}]
+          }
+        ]}
+      ]
+    };
   }
 
   boot();
