@@ -48,7 +48,7 @@
   .nav .lo{padding-left:18px;color:#cfe0ee}
   .nav button[aria-current="true"]{background:#0e2723;outline:1px solid #11433b}
   .nav .meta-link{margin:12px 8px 6px;display:block;color:var(--muted);font-size:13px}
-  .foot{margin:14px 8px 4px;color:var(--muted);font-size:12px;border-top:1px dashed #2a3340;padding-top:10px}
+  .foot{margin:14px 8px 4px;color:#8ea1b2;font-size:12px;border-top:1px dashed #2a3340;padding-top:10px}
   .foot a{color:#9ab0c3;text-decoration:underline}
 
   /* Reader */
@@ -131,9 +131,9 @@
     </aside>
   </div>
 
-  <!-- Lightbox (for zoom) -->
-  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Zoom">
-    <button class="btn close" id="lbClose" style="position:absolute;top:14px;right:14px">Close</button>
+  <!-- Lightbox (zoom) -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Zoom" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);align-items:center;justify-content:center;z-index:100">
+    <button class="btn" id="lbClose" style="position:absolute;top:14px;right:14px">Close</button>
     <div id="lbSlot" style="max-width:92vw;max-height:92vh;margin:auto"></div>
   </div>
 
@@ -155,9 +155,13 @@
   const LS_TIME = 'ao.v2.time';
   const LS_LAST = 'ao.v2.last';
   const COMP_THRESH = { red:20, yellow:60 };
+
   const params = new URLSearchParams(location.search);
-  const WANT_DEMO = params.get('demo') === '1';
-  const WANT_FULL = params.get('full') === '1'; // loads /full/site.json
+  const WANT_DEMO = params.get('demo') === '1';   // only show demo when explicitly requested
+  const WANT_FULL = params.get('full') === '1';   // load /full/site.json
+
+  // Titles we will suppress unless WANT_DEMO=true
+  const EXCLUDE_TEST_TITLES = ['Media Tests','Demo Samples'];
 
   // ---------- Helpers ----------
   const h=(t,a={},...c)=>{const e=document.createElement(t);
@@ -253,7 +257,7 @@
       const v = h('video',{src:node.currentSrc||node.src, controls:true, autoplay:true, style:'max-width:92vw;max-height:92vh;border-radius:10px'});
       LB_SLOT.appendChild(v);
     }
-    LB.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:100';
+    LB.style.display='flex';
   }
   function closeZoom(){ LB.style.display='none'; LB_SLOT.innerHTML=''; }
   LB_CLOSE.addEventListener('click', closeZoom);
@@ -317,7 +321,6 @@
     // If no tokens, but media exists, show the first media once
     if(imgTokens.length===0 && vidTokens.length===0 && pool[0]) addFigure(pool[0]);
 
-    // Fallback copy
     if(!s && !pool.length){
       MAIN.append(h('div',{class:'muted'}, 'Data source: site.json.'));
     }
@@ -399,7 +402,7 @@
     progHost.innerHTML = '<h4>Your progress</h4>';
     const {done,total,pct}=totals();
     progHost.appendChild(h('div',{class:'muted'}, `${done} of ${total} (${pct}%)`));
-    progHost.appendChild(h('div',{class:'progress',style:'margin-top:6px'}, h('i',{style:`width:${pct}%;`})));
+    progHost.appendChild(h('div',{class:'progress',style:'margin-top:6px'}, h('i',{style:`width:${pct}%;`}));
   }
 
   // ---------- Pages ----------
@@ -506,7 +509,7 @@
           h('div',{class:'legend',style:'margin-top:4px'},
             h('span',{}, h('i',{class:'dot red'}),'Under 20s'),
             h('span',{}, h('i',{class:'dot yellow'}),'20–59s'),
-            h('span',{}, h('i',{class:'dot green'}),'60s+')
+            h('span',}, h('i',{class:'dot green'}),'60s+')
           ),
           h('div',{class:'muted',style:'margin-top:8px'}, `Total time: ${Math.round(agg.totalSecs/60)} min`)
         )
@@ -649,16 +652,24 @@
       const txt=await res.text();
       site=JSON.parse(txt);
     }catch(e){
+      // If JSON fails and demo is not explicitly requested, show nothing extra.
       if(!WANT_DEMO){
         NAV.innerHTML='';
-        NAV.append(h('div',{class:'muted'}, 'Could not load site.json. (No demo content is shown unless you add ?demo=1)'));
+        NAV.append(h('div',{class:'muted'}, 'Could not load site.json.'));
         site = { title:'', chapters:[], events:[] };
       }else{
         site = makeDemoSite();
       }
     }
 
+    // Filter OUT any test/demo chapters unless WANT_DEMO
+    const filterTests = ch => {
+      const title=(ch.title||'').trim().toLowerCase();
+      return WANT_DEMO || !EXCLUDE_TEST_TITLES.some(t => title === t.toLowerCase());
+    };
+
     chapters=(site.chapters||[])
+      .filter(filterTests)
       .map((ch,i)=>({ch,ord:chapterOrderIndex(ch,i)}))
       .sort((a,b)=>a.ord-b.ord)
       .map(x=>x.ch);
@@ -681,7 +692,6 @@
     if (hash.startsWith('#privacy'))  { renderPrivacy(); return; }
     if (hash.startsWith('#about'))    { renderAbout(); return; }
     if (hash.startsWith('#search:'))  { runSearch(decodeURIComponent(hash.split(':')[1]||''),'page'); return; }
-    // default: jump to first LO if present
     if(chapters[0]?.los?.length){ location.hash = '#ch1-lo1'; openFromHash(); } else { renderHome(); }
   }
 
