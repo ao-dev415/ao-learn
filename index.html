@@ -65,20 +65,18 @@
   .progress{height:10px;background:#0d1117;border:1px solid #222a33;border-radius:999px;overflow:hidden}
   .progress>i{display:block;height:100%;width:0%;background:linear-gradient(90deg,#00d0b6,#35e0a5)}
 
-  /* My Data (time, competency) */
+  /* My Data */
   .data-grid{display:grid;grid-template-columns:1fr;gap:12px}
   .data-table{width:100%;border-collapse:collapse;font-size:14px}
   .data-table th,.data-table td{padding:8px;border-bottom:1px dashed #2a3340}
   .data-table th{border-bottom:1px solid #2a3340;color:#bcd0e0;font-weight:600;text-align:left}
   .data-table td:last-child,.data-table th:last-child{text-align:right}
   .dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:-1px;margin-right:6px}
-  .dot.red{background:var(--danger)}
-  .dot.yellow{background:var(--warn)}
-  .dot.green{background:var(--ok)}
+  .dot.red{background:var(--danger)} .dot.yellow{background:var(--warn)} .dot.green{background:var(--ok)}
   .legend{display:flex;gap:12px;align-items:center}
   .legend span{display:inline-flex;align-items:center;gap:6px;color:#9ab0c3;font-size:12px}
 
-  /* Events list */
+  /* Events */
   .event{padding:10px;border:1px solid var(--border);border-radius:10px;margin:0 0 10px}
   .event h3{margin:0 0 4px;font-size:16px}
   .event .meta{color:#9ab0c3;font-size:12px}
@@ -99,6 +97,11 @@
   .lightbox .close{position:absolute;top:14px;right:14px}
   .lightbox .arrow{position:absolute;top:50%;transform:translateY(-50%);padding:10px 12px;border-radius:10px;background:rgba(0,0,0,.35);border:1px solid #2a3340;cursor:pointer}
   .lightbox .prev{left:12px}.lightbox .next{right:12px}
+
+  /* Mobile inline figures */
+  figure{margin:10px 0}
+  figure img, figure video{display:block;max-width:100%;height:auto;border:1px solid var(--border);border-radius:10px;background:#000}
+  figure figcaption{font-size:12px;color:#9ab0c3;margin-top:4px}
 
   @media (max-width:1100px){
     .top-wrap{grid-template-columns:1fr}
@@ -152,11 +155,6 @@
   </div>
 
 <script>
-/* ===========================================================
-   Advice-Only® Reader + Menu Pages + Rail + Search + Timing
-   + Desktop Media Viewer + Mobile inline media + Lightbox
-   + Fallback demo dataset (if site.json not found)
-   =========================================================== */
 (function(){
   // ---------- DOM refs ----------
   const NAV  = document.getElementById('nav');
@@ -173,18 +171,15 @@
   const LB_PREV = document.getElementById('lbPrev');
   const LB_NEXT = document.getElementById('lbNext');
 
-  // ---------- Config / constants ----------
+  // ---------- Config ----------
   const LS_SEEN = 'ao.v2.seen';
   const LS_TIME = 'ao.v2.time';
   const LS_LAST = 'ao.v2.last';
-  const COMP_THRESH = { red:20, yellow:60 }; // seconds thresholds
-  const isMobile = () => window.matchMedia('(max-width:1100px)').matches;
+  const COMP_THRESH = { red:20, yellow:60 };
 
-  const pickUrl = () => {
-    const base = location.pathname.replace(/[^/]*$/, '');
-    const full = new URL(location.href).searchParams.get('full') === '1';
-    return base + (full ? 'full/site.json' : 'site.json');
-  };
+  // robust mobile check + resize watcher
+  const isMobile = () => (window.matchMedia && window.matchMedia('(max-width:1100px)').matches) || (window.innerWidth <= 1100);
+  let lastIsMobile = isMobile();
 
   // ---------- Helpers ----------
   const h=(t,a={},...c)=>{const e=document.createElement(t);
@@ -216,12 +211,7 @@
     const [w,h]=size;
     const svg = `
 <svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}' viewBox='0 0 ${w} ${h}'>
-  <defs>
-    <linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
-      <stop offset='0%' stop-color='#0b0d10'/>
-      <stop offset='100%' stop-color='#12151a'/>
-    </linearGradient>
-  </defs>
+  <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='#0b0d10'/><stop offset='100%' stop-color='#12151a'/></linearGradient></defs>
   <rect fill='url(#g)' width='100%' height='100%'/>
   <rect x='24' y='24' width='${w-48}' height='${h-48}' rx='28' fill='none' stroke='#1e242c' stroke-width='3'/>
   <g font-family='Inter,Segoe UI,Arial' text-anchor='middle' fill='#00d0b6'>
@@ -234,13 +224,11 @@
   function isVideoSrc(src){
     return /\.mp4($|\?)/i.test(src) || /\.webm($|\?)/i.test(src) || /\.ogg($|\?)/i.test(src);
   }
-  // Normalize any of: string | {src,alt,caption,type} | array of those
   function normalizeMedia(raw){
     const toItem = (x)=>{
       if(typeof x==='string'){
         if(x.startsWith('placeholder:')){
-          const parts=x.split(':'); // placeholder:<ratio>:<label...>
-          const ratio=parts[1]||'4x3';
+          const parts=x.split(':'); const ratio=parts[1]||'4x3';
           const label=decodeURIComponent((parts.slice(2).join(':')||'Media'));
           return { kind:'image', src:placeholderData(ratio,label), alt:label, caption:label };
         }
@@ -248,9 +236,7 @@
       }
       if(x && typeof x==='object'){
         const kind = x.type==='video' || x.video ? 'video' : (isVideoSrc(x.src||'') ? 'video' : 'image');
-        if(kind==='image' && x.src && x.src.startsWith('placeholder:')){
-          return toItem(x.src);
-        }
+        if(kind==='image' && x.src && x.src.startsWith('placeholder:')) return toItem(x.src);
         return { kind, src:x.src, alt:x.alt||'', caption:x.caption||x.title||'' };
       }
       return null;
@@ -263,11 +249,10 @@
 
   // ---------- State ----------
   const seen = new Set(loadJSON(LS_SEEN, []));
-  const timeMap = loadJSON(LS_TIME, {}); // "1.2" -> seconds
+  const timeMap = loadJSON(LS_TIME, {});
   let currentTimer = null;
   let site=null, chapters=[], docs=[];
-  let viewerMedia = []; // [{kind:'image'|'video', src, alt, caption}]
-  let viewerIndex = 0;
+  let viewerMedia = []; let viewerIndex = 0;
 
   // Timing
   function startTiming(key){ stopTiming(); currentTimer={key,start:Date.now()}; localStorage.setItem(LS_LAST,key); }
@@ -276,7 +261,6 @@
   document.addEventListener('visibilitychange', ()=>{ if(document.hidden) stopTiming(); });
   (function recover(){ const last=localStorage.getItem(LS_LAST); if(last){ seen.add(last); saveJSON(LS_SEEN,[...seen]); localStorage.removeItem(LS_LAST); } })();
 
-  // Sorting
   function chapterOrderIndex(ch, i) {
     if (typeof ch.index === 'number') return ch.index;
     const ct = (ch.title || '').trim();
@@ -294,7 +278,6 @@
     return best !== Infinity ? best : 1000+i;
   }
 
-  // Labels & inline images
   function loLabel(lo){
     const t=(lo.title||'').trim();
     const m=t.match(/(\d+\.\d+)/);
@@ -304,35 +287,29 @@
     }
     return t||'Untitled';
   }
-  function bodyWithInlineFigures(text, media){
-    const inds=[];
-    const stripped=(text||'').replace(/\[\[img:(\d+)\]\]/gi, (_,n)=>{
-      const idx=Math.max(1,parseInt(n,10));
-      inds.push(idx-1);
-      return '';
-    }).replace(/\s{2,}/g,' ').trim();
-    // keep only image items for token placement
-    const onlyImgs = inds.filter(i=>media[i] && media[i].kind==='image');
-    return { text:stripped, indices:onlyImgs };
+
+  // Inline figures (tokens optional)
+  function extractTokenIndices(text){
+    const inds=[]; (text||'').replace(/\[\[img:(\d+)\]\]/gi, (_,n)=>{ inds.push(Math.max(1,parseInt(n,10))-1); return ''; });
+    return inds;
   }
   function renderInlineFigure(container, item){
-    const fig=h('figure',{style:'margin:10px 0'});
+    const fig=h('figure');
     if(item.kind==='image'){
-      fig.appendChild(h('img',{src:item.src, alt:item.alt||'', style:'max-width:100%;border:1px solid var(--border);border-radius:10px;cursor:pointer', onclick:()=>openLightbox(viewerMedia.indexOf(item))}));
+      fig.appendChild(h('img',{src:item.src, alt:item.alt||'', onclick:()=>openLightbox(viewerMedia.indexOf(item))}));
     }else{
-      const v=h('video',{src:item.src, controls:true, style:'max-width:100%;border:1px solid var(--border);border-radius:10px;background:#000'});
-      fig.appendChild(v);
+      fig.appendChild(h('video',{src:item.src, controls:true}));
     }
-    if(item.caption) fig.appendChild(h('figcaption',{class:'muted',style:'font-size:12px;margin-top:4px'}, item.caption));
+    if(item.caption) fig.appendChild(h('figcaption',{}, item.caption));
     container.appendChild(fig);
   }
 
-  // Reader
   function setActiveLO(btn){
     NAV.querySelectorAll('button[aria-current="true"]').forEach(b=>b.setAttribute('aria-current','false'));
     btn?.setAttribute('aria-current','true');
     btn?.scrollIntoView({block:'nearest', inline:'nearest'});
   }
+
   function renderMain(ch, lo, chIdx, loIdx){
     const key = `${chIdx+1}.${loIdx+1}`;
     if(!seen.has(key)){ seen.add(key); saveJSON(LS_SEEN,[...seen]); }
@@ -344,36 +321,47 @@
       h('p',{class:'lead'}, lo.preview || 'This is preview text for this learning objective.')
     );
 
-    // Resolve media: lo.images / lo.image plus snippet media
-    const base = [
+    // Build media pool from LO + all snippets
+    const pool = [
       ...normalizeMedia(lo.images),
       ...normalizeMedia(lo.image||lo.img)
     ];
     (lo.snippets||[]).forEach(s=>{
-      base.push(...normalizeMedia(s.images), ...normalizeMedia(s.image||s.img));
+      pool.push(...normalizeMedia(s.images), ...normalizeMedia(s.image||s.img));
     });
-    // de-dup by src
     const seenSrc=new Set(); viewerMedia=[];
-    base.forEach(it=>{ if(it && it.src && !seenSrc.has(it.src)){ seenSrc.add(it.src); viewerMedia.push(it); } });
+    pool.forEach(it=>{ if(it && it.src && !seenSrc.has(it.src)){ seenSrc.add(it.src); viewerMedia.push(it); } });
     viewerIndex=0; updateViewer();
 
-    const s = lo.snippets && lo.snippets[0];
-    if(s){
-      if(s.title) MAIN.append(h('h2',{}, s.title));
-      if(s.body){
-        if(isMobile()){
-          const {text, indices} = bodyWithInlineFigures(s.body, viewerMedia);
-          MAIN.append(h('p',{}, text || s.body));
-          if(indices.length){ indices.forEach(i=>viewerMedia[i] && renderInlineFigure(MAIN, viewerMedia[i])); }
-          else if(viewerMedia[0]){ renderInlineFigure(MAIN, viewerMedia[0]); }
-        }else{
-          MAIN.append(h('p',{}, s.body));
-        }
+    // Render content + ALWAYS inline media on mobile
+    const snippets = Array.isArray(lo.snippets)? lo.snippets : [];
+    const first = snippets[0];
+
+    if(first?.title) MAIN.append(h('h2',{}, first.title));
+    if(first?.body){
+      // Show the text (tokens are only markers; we don't keep them in the text)
+      const stripped = (first.body||'').replace(/\[\[img:(\d+)\]\]/gi,'').replace(/\s{2,}/g,' ').trim();
+      if(stripped) MAIN.append(h('p',{}, stripped));
+    }
+
+    if(isMobile()){
+      // 1) Honor any tokens across ALL snippet bodies
+      let tokenIndices=[];
+      snippets.forEach(s=> tokenIndices = tokenIndices.concat(extractTokenIndices(s.body||'')));
+      tokenIndices = tokenIndices.filter(i => viewerMedia[i]);
+
+      if(tokenIndices.length){
+        tokenIndices.forEach(i=> renderInlineFigure(MAIN, viewerMedia[i]));
+      }else if(viewerMedia[0]){
+        // 2) Fallback: show the first media under the text
+        renderInlineFigure(MAIN, viewerMedia[0]);
       }
-    } else {
-      MAIN.append(h('div',{class:'muted'}, 'Data source: site.json.'));
+    }else{
+      // Desktop: show remaining snippet text normally (viewer handles media)
+      if(!first?.body) MAIN.append(h('div',{class:'muted'}, 'Data source: site.json.'));
     }
   }
+
   function buildLeftNav(){
     NAV.innerHTML='';
     const list=h('ul');
@@ -394,22 +382,19 @@
     });
     NAV.append(list, h('a',{href:'#data',class:'meta-link'},'→ Open My Data'));
   }
+
   function openFromHash(){
     const m=location.hash.match(/^#ch(\d+)-lo(\d+)$/);
     const ch=chapters[(m?+m[1]:1)-1];
     const lo=ch?.los?.[(m?+m[2]:1)-1];
     if(ch && lo){
-      renderMain(ch,lo,(m?+m[1]:1)-1,(m?+m[2]:1)-1);
-      const btns = NAV.querySelectorAll('button.lo');
-      let flat=0,target=0;
-      chapters.forEach((c)=>{(c.los||[]).forEach((l)=>{ if(c===ch&&l===lo) target=flat; flat++; });});
-      setActiveLO(btns[target]);
+      renderMain(ch,lo((m?+m[1]:1)-1),((m?+m[2]:1)-1));
       return true;
     }
     return false;
   }
 
-  // Rail (viewer + others)
+  // Rail
   function totals(){
     let total=0; (chapters||[]).forEach(ch=> total+=(ch.los?.length||0));
     let done=0; for(const k of seen){
@@ -434,8 +419,7 @@
     if(!pane || isMobile()){ return; }
     pane.innerHTML=''; cap.textContent='';
     if(!viewerMedia.length){
-      pane.appendChild(h('div',{class:'viewer-empty muted'},'No media'));
-      return;
+      pane.appendChild(h('div',{class:'viewer-empty muted'},'No media')); return;
     }
     const item = viewerMedia[viewerIndex];
     if(item.kind==='image'){
@@ -568,7 +552,6 @@
     MAIN.append(top);
   }
 
-  // My Data
   const compColor = secs => secs < COMP_THRESH.red ? 'red' : (secs < COMP_THRESH.yellow ? 'yellow' : 'green');
   function renderMyData(){
     stopTiming();
@@ -643,6 +626,7 @@
   }
 
   // Search
+  let docs=[];
   function buildDocs(){
     docs = [];
     (chapters||[]).forEach((ch,ci)=>{
@@ -719,7 +703,6 @@
   SEARCH_BOX.addEventListener('input', e=>{
     const q=e.target.value.trim();
     if(!q){ SEARCH_DD.classList.remove('show'); return; }
-    const qTokens = tokenize(q);
     runSearch(q,'dd');
   });
   SEARCH_BOX.addEventListener('keydown', e=>{
@@ -740,11 +723,8 @@
     viewerIndex = (idx==null?viewerIndex:idx);
     LB_SLOT.innerHTML='';
     const item = viewerMedia[viewerIndex];
-    if(item.kind==='image'){
-      LB_SLOT.appendChild(h('img',{src:item.src, alt:item.alt||''}));
-    }else{
-      LB_SLOT.appendChild(h('video',{src:item.src, controls:true, autoplay:true}));
-    }
+    if(item.kind==='image'){ LB_SLOT.appendChild(h('img',{src:item.src, alt:item.alt||''})); }
+    else{ LB_SLOT.appendChild(h('video',{src:item.src, controls:true, autoplay:true})); }
     LB.classList.add('show');
   }
   function closeLightbox(){ LB.classList.remove('show'); LB_SLOT.innerHTML=''; }
@@ -764,93 +744,60 @@
     else if(e.key==='ArrowRight') navLightbox(1);
   });
 
-  // Boot & routing
+  // Boot & routing (with fallback demo data)
   function setActiveMenu(){
     const r = (location.hash.replace('#','') || 'home').split(':')[0];
     MENU.querySelectorAll('a').forEach(a=>{
       a.setAttribute('aria-current', a.dataset.route===r ? 'page' : 'false');
     });
   }
-  function refreshRail(){ /* rebuilt after chapters loaded */ }
+  function refreshRail(){ /* real build happens after load */ }
 
   async function boot(){
-    // Fallback demo data (used if fetch fails)
     const FALLBACK = {
       title:"Advice-Only® Book Preview",
       alerts:["Welcome to the media viewer test."],
       events:[{title:"Live Q&A",date:"2026-01-08",time:"13:00",tz:"America/New_York",mode:"Zoom",ctaUrl:"#",ctaLabel:"Details"}],
       about:{name:"Your Name",location:"City, ST",bio:"Financial planner, educator, tinkerer.",specialties:["Planning","Behavior","Retirement"]},
       chapters:[
-        {
-          title:"My Perfect Plan",
-          los:[
-            {
-              title:"1.1 — What's The Perfect Plan?",
-              preview:"Overview with inline figure tokens.",
-              images:["placeholder:16x9:Perfect Plan Cover"],
-              snippets:[{title:"Body",body:"We’ll start broad and then narrow. Here is an inline image: [[img:1]]. Good?"}]
-            },
-            {
-              title:"1.2 — Why Be Rational?",
-              preview:"Objectivity reduces uncertainty.",
-              images:["placeholder:4x3:Rationality"],
-              snippets:[{title:"Body",body:"Objectivity favors methods over products."}]
-            },
-            {
-              title:"1.3 — Me, Myself and I",
-              preview:"Identity & preferences.",
-              images:["placeholder:4x3:Portrait","placeholder:1x1:Notebook","placeholder:16x9:Desk Setup"],
-              snippets:[{title:"Body",body:"Three quick frames to consider your personal context."}]
-            }
-          ]
-        },
-        {
-          title:"Media Tests",
-          los:[
-            {
-              title:"2.1 — Snippet-level image",
-              preview:"Image defined inside snippet only.",
-              snippets:[
-                {title:"Body",
-                 images:["placeholder:4x3:Snippet Image"],
-                 body:"This LO has its image attached to the snippet. The viewer should still find it."}
-              ]
-            },
-            {
-              title:"2.2 — Multiple images (3)",
-              preview:"A triptych example.",
-              images:["placeholder:4x3:Chart A","placeholder:4x3:Chart B","placeholder:4x3:Chart C"],
-              snippets:[{title:"Body",body:"Move between images using the viewer arrows on desktop."}]
-            },
-            {
-              title:"2.3 — Video demo",
-              preview:"Short WebM sample.",
-              images:[{type:"video",src:"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm",caption:"Sample video"}],
-              snippets:[{title:"Body",body:"The viewer should play the video. On mobile, the video appears inline under the text."}]
-            }
-          ]
-        }
+        { title:"My Perfect Plan", los:[
+          { title:"1.1 — What's The Perfect Plan?", preview:"Overview with inline figure tokens.",
+            images:["placeholder:16x9:Perfect Plan Cover"],
+            snippets:[{title:"Body",body:"We’ll start broad and then narrow. Here is an inline image: [[img:1]]. Good?"}] },
+          { title:"1.2 — Why Be Rational?", preview:"Objectivity reduces uncertainty.",
+            images:["placeholder:4x3:Rationality"], snippets:[{title:"Body",body:"Objectivity favors methods over products."}] },
+          { title:"1.3 — Me, Myself and I", preview:"Identity & preferences.",
+            images:["placeholder:4x3:Portrait","placeholder:1x1:Notebook","placeholder:16x9:Desk Setup"],
+            snippets:[{title:"Body",body:"Three quick frames to consider your personal context."}] }
+        ]},
+        { title:"Media Tests", los:[
+          { title:"2.1 — Snippet-level image", preview:"Image defined inside snippet only.",
+            snippets:[{title:"Body",images:["placeholder:4x3:Snippet Image"],body:"This LO has its image attached to the snippet. The viewer should still find it."}] },
+          { title:"2.2 — Multiple images (3)", preview:"A triptych example.",
+            images:["placeholder:4x3:Chart A","placeholder:4x3:Chart B","placeholder:4x3:Chart C"],
+            snippets:[{title:"Body",body:"Move between images using the viewer arrows on desktop."}] },
+          { title:"2.3 — Video demo", preview:"Short WebM sample.",
+            images:[{type:"video",src:"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm",caption:"Sample video"}],
+            snippets:[{title:"Body",body:"The viewer should play the video. On mobile, the video appears inline under the text."}] }
+        ]}
       ]
     };
 
     try{
-      const res=await fetch(pickUrl(), {cache:'no-store', credentials:'same-origin'});
-      const txt=await res.text();
-      site=JSON.parse(txt);
-    }catch(e){
-      site = FALLBACK; // use embedded demo data
-    }
+      const base = location.pathname.replace(/[^/]*$/, '');
+      const full = new URL(location.href).searchParams.get('full') === '1';
+      const url = base + (full ? 'full/site.json' : 'site.json');
+      const res=await fetch(url, {cache:'no-store', credentials:'same-origin'});
+      const txt=await res.text(); site=JSON.parse(txt);
+    }catch{ site = FALLBACK; }
 
     chapters=(site.chapters||[])
       .map((ch,i)=>({ch,ord:chapterOrderIndex(ch,i)}))
       .sort((a,b)=>a.ord-b.ord)
       .map(x=>x.ch);
 
-    // Build UI
-    buildLeftNav();
-    buildDocs();
+    buildLeftNav(); buildDocs();
 
-    // Build rail now that DOM is ready
     RAIL.innerHTML='';
     RAIL.appendChild(railViewer());
     RAIL.appendChild(railAlerts());
@@ -860,13 +807,27 @@
 
     route();
     window.addEventListener('hashchange', route);
+
+    // Re-render when crossing the mobile/desktop breakpoint
+    window.addEventListener('resize', ()=>{
+      const now=isMobile();
+      if(now!==lastIsMobile){
+        lastIsMobile = now;
+        route(); // re-render current page to move media between inline/rail
+      }
+    });
   }
 
   function route(){
     setActiveMenu();
     const hash = location.hash || '#home';
-    if (/^#ch\d+-lo\d+$/.test(hash)) { openFromHash(); return; }
-
+    if (/^#ch\d+-lo\d+$/.test(hash)) { // open LO
+      const m=hash.match(/^#ch(\d+)-lo(\d+)$/);
+      const ch=chapters[(m?+m[1]:1)-1];
+      const lo=ch?.los?.[(m?+m[2]:1)-1];
+      if(ch && lo) renderMain(ch, lo, (m?+m[1]:1)-1, (m?+m[2]:1)-1);
+      return;
+    }
     if (hash.startsWith('#home'))     { renderHome(); return; }
     if (hash.startsWith('#data'))     { renderMyData(); return; }
     if (hash.startsWith('#events'))   { renderEvents(); return; }
@@ -874,10 +835,8 @@
     if (hash.startsWith('#about'))    { renderAbout(); return; }
     if (hash.startsWith('#search:'))  { runSearch(decodeURIComponent(hash.split(':')[1]||''),'page'); return; }
 
-    if(!openFromHash()){
-      location.hash = '#ch1-lo1';
-      openFromHash();
-    }
+    // default
+    location.hash = '#ch1-lo1';
   }
 
   boot();
