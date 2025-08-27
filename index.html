@@ -47,7 +47,7 @@
   .nav button:hover{background:var(--hover)}
   .nav .lo{padding-left:18px;color:#cfe0ee}
   .nav button[aria-current="true"]{background:#0e2723;outline:1px solid #11433b}
-  .nav .meta-link{margin:12px 8px 6px;display:block;color:var(--muted);font-size:13px}
+  .nav .meta-link{margin:12px 8px 6px;display:block;color:#var(--muted);font-size:13px}
 
   /* Reader */
   .main h1{margin:0 0 14px;font-size:22px}
@@ -205,7 +205,7 @@
   const loadJSON=(k,def)=>{ try{const v=JSON.parse(localStorage.getItem(k)||''); return v??def;}catch{ return def; } };
   const saveJSON=(k,v)=>localStorage.setItem(k, JSON.stringify(v));
 
-  // ---------- Placeholder image generator ----------
+  // ---------- Placeholder media ----------
   function placeholderData(ratio='4x3', label='Media'){
     const size = { '4x3':[1200,900], '16x9':[1280,720], '1x1':[900,900] }[ratio] || [1200,900];
     const [w,h]=size;
@@ -221,9 +221,7 @@
 </svg>`;
     return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
   }
-  function isVideoSrc(src){
-    return /\.mp4($|\?)/i.test(src) || /\.webm($|\?)/i.test(src) || /\.ogg($|\?)/i.test(src);
-  }
+  const isVideoSrc = src => /\.mp4($|\?)/i.test(src) || /\.webm($|\?)/i.test(src) || /\.ogg($|\?)/i.test(src);
   function normalizeMedia(raw){
     const toItem = (x)=>{
       if(typeof x==='string'){
@@ -236,7 +234,7 @@
       }
       if(x && typeof x==='object'){
         const kind = x.type==='video' || x.video ? 'video' : (isVideoSrc(x.src||'') ? 'video' : 'image');
-        if(kind==='image' && x.src && x.src.startsWith('placeholder:')) return toItem(x.src);
+        if(kind==='image' && x.src && x.startsWith && x.src.startsWith('placeholder:')) return toItem(x.src);
         return { kind, src:x.src, alt:x.alt||'', caption:x.caption||x.title||'' };
       }
       return null;
@@ -251,7 +249,7 @@
   const seen = new Set(loadJSON(LS_SEEN, []));
   const timeMap = loadJSON(LS_TIME, {});
   let currentTimer = null;
-  let site=null, chapters=[], docs=[];
+  let site=null, chapters=[], docs=[]; // <-- docs declared once here
   let viewerMedia = []; let viewerIndex = 0;
 
   // Timing
@@ -289,10 +287,10 @@
   }
 
   // Inline figures (tokens optional)
-  function extractTokenIndices(text){
+  const extractTokenIndices = text => {
     const inds=[]; (text||'').replace(/\[\[img:(\d+)\]\]/gi, (_,n)=>{ inds.push(Math.max(1,parseInt(n,10))-1); return ''; });
     return inds;
-  }
+  };
   function renderInlineFigure(container, item){
     const fig=h('figure');
     if(item.kind==='image'){
@@ -339,13 +337,12 @@
 
     if(first?.title) MAIN.append(h('h2',{}, first.title));
     if(first?.body){
-      // Show the text (tokens are only markers; we don't keep them in the text)
       const stripped = (first.body||'').replace(/\[\[img:(\d+)\]\]/gi,'').replace(/\s{2,}/g,' ').trim();
       if(stripped) MAIN.append(h('p',{}, stripped));
     }
 
     if(isMobile()){
-      // 1) Honor any tokens across ALL snippet bodies
+      // 1) honor tokens across ALL snippets
       let tokenIndices=[];
       snippets.forEach(s=> tokenIndices = tokenIndices.concat(extractTokenIndices(s.body||'')));
       tokenIndices = tokenIndices.filter(i => viewerMedia[i]);
@@ -353,11 +350,10 @@
       if(tokenIndices.length){
         tokenIndices.forEach(i=> renderInlineFigure(MAIN, viewerMedia[i]));
       }else if(viewerMedia[0]){
-        // 2) Fallback: show the first media under the text
+        // 2) fallback under the text
         renderInlineFigure(MAIN, viewerMedia[0]);
       }
     }else{
-      // Desktop: show remaining snippet text normally (viewer handles media)
       if(!first?.body) MAIN.append(h('div',{class:'muted'}, 'Data source: site.json.'));
     }
   }
@@ -388,7 +384,7 @@
     const ch=chapters[(m?+m[1]:1)-1];
     const lo=ch?.los?.[(m?+m[2]:1)-1];
     if(ch && lo){
-      renderMain(ch,lo((m?+m[1]:1)-1),((m?+m[2]:1)-1));
+      renderMain(ch, lo, (m?+m[1]:1)-1, (m?+m[2]:1)-1); // fixed
       return true;
     }
     return false;
@@ -626,7 +622,6 @@
   }
 
   // Search
-  let docs=[];
   function buildDocs(){
     docs = [];
     (chapters||[]).forEach((ch,ci)=>{
@@ -745,14 +740,6 @@
   });
 
   // Boot & routing (with fallback demo data)
-  function setActiveMenu(){
-    const r = (location.hash.replace('#','') || 'home').split(':')[0];
-    MENU.querySelectorAll('a').forEach(a=>{
-      a.setAttribute('aria-current', a.dataset.route===r ? 'page' : 'false');
-    });
-  }
-  function refreshRail(){ /* real build happens after load */ }
-
   async function boot(){
     const FALLBACK = {
       title:"Advice-Only® Book Preview",
@@ -789,7 +776,10 @@
       const url = base + (full ? 'full/site.json' : 'site.json');
       const res=await fetch(url, {cache:'no-store', credentials:'same-origin'});
       const txt=await res.text(); site=JSON.parse(txt);
-    }catch{ site = FALLBACK; }
+    }catch(e){
+      console.warn('Falling back to demo data:', e);
+      site = FALLBACK;
+    }
 
     chapters=(site.chapters||[])
       .map((ch,i)=>({ch,ord:chapterOrderIndex(ch,i)}))
@@ -797,13 +787,7 @@
       .map(x=>x.ch);
 
     buildLeftNav(); buildDocs();
-
-    RAIL.innerHTML='';
-    RAIL.appendChild(railViewer());
-    RAIL.appendChild(railAlerts());
-    const nxt=railNextEvent(); if(nxt) RAIL.appendChild(nxt);
-    RAIL.appendChild(railProgress());
-    updateViewer();
+    refreshRail();
 
     route();
     window.addEventListener('hashchange', route);
@@ -821,7 +805,7 @@
   function route(){
     setActiveMenu();
     const hash = location.hash || '#home';
-    if (/^#ch\d+-lo\d+$/.test(hash)) { // open LO
+    if (/^#ch\d+-lo\d+$/.test(hash)) {
       const m=hash.match(/^#ch(\d+)-lo(\d+)$/);
       const ch=chapters[(m?+m[1]:1)-1];
       const lo=ch?.los?.[(m?+m[2]:1)-1];
