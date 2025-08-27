@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Advice Only™ Bookstore (Preview)</title>
+<title>Advice-Only® Bookstore (Preview)</title>
 <meta name="robots" content="noindex,nofollow"/>
 
 <style>
@@ -25,7 +25,7 @@
   .menu a[aria-current="page"], .menu a:hover{background:var(--hover)}
   .search{position:relative}
   .search input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #233041;background:#0d131a;color:var(--fg)}
-  .search .dd{position:absolute;inset:auto 0  auto 0;top:42px;background:#0f141b;border:1px solid #223042;border-radius:10px;max-height:50vh;overflow:auto;box-shadow:0 10px 30px rgba(0,0,0,.35);display:none}
+  .search .dd{position:absolute;inset:auto 0 auto 0;top:42px;background:#0f141b;border:1px solid #223042;border-radius:10px;max-height:50vh;overflow:auto;box-shadow:0 10px 30px rgba(0,0,0,.35);display:none}
   .search .dd.show{display:block}
   .search .res{padding:10px;border-bottom:1px dashed #223042;cursor:pointer}
   .search .res:hover{background:#131a23}
@@ -96,16 +96,16 @@
   <header class="top" id="top">
     <div class="top-wrap">
       <div class="logo">
-        <!-- Replace /logo.svg with your actual logo path -->
+        <!-- Replace /logo.svg with your actual logo; if missing, text remains -->
         <img src="/logo.svg" alt="" onerror="this.remove()"/>
-        <a href="#home" id="brand">Advice Only™</a>
+        <a href="#home" id="brand">Advice-Only®</a>
       </div>
       <nav class="menu" id="menu">
         <a href="#home" data-route="home">Home</a>
         <a href="#data" data-route="data">My Data</a>
         <a href="#events" data-route="events">Events</a>
-        <a href="#transparency" data-route="transparency">Transparency</a>
-        <a href="#profile" data-route="profile">Profile</a>
+        <a href="#privacy" data-route="privacy">Privacy</a>
+        <a href="#about" data-route="about">About</a>
       </nav>
       <div class="search" id="search">
         <input id="q" placeholder="Search or ask (Enter to view all)…" autocomplete="off"/>
@@ -129,8 +129,8 @@
 
 <script>
 /* ===========================================================
-   AO Reader + Menu Pages + Rail + RAG-style Search + Timing
-   Everything is local and file-based.
+   Advice-Only® Reader + Menu Pages + Rail + Search + Timing
+   Local-only; reads /site.json (or /full/site.json with ?full=1)
    =========================================================== */
 (function(){
   // ---------- DOM refs ----------
@@ -160,6 +160,8 @@
     c.forEach(x=>{ if(x!=null) e.appendChild(typeof x==='string'?document.createTextNode(x):x) });
     return e;
   };
+  const num = s => s ? parseInt(s,10) : NaN;
+  const tokenize = s => (s||'').toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(Boolean);
   const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
   const fmtDate=(iso,tz,time)=>{
     try{const dt=new Date(`${iso}T${time||'00:00'}:00`);
@@ -191,19 +193,16 @@
     currentTimer = null;
     localStorage.removeItem(LS_LAST);
   }
-  // Try to recover an in-flight timer (if user reloaded on an LO)
   (function recoverTimer(){
     const key = localStorage.getItem(LS_LAST);
     if(!key) return;
-    // We don't know the exact start; instead, ensure the LO shows as "seen"
     seen.add(key);
     saveJSON(LS_SEEN, [...seen]);
     localStorage.removeItem(LS_LAST);
   })();
 
-  // ---------- Data load ----------
-  let site=null, chapters=[], docs=[]; // docs = flattened searchable items
-  const num = s => s ? parseInt(s,10) : NaN;
+  // ---------- Data load / sort ----------
+  let site=null, chapters=[], docs=[];
   function chapterOrderIndex(ch, i) {
     if (typeof ch.index === 'number') return ch.index;
     const ct = (ch.title || '').trim();
@@ -237,11 +236,9 @@
     btn?.scrollIntoView({block:'nearest', inline:'nearest'});
   }
   function renderMain(ch, lo, chIdx, loIdx){
-    // mark seen
     const key = `${chIdx+1}.${loIdx+1}`;
     if(!seen.has(key)){ seen.add(key); saveJSON(LS_SEEN, [...seen]); }
-    stopTiming();     // close old LO timer
-    startTiming(key); // start new LO timer
+    stopTiming(); startTiming(key);
 
     MAIN.innerHTML='';
     MAIN.append(
@@ -268,23 +265,20 @@
             renderMain(ch,lo,chIdx,loIdx);
             location.hash=`#ch${chIdx+1}-lo${loIdx+1}`;
             setActiveLO(btn);
-            refreshRail(); // progress may change
+            refreshRail();
           }
         }, loLabel(lo));
         list.append(h('li',{}, btn));
       });
     });
-    // convenience link
-    const md = h('a',{href:'#data',class:'meta-link'},'→ Open My Data');
-    NAV.append(list, md);
+    NAV.append(list, h('a',{href:'#data',class:'meta-link'},'→ Open My Data'));
   }
   function openFromHash(){
-    const m=location.hash.match(HASH_LO);
+    const m=location.hash.match(/^#ch(\d+)-lo(\d+)$/);
     const ch=chapters[(m?+m[1]:1)-1];
     const lo=ch?.los?.[(m?+m[2]:1)-1];
     if(ch && lo){
       renderMain(ch,lo,(m?+m[1]:1)-1,(m?+m[2]:1)-1);
-      // mark button active
       const btns = NAV.querySelectorAll('button.lo');
       let flat=0,target=0;
       chapters.forEach((c)=>{(c.los||[]).forEach((l)=>{ if(c===ch&&l===lo) target=flat; flat++; });});
@@ -294,7 +288,7 @@
     return false;
   }
 
-  // ---------- Rail cards ----------
+  // ---------- Rail cards (profile removed as requested) ----------
   function totals(){
     let total=0; (chapters||[]).forEach(ch=> total+=(ch.los?.length||0));
     let done=0; for(const k of seen){
@@ -306,19 +300,6 @@
   function railAlerts(){
     const msg=(site.alerts && site.alerts[0]) || 'This panel is a placeholder for progress, recent items, etc.';
     return h('div',{class:'cardlet'}, h('h4',{},'Alerts'), h('div',{class:'muted'}, msg));
-  }
-  function railProfile(){
-    if(!site.profile) return null;
-    const p=site.profile;
-    return h('div',{class:'cardlet'},
-      h('h4',{},'Profile'),
-      h('div',{},
-        h('div',{style:'font-weight:600'}, p.name||''),
-        h('div',{class:'muted'}, p.subtitle||''),
-        p.mode ? h('div',{style:'margin-top:6px'}, h('span',{class:'pill'}, p.mode)) : null,
-        (p.ctaUrl && p.ctaLabel) ? h('div',{style:'margin-top:8px'}, h('a',{href:p.ctaUrl,class:'btn',target:'_blank',rel:'noopener'}, p.ctaLabel)) : null
-      )
-    );
   }
   function railNextEvent(){
     const list=Array.isArray(site.events)?site.events.slice():[];
@@ -345,7 +326,6 @@
   function refreshRail(){
     RAIL.innerHTML='';
     RAIL.appendChild(railAlerts());
-    const prof=railProfile(); if(prof) RAIL.appendChild(prof);
     const nxt=railNextEvent(); if(nxt) RAIL.appendChild(nxt);
     RAIL.appendChild(railProgress());
   }
@@ -358,13 +338,12 @@
     });
   }
   function renderHome(){
-    stopTiming(); // leaving any LO
+    stopTiming();
     MAIN.innerHTML='';
     MAIN.append(
-      h('h1',{}, site.title || site.book || 'Advice Only™'),
+      h('h1',{}, site.title || site.book || 'Advice-Only®'),
       h('p',{class:'lead'}, 'Welcome. Browse chapters on the left, or use search above.')
     );
-    // Quick stat
     const {done,total,pct}=totals();
     MAIN.append(
       h('div',{class:'cardlet'},
@@ -394,41 +373,47 @@
       ));
     });
   }
-  function renderTransparency(){
+  function renderPrivacy(){
     stopTiming();
     MAIN.innerHTML='';
     MAIN.append(
-      h('h1',{},'Transparency'),
+      h('h1',{},'Privacy'),
       h('p',{class:'lead'}, 'How your data is handled here.')
     );
     MAIN.append(
       h('div',{class:'cardlet'},
         h('h4',{},'Local-only analytics'),
-        h('p',{},'Time on page and completion status are stored in your browser using localStorage. Nothing is sent to a server.'),
-        h('p',{},'You can clear everything from My Data → Clear progress/time.')
+        h('p',{},'Time on each learning objective and completion status are stored in your browser (localStorage). Nothing is sent to a server.'),
+        h('p',{},'Manage or clear your data from My Data → Clear progress/time.')
       )
     );
   }
-  function renderProfile(){
+  function renderAbout(){
     stopTiming();
     MAIN.innerHTML='';
-    MAIN.append(h('h1',{},'Profile'));
-    if(!site.profile){
-      MAIN.append(h('div',{class:'muted'},'No profile in site.json.'));
+    MAIN.append(h('h1',{},'About'));
+    const a = site.about || site.profile || null;
+    if(!a){
+      MAIN.append(h('div',{class:'muted'},'No about/profile information found in site.json.'));
       return;
     }
-    const p=site.profile;
-    MAIN.append(
-      h('div',{class:'cardlet'},
-        h('div',{style:'font-size:18px;font-weight:700'}, p.name || ''),
-        h('div',{class:'muted'}, p.subtitle || ''),
-        p.mode ? h('div',{style:'margin-top:6px'}, h('span',{class:'pill'}, p.mode)) : null,
-        (p.ctaUrl && p.ctaLabel) ? h('div',{style:'margin-top:12px'}, h('a',{href:p.ctaUrl,class:'btn',target:'_blank',rel:'noopener'}, p.ctaLabel)) : null
-      )
+    const name = a.name || '';
+    const location = a.location || a.address || '';
+    const bio = a.bio || a.subtitle || '';
+    const specialties = Array.isArray(a.specialties) ? a.specialties : (a.specialty ? [a.specialty] : []);
+    const top = h('div',{class:'cardlet'},
+      h('div',{style:'font-size:18px;font-weight:700'}, name),
+      location ? h('div',{class:'muted',style:'margin-top:2px'}, location) : null,
+      bio ? h('p',{style:'margin-top:8px'}, bio) : null,
+      specialties.length ? h('div', {style:'margin-top:6px'}, h('span',{class:'pill'}, `Specialties: ${specialties.join(', ')}`)) : null,
+      (a.ctaUrl && a.ctaLabel) ? h('div',{style:'margin-top:12px'}, h('a',{href:a.ctaUrl,class:'btn',target:'_blank',rel:'noopener'}, a.ctaLabel)) : null
     );
+    MAIN.append(top);
   }
 
   // ---------- My Data (with time colors) ----------
+  const LS_TIME = 'ao.v2.time';
+  const COMP_THRESH = { red:20, yellow:60 };
   const compColor = secs => secs < COMP_THRESH.red ? 'red' : (secs < COMP_THRESH.yellow ? 'yellow' : 'green');
   function renderMyData(){
     stopTiming();
@@ -444,7 +429,6 @@
       h('p',{class:'lead'},'Local-only engagement data (per learning objective).')
     );
 
-    // Summary cards
     const sum = h('div',{class:'data-grid'},
       h('div',{class:'cardlet'},
         h('h4',{},'Overall progress'),
@@ -469,7 +453,6 @@
     );
     MAIN.append(sum);
 
-    // Per-chapter table
     const table=h('table',{class:'data-table', style:'margin-top:8px'});
     table.innerHTML=`<thead>
       <tr>
@@ -481,7 +464,6 @@
 
     (chapters||[]).forEach((ch,ci)=>{
       const title = ch.title || `Chapter ${ci+1}`;
-      // chapter row
       let chTime=0;
       (ch.los||[]).forEach((_,li)=>{ chTime += (timeMap[`${ci+1}.${li+1}`]||0); });
       const trC = h('tr',{}, 
@@ -491,7 +473,6 @@
       );
       tb.appendChild(trC);
 
-      // LO rows
       (ch.los||[]).forEach((lo,li)=>{
         const key=`${ci+1}.${li+1}`, secs=(timeMap[key]||0);
         const color=compColor(secs);
@@ -504,7 +485,6 @@
     });
     MAIN.append(table);
 
-    // Actions
     MAIN.append(h('div',{style:'margin-top:12px;display:flex;gap:8px;flex-wrap:wrap'},
       h('button',{class:'btn',onclick:()=>{ localStorage.removeItem(LS_SEEN); seen.clear(); refreshRail(); renderMyData(); }},'Clear progress'),
       h('button',{class:'btn',onclick:()=>{ localStorage.removeItem(LS_TIME); for(const k in timeMap) delete timeMap[k]; renderMyData(); }},'Clear time'),
@@ -512,7 +492,7 @@
     ));
   }
 
-  // ---------- RAG-style search over snippets ----------
+  // ---------- RAG-style search ----------
   function buildDocs(){
     docs = [];
     (chapters||[]).forEach((ch,ci)=>{
@@ -529,18 +509,15 @@
       });
     });
   }
-  const tokenize = s => (s||'').toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(Boolean);
   function scoreDoc(qTokens, doc){
     let score=0;
     for(const f of doc.fields){
       const fTokens = tokenize(f.text);
       for(const qt of qTokens){
-        // simple exact token overlap; boost title/preview via weight
         const hits = fTokens.filter(t=>t===qt).length;
         if (hits) score += hits * f.w;
       }
     }
-    // small bonus if query substring in LO title
     const lt=(doc.loTitle||'').toLowerCase();
     if(qTokens.some(q=>lt.includes(q))) score+=2;
     return score;
@@ -566,17 +543,15 @@
     });
     SEARCH_DD.classList.add('show');
   }
-  function runSearch(q, mode){ // mode: 'dd' | 'page'
+  function runSearch(q, mode){
     const qTokens = tokenize(q);
     if(!qTokens.length){ SEARCH_DD.classList.remove('show'); return; }
     const results = docs.map(d=>{
-      // preview = first snippet body or preview text
       const pv = (chapters[d.ci].los[d.li].snippets?.[0]?.body) || (chapters[d.ci].los[d.li].preview) || '';
       return { ...d, score: scoreDoc(qTokens, d), preview: pv };
     }).filter(r=>r.score>0).sort((a,b)=>b.score-a.score);
 
     if(mode==='dd'){ showSearchDD(results, qTokens); return; }
-    // full results page
     stopTiming();
     SEARCH_DD.classList.remove('show');
     MAIN.innerHTML='';
@@ -593,6 +568,7 @@
   SEARCH_BOX.addEventListener('input', e=>{
     const q=e.target.value.trim();
     if(!q){ SEARCH_DD.classList.remove('show'); return; }
+    const qTokens = tokenize(q);
     runSearch(q,'dd');
   });
   SEARCH_BOX.addEventListener('keydown', e=>{
@@ -607,7 +583,7 @@
     if(!document.getElementById('search').contains(e.target)){ SEARCH_DD.classList.remove('show'); }
   });
 
-  // ---------- Boot ----------
+  // ---------- Boot & routing ----------
   async function boot(){
     try{
       const res=await fetch(pickUrl(), {cache:'no-store', credentials:'same-origin'});
@@ -616,7 +592,6 @@
     }catch(e){
       NAV.innerHTML=''; NAV.append(h('div',{class:'muted'},'Could not load site.json')); return;
     }
-    // chapters sorted
     chapters=(site.chapters||[])
       .map((ch,i)=>({ch,ord:chapterOrderIndex(ch,i)}))
       .sort((a,b)=>a.ord-b.ord)
@@ -626,26 +601,29 @@
     buildDocs();
     refreshRail();
 
-    // Initial route
     route();
-
     window.addEventListener('hashchange', route);
   }
 
+  function setActiveMenu(){ // already declared above
+
+  }
   function route(){
-    setActiveMenu();
+    const r = (location.hash.replace('#','') || 'home').split(':')[0];
+    MENU.querySelectorAll('a').forEach(a=>{
+      a.setAttribute('aria-current', a.dataset.route===r ? 'page' : 'false');
+    });
+
     const hash = location.hash || '#home';
-    if (HASH_LO.test(hash)) { openFromHash(); return; }
+    if (/^#ch\d+-lo\d+$/.test(hash)) { openFromHash(); return; }
 
-    // "pages"
-    if (hash.startsWith('#home'))          { renderHome(); return; }
-    if (hash.startsWith('#data'))          { renderMyData(); return; }
-    if (hash.startsWith('#events'))        { renderEvents(); return; }
-    if (hash.startsWith('#transparency'))  { renderTransparency(); return; }
-    if (hash.startsWith('#profile'))       { renderProfile(); return; }
-    if (hash.startsWith('#search:'))       { runSearch(decodeURIComponent(hash.split(':')[1]||''),'page'); return; }
+    if (hash.startsWith('#home'))     { renderHome(); return; }
+    if (hash.startsWith('#data'))     { renderMyData(); return; }
+    if (hash.startsWith('#events'))   { renderEvents(); return; }
+    if (hash.startsWith('#privacy'))  { renderPrivacy(); return; }
+    if (hash.startsWith('#about'))    { renderAbout(); return; }
+    if (hash.startsWith('#search:'))  { runSearch(decodeURIComponent(hash.split(':')[1]||''),'page'); return; }
 
-    // default
     if(!openFromHash()){
       location.hash = '#ch1-lo1';
       openFromHash();
