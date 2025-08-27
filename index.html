@@ -35,11 +35,10 @@
   /* Layout columns */
   .wrap{display:grid;grid-template-columns:280px 1fr 320px;gap:16px;min-height:calc(100vh - 58px);padding:16px}
   .card{background:var(--panel);border:1px solid var(--border);border-radius:10px}
-  .nav{padding:12px;overflow:auto;max-height:calc(100vh - 98px)}
-  .main{padding:16px;overflow:auto}
-  .rail{padding:12px}
 
-  /* Left nav */
+  /* Left nav as a column with pinned footer */
+  .nav{padding:12px;display:flex;flex-direction:column;height:calc(100vh - 98px)}
+  .nav .list{overflow:auto;min-height:0}
   .nav h3{margin:12px 8px 6px;color:#bcd0e0;font-weight:600;font-size:13px}
   .nav ul{list-style:none;margin:0;padding:0}
   .nav li{margin:0}
@@ -48,8 +47,11 @@
   .nav .lo{padding-left:18px;color:#cfe0ee}
   .nav button[aria-current="true"]{background:#0e2723;outline:1px solid #11433b}
   .nav .meta-link{margin:12px 8px 6px;display:block;color:var(--muted);font-size:13px}
+  .nav .foot{margin-top:8px;padding-top:8px;border-top:1px dashed #2a3340;font-size:12px;color:var(--muted)}
+  .nav .foot a{color:var(--muted);text-decoration:underline}
 
   /* Reader */
+  .main{padding:16px;overflow:auto}
   .main h1{margin:0 0 14px;font-size:22px}
   .main h2{margin:20px 0 8px;font-size:16px}
   .main .lead{margin:0 0 16px;color:#c7d7e6}
@@ -126,7 +128,9 @@
 
   <!-- Columns -->
   <div class="wrap">
-    <aside class="card nav" id="nav"><div class="muted">Loading…</div></aside>
+    <aside class="card nav" id="nav">
+      <div class="muted">Loading…</div>
+    </aside>
 
     <main class="card main" id="main">
       <h1>Welcome</h1>
@@ -157,6 +161,10 @@
    Clean Reader: chapters + inline media + simple lightbox
    =========================================================== */
 (function(){
+  // ---------- Feature flags ----------
+  // Toggle this to true if you want a temporary helper card in the right rail:
+  const SHOW_PLACEHOLDER_CARD = false; // ← set to true to display "How to add images" card
+
   // ---------- DOM refs ----------
   const NAV  = document.getElementById('nav');
   const MAIN = document.getElementById('main');
@@ -252,12 +260,12 @@
     btn?.scrollIntoView({block:'nearest', inline:'nearest'});
   }
 
-  // Inline media
+  // Media normalization + figure render
   function normalizeMedia(raw){
     const toItem = (x)=>{
-      if(typeof x==='string') return /\.mp4$|\.webm$|\.ogg$/i.test(x) ? {kind:'video',src:x} : {kind:'image',src:x};
+      if(typeof x==='string') return /\.(mp4|webm|ogg)(\?|$)/i.test(x) ? {kind:'video',src:x} : {kind:'image',src:x};
       if(x && typeof x==='object'){
-        const kind = x.type==='video' || x.video ? 'video' : (/\.mp4$|\.webm$|\.ogg$/i.test(x.src||'') ? 'video' : 'image');
+        const kind = x.type==='video' || x.video ? 'video' : (/\.(mp4|webm|ogg)(\?|$)/i.test(x.src||'') ? 'video' : 'image');
         return { kind, src:x.src, alt:x.alt||'', caption:x.caption||x.title||'' };
       }
       return null;
@@ -270,14 +278,31 @@
   function renderFigure(item){
     const fig=h('figure');
     if(item.kind==='image'){
-      const img=h('img',{src:item.src, alt:item.alt||'', onclick:()=>openLightbox([{...item}],0)});
-      fig.appendChild(img);
+      fig.appendChild(h('img',{src:item.src, alt:item.alt||'', onclick:()=>openLightbox([{...item}],0)}));
     }else{
-      const vid=h('video',{src:item.src, controls:true});
-      fig.appendChild(vid);
+      fig.appendChild(h('video',{src:item.src, controls:true}));
     }
     if(item.caption) fig.appendChild(h('figcaption',{}, item.caption));
     return fig;
+  }
+
+  // Body renderer with [[img:N]] tokens
+  // Tokens are 1-indexed into the *snippet* images array.
+  function renderBodyWithTokens(text, snipMedia){
+    const frag = document.createDocumentFragment();
+    if(!text){ return frag; }
+    const parts = String(text).split(/\[\[img:(\d+)\]\]/i); // keeps numbers in array
+    for(let i=0;i<parts.length;i++){
+      if(i%2===0){
+        const chunk = parts[i];
+        if(chunk) frag.appendChild(h('p',{}, chunk));
+      }else{
+        const idx = Math.max(1, parseInt(parts[i],10)) - 1;
+        const item = snipMedia[idx];
+        if(item) frag.appendChild(renderFigure(item));
+      }
+    }
+    return frag;
   }
 
   // Main renderer
@@ -295,15 +320,22 @@
 
     const s = lo.snippets && lo.snippets[0];
     if (s) {
+      const snipMedia = normalizeMedia(s.images || s.image || s.img);
       if (s.title) MAIN.append(h('h2',{}, s.title));
-      if (s.body)  MAIN.append(h('p',{}, s.body));
-      // inline snippet media (if present)
-      normalizeMedia(s.images || s.image || s.img).forEach(m=> MAIN.append(renderFigure(m)));
+      // parse body with tokens; any images not tokened will be appended after body
+      if (s.body) MAIN.append(renderBodyWithTokens(s.body, snipMedia));
+      // append any unreferenced snippet media
+      if (snipMedia.length){
+        // find tokened indexes
+        const used = new Set();
+        String(s.body||'').replace(/\[\[img:(\d+)\]\]/ig,(_,n)=>{ used.add(Math.max(1,parseInt(n,10))-1); });
+        snipMedia.forEach((m,i)=>{ if(!used.has(i)) MAIN.append(renderFigure(m)); });
+      }
     } else {
       MAIN.append(h('div',{class:'muted'}, 'Data source: site.json.'));
     }
 
-    // LO-level media (also inline, after text)
+    // LO-level media (always appended after snippet content unless you switch to tokens there too)
     const loMedia = [
       ...normalizeMedia(lo.images),
       ...normalizeMedia(lo.image||lo.img)
@@ -313,11 +345,13 @@
     refreshRail(); // keep progress current
   }
 
-  // Build left nav
+  // Build left nav (chapters only, no experimental menu)
   function buildLeftNav(){
     NAV.innerHTML='';
+    const inner = h('div',{class:'nav-inner'});
+    const listWrap = h('div',{class:'list'});
     const list=h('ul');
-    chapters.forEach((ch,chIdx)=>{
+    (chapters||[]).forEach((ch,chIdx)=>{
       list.append(h('h3',{}, ch.title || `Chapter ${chIdx+1}`));
       (ch.los||[]).forEach((lo,loIdx)=>{
         const btn=h('button',{
@@ -331,7 +365,16 @@
         list.append(h('li',{}, btn));
       });
     });
-    NAV.append(list, h('a',{href:'#data',class:'meta-link'},'→ Open My Data'));
+    listWrap.append(list, h('a',{href:'#data',class:'meta-link'},'→ Open My Data'));
+
+    const year = new Date().getFullYear();
+    const foot = h('div',{class:'foot'},
+      `©${year} Hall Financial Services, Inc. d/b/a ADVICE ONLY. `,
+      h('a',{href:'https://adviceonly.info/important-disclosures-and-privacy/', target:'_blank', rel:'noopener'}, 'Privacy')
+    );
+
+    inner.append(listWrap, foot);
+    NAV.append(inner);
   }
 
   function openFromHash(){
@@ -350,7 +393,7 @@
     return false;
   }
 
-  // Rail (alerts, next event, progress)
+  // Rail (alerts, next event, progress, optional helper card)
   function totals(){
     let total=0; (chapters||[]).forEach(ch=> total+=(ch.los?.length||0));
     let done=0; for(const k of seen){
@@ -385,8 +428,21 @@
       h('div',{class:'progress',style:'margin-top:6px'}, h('i',{style:`width:${pct}%;`}))
     );
   }
+  function railHelperCard(){
+    return h('div',{class:'cardlet'},
+      h('h4',{},'How to add images (placeholder)'),
+      h('div',{class:'muted'},
+        'Put images on the snippet as an array, then place tokens like ',
+        h('span',{class:'kbd'},'[[img:1]]'),
+        ' inside the body where you want each figure. Remove this card by setting ',
+        h('span',{class:'kbd'},'SHOW_PLACEHOLDER_CARD=false'),
+        ' near the top of the script.'
+      )
+    );
+  }
   function refreshRail(){
     RAIL.innerHTML='';
+    if (SHOW_PLACEHOLDER_CARD) RAIL.appendChild(railHelperCard());
     RAIL.appendChild(railAlerts());
     const nxt=railNextEvent(); if(nxt) RAIL.appendChild(nxt);
     RAIL.appendChild(railProgress());
@@ -641,7 +697,7 @@
     if(!document.getElementById('search').contains(e.target)){ SEARCH_DD.classList.remove('show'); }
   });
 
-  // Lightbox (simple; used by inline images/videos)
+  // Lightbox (simple)
   let lbItems = []; let lbIndex = 0;
   function openLightbox(items, idx){
     lbItems = items; lbIndex = idx||0;
@@ -677,7 +733,7 @@
     else if(e.key==='ArrowRight') navLightbox(1);
   });
 
-  // Boot & routing (with minimal fallback; NO "Media Tests")
+  // Boot & routing (with minimal fallback)
   async function boot(){
     const FALLBACK = {
       title:"Advice-Only® Book Preview",
@@ -687,7 +743,7 @@
       chapters:[
         { title:"My Perfect Plan", los:[
           { title:"1.1 — What's The Perfect Plan?", preview:"Overview.",
-            snippets:[{title:"Body",body:"We’ll start broad and then narrow. This is standard inline content; add images to snippet or LO to display below."}] },
+            snippets:[{title:"Body",body:"We’ll start broad and then narrow. This is standard inline content; add images to the snippet and place tokens like [[img:1]] where you want them."}] },
           { title:"1.2 — Why Be Rational?", preview:"Objectivity reduces uncertainty.",
             snippets:[{title:"Body",body:"Objectivity favors methods over products."}] },
           { title:"1.3 — Me, Myself and I", preview:"Identity & preferences.",
