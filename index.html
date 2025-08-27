@@ -121,7 +121,7 @@
     <main class="card main" id="main">
       <h1>Welcome</h1>
       <p class="lead">Select a learning objective from the left. Use the search above to jump to content.</p>
-      <div class="muted">Data comes from <span class="kbd">site.json</span>. Add <span class="kbd">?full=1</span> to load <span class="kbd">/full/site.json</span>.</div>
+      <div class="muted">Data comes from <span class="kbd">site.json</span>. Add <span class="kbd">?full=1</span> to load <span class="kbd">full/site.json</span>.</div>
     </main>
 
     <aside class="card rail" id="rail"><div class="muted">Loading cards…</div></aside>
@@ -130,7 +130,7 @@
 <script>
 /* ===========================================================
    Advice-Only® Reader + Menu Pages + Rail + Search + Timing
-   Local-only; reads /site.json (or /full/site.json with ?full=1)
+   Local-only; reads site.json (or full/site.json with ?full=1)
    =========================================================== */
 (function(){
   // ---------- DOM refs ----------
@@ -147,7 +147,13 @@
   const LS_LAST = 'ao.v2.last';   // last LO key for in-flight timing
   const COMP_THRESH = { red:20, yellow:60 }; // seconds; <20 red, <60 yellow, else green
   const HASH_LO = /^#ch(\d+)-lo(\d+)$/;
-  const pickUrl = () => new URL(location.href).searchParams.get('full')==='1'? '/full/site.json' : '/site.json';
+
+  // Subpath-safe loader: resolves next to this HTML file
+  const pickUrl = () => {
+    const base = location.pathname.replace(/[^/]*$/, ''); // directory of this HTML
+    const full = new URL(location.href).searchParams.get('full') === '1';
+    return base + (full ? 'full/site.json' : 'site.json');
+  };
 
   // ---------- Tiny helpers ----------
   const h=(t,a={},...c)=>{const e=document.createElement(t);
@@ -162,7 +168,6 @@
   };
   const num = s => s ? parseInt(s,10) : NaN;
   const tokenize = s => (s||'').toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(Boolean);
-  const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
   const fmtDate=(iso,tz,time)=>{
     try{const dt=new Date(`${iso}T${time||'00:00'}:00`);
       const opt={dateStyle:'medium',timeStyle:time?'short':undefined};
@@ -193,6 +198,10 @@
     currentTimer = null;
     localStorage.removeItem(LS_LAST);
   }
+  // Safety: ensure timer is flushed on unload/visibility change
+  window.addEventListener('beforeunload', stopTiming);
+  document.addEventListener('visibilitychange', ()=>{ if(document.hidden) stopTiming(); });
+
   (function recoverTimer(){
     const key = localStorage.getItem(LS_LAST);
     if(!key) return;
@@ -412,12 +421,10 @@
   }
 
   // ---------- My Data (with time colors) ----------
-  const LS_TIME = 'ao.v2.time';
-  const COMP_THRESH = { red:20, yellow:60 };
   const compColor = secs => secs < COMP_THRESH.red ? 'red' : (secs < COMP_THRESH.yellow ? 'yellow' : 'green');
   function renderMyData(){
     stopTiming();
-    const {red,yellow,green,totalSecs} = Object.entries(timeMap).reduce((acc,[,s])=>{
+    const agg = Object.entries(timeMap).reduce((acc,[,s])=>{
       const c=compColor(s);
       acc[c]++; acc.totalSecs+=s; return acc;
     }, {red:0,yellow:0,green:0,totalSecs:0});
@@ -442,13 +449,13 @@
           h('span',{}, h('i',{class:'dot yellow'}),'20–59s'),
           h('span',{}, h('i',{class:'dot green'}),'60s+'),
         ),
-        h('div',{class:'muted',style:'margin-top:8px'}, `Items by competency: `),
+        h('div',{class:'muted',style:'margin-top:8px'}, `Items by competency:`),
         h('div',{style:'margin-top:4px'}, 
-          h('span',{class:'pill'}, `Red ${red}`), ' ',
-          h('span',{class:'pill'}, `Yellow ${yellow}`), ' ',
-          h('span',{class:'pill'}, `Green ${green}`)
+          h('span',{class:'pill'}, `Red ${agg.red}`), ' ',
+          h('span',{class:'pill'}, `Yellow ${agg.yellow}`), ' ',
+          h('span',{class:'pill'}, `Green ${agg.green}`)
         ),
-        h('div',{class:'muted',style:'margin-top:8px'}, `Total time: ${Math.round(totalSecs/60)} min`)
+        h('div',{class:'muted',style:'margin-top:8px'}, `Total time: ${Math.round(agg.totalSecs/60)} min`)
       )
     );
     MAIN.append(sum);
@@ -526,7 +533,8 @@
     if(!text) return '';
     let out = text;
     qTokens.forEach(q=>{
-      out = out.replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`,'ig'), '<mark>$1</mark>');
+      const esc = q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+      out = out.replace(new RegExp(`(${esc})`,'ig'), '<mark>$1</mark>');
     });
     return out;
   }
@@ -568,7 +576,6 @@
   SEARCH_BOX.addEventListener('input', e=>{
     const q=e.target.value.trim();
     if(!q){ SEARCH_DD.classList.remove('show'); return; }
-    const qTokens = tokenize(q);
     runSearch(q,'dd');
   });
   SEARCH_BOX.addEventListener('keydown', e=>{
@@ -605,14 +612,8 @@
     window.addEventListener('hashchange', route);
   }
 
-  function setActiveMenu(){ // already declared above
-
-  }
   function route(){
-    const r = (location.hash.replace('#','') || 'home').split(':')[0];
-    MENU.querySelectorAll('a').forEach(a=>{
-      a.setAttribute('aria-current', a.dataset.route===r ? 'page' : 'false');
-    });
+    setActiveMenu();
 
     const hash = location.hash || '#home';
     if (/^#ch\d+-lo\d+$/.test(hash)) { openFromHash(); return; }
