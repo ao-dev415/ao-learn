@@ -380,9 +380,9 @@ function renderAssessment(ch, chIdx){
     row.appendChild(h('div',{style:'font-weight:600;margin-bottom:6px'}, `${ii+1}. ${it.text}`));
     const opts = h('div',{style:'display:flex;gap:10px;flex-wrap:wrap'});
     for(let v=min; v<=max; v++){
-      const id = `${a.id}-i${ii}-v${v}`;
+      const id = `${a.id}-i${ii}-v${v}`.replace(/[^a-zA-Z0-9_-]/g,'_');
       const lbl = h('label',{for:id,style:'display:flex;gap:6px;align-items:center;cursor:pointer'});
-      const rb  = h('input',{type:'radio',name:`i${ii}`,id:id.replace(/[^a-zA-Z0-9_-]/g,'_'),value:String(v)});
+      const rb  = h('input',{type:'radio',name:`i${ii}`,id:id,value:String(v)});
       lbl.appendChild(rb);
       const tag = (v===min && a.scale?.labels?.[String(min)]) ? ` (${a.scale.labels[String(min)]})`
                 : (v===max && a.scale?.labels?.[String(max)]) ? ` (${a.scale.labels[String(max)]})` : '';
@@ -393,7 +393,6 @@ function renderAssessment(ch, chIdx){
     form.appendChild(row);
   });
 
-  // Submit row **inside the form**
   const buttonRow = h('div',{style:'margin-top:10px;display:flex;gap:8px;flex-wrap:wrap'});
   const submit    = h('button',{type:'submit',class:'btn'}, prior ? 'Retake assessment' : 'Submit assessment');
   buttonRow.appendChild(submit);
@@ -425,9 +424,17 @@ function renderAssessment(ch, chIdx){
       const sel = form.querySelector(`input[name="i${ii}"]:checked`);
       return sel ? parseInt(sel.value,10) : 0;
     });
+    const labels = vals.map(v => a.scale?.labels?.[String(v)] ?? null);
     const sum = vals.reduce((s,v)=>s+v,0);
     const avg = vals.length? sum/vals.length : 0;
-    const res = { chapter: chIdx+1, values: vals, sum, avg, ts: Date.now() };
+    const res = {
+      chapter: chIdx+1,
+      values: vals,
+      valueLabels: labels,
+      itemText: a.items.map(x=>x.text),
+      scale: a.scale || null,
+      sum, avg, ts: Date.now()
+    };
     saveAssessResult(a.id, res);
     status.textContent = `Saved: total=${sum}, avg=${avg.toFixed(2)}`;
     lockForm(true);
