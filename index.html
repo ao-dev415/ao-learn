@@ -144,16 +144,16 @@
   </div>
 
 <script>
-/* If anything throws during boot, show it in the left nav. */
+/* Show uncaught JS errors in the left nav so you see them immediately. */
 window.addEventListener('error', (ev) => {
   try {
     const n = document.getElementById('nav');
     if (!n) return;
     n.innerHTML = '';
-    const d = document.createElement('div');
-    d.className = 'muted';
-    d.textContent = 'Script error: ' + (ev.error?.message || ev.message || 'unknown');
-    n.appendChild(d);
+    n.appendChild(Object.assign(document.createElement('div'), {
+      className: 'muted',
+      textContent: 'Script error: ' + (ev.error?.message || ev.message || 'unknown')
+    }));
   } catch {}
 });
 
@@ -202,6 +202,9 @@ window.addEventListener('error', (ev) => {
   };
   const loadJSON=(k,def)=>{ try{const v=JSON.parse(localStorage.getItem(k)||''); return v??def;}catch{ return def; } };
   const saveJSON=(k,v)=>localStorage.setItem(k, JSON.stringify(v));
+  const status = (msg)=>{
+    NAV.innerHTML=''; NAV.appendChild(h('div',{class:'muted'}, String(msg)));
+  };
 
   // ---------- State ----------
   const seen = new Set(loadJSON(LS_SEEN, []));
@@ -337,7 +340,6 @@ window.addEventListener('error', (ev) => {
     // If no tokens, but media exists, show the first media once
     if(imgTokens.length===0 && vidTokens.length===0 && pool[0]) addFigure(pool[0]);
 
-    // Fallback copy
     if(!s && !pool.length){
       MAIN.append(h('div',{class:'muted'}, 'Data source: site.json.'));
     }
@@ -363,7 +365,7 @@ window.addEventListener('error', (ev) => {
     });
     NAV.append(list, h('a',{href:'#data',class:'meta-link'},'→ Open My Data'));
 
-    /* Footer (copyright + privacy) */
+    // Footer (copyright + privacy)
     const year = new Date().getFullYear();
     const foot = h('div',{class:'foot',id:'foot'});
     foot.appendChild(h('div',{html:`©${year} Hall Financial Services, Inc. d/b/a ADVICE ONLY.`}));
@@ -403,7 +405,6 @@ window.addEventListener('error', (ev) => {
   function refreshRail(){
     const evHost = document.getElementById('rail-events');
     const progHost = document.getElementById('rail-progress');
-
     // Events
     evHost.innerHTML = '<h4>Next event</h4>';
     const list=Array.isArray(site?.events)?site.events.slice():[];
@@ -416,12 +417,12 @@ window.addEventListener('error', (ev) => {
       if(ev.mode) evHost.appendChild(h('div',{class:'muted',style:'margin-top:2px'}, ev.mode));
       if(ev.ctaUrl && ev.ctaLabel) evHost.appendChild(h('div',{style:'margin-top:8px'}, h('a',{href:ev.ctaUrl,class:'btn',target:'_blank',rel:'noopener'}, ev.ctaLabel)));
     }
-
     // Progress
     const {done,total,pct}=totals();
     progHost.innerHTML = '<h4>Your progress</h4>';
     progHost.appendChild(h('div',{class:'muted'}, `${done} of ${total} (${pct}%)`));
-    progHost.appendChild(h('div',{class:'progress',style:'margin-top:6px'}, h('i',{style:`width:${pct}%;`}));
+    // ✅ fixed missing parenthesis here
+    progHost.appendChild(h('div',{class:'progress',style:'margin-top:6px'}, h('i',{style:`width:${pct}%;`})));
   }
 
   // ---------- Pages ----------
@@ -660,28 +661,51 @@ window.addEventListener('error', (ev) => {
     if(!document.getElementById('search').contains(e.target)){ SEARCH_DD.classList.remove('show'); }
   });
 
-  // ---------- Boot ----------
+  // ---------- Boot (robust path + diagnostics) ----------
   async function boot(){
-    const ROOT = document.querySelector('meta[name="ao-root"]')?.content || '/';
-    const url  = ROOT + (WANT_FULL ? 'full/site.json' : 'site.json');
+    // Read <meta name="ao-root"> and normalize
+    const metaRoot = (document.querySelector('meta[name="ao-root"]')?.content || '/').trim();
+    const ROOT = metaRoot.endsWith('/') ? metaRoot : (metaRoot + '/');
 
-    try{
-      const res=await fetch(url, {cache:'no-store', credentials:'same-origin'});
-      if(!res.ok) throw new Error(`HTTP ${res.status}`);
-      const txt=await res.text();
-      site=JSON.parse(txt);
-    }catch(e){
-      // No silent demo unless you add ?demo=1
+    // Current directory of this page (e.g., "/repo/" or "/docs/")
+    const DIR = location.pathname.replace(/[^/]*$/, '');
+    const rel = WANT_FULL ? 'full/site.json' : 'site.json';
+
+    // Try a few sensible candidates, left-to-right
+    const candidates = Array.from(new Set([
+      new URL(ROOT + rel, location.origin).toString(),
+      new URL(DIR + rel,  location.origin).toString(),
+      new URL('/' + rel,  location.origin).toString()
+    ]));
+
+    let errors = [];
+    for (const u of candidates) {
+      status('Loading ' + u + ' …');
+      try{
+        const res=await fetch(u, {cache:'no-store', credentials:'same-origin'});
+        if(!res.ok){ errors.push(`HTTP ${res.status} @ ${u}`); continue; }
+        const txt=await res.text();
+        site=JSON.parse(txt);
+        status('Loaded from: ' + u);
+        break;
+      }catch(e){
+        errors.push((e?.message || String(e)) + ' @ ' + u);
+      }
+    }
+
+    if(!site){
       if(!WANT_DEMO){
         NAV.innerHTML='';
-        NAV.append(h('div',{class:'muted'}, `Could not load site.json (${e.message||e}).`));
+        NAV.append(
+          h('div',{class:'muted'}, 'Could not load site.json.'),
+          h('div',{class:'muted',html:'Tried:<br>' + errors.map(x=>x.replace(/&/g,'&amp;').replace(/</g,'&lt;')).join('<br>')})
+        );
         site = { title:'', chapters:[], events:[] };
       }else{
         site = makeDemoSite();
       }
     }
 
-    // Build chapter list (no test/demo chapters in your real JSON)
     chapters=(site.chapters||[])
       .map((ch,i)=>({ch,ord:chapterOrderIndex(ch,i)}))
       .sort((a,b)=>a.ord-b.ord)
@@ -737,6 +761,5 @@ window.addEventListener('error', (ev) => {
   boot();
 })();
 </script>
-
 </body>
 </html>
