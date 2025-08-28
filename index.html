@@ -288,66 +288,71 @@ window.addEventListener('error', (ev) => {
   function saveQuizResult(id, payload){ quizResults[id] = payload; saveJSON(LS_QUIZ, quizResults); }
   function saveAssessResult(id, payload){ assessResults[id] = payload; saveJSON(LS_ASSESS, assessResults); }
 
-  function renderQuiz(lo, key){
-    const q = lo.quiz;
-    if(!q || !Array.isArray(q.questions) || !q.questions.length) return;
+function renderQuiz(lo, key){
+  const q = lo.quiz;
+  if(!q || !Array.isArray(q.questions) || !q.questions.length) return;
 
-    const host = h('div',{class:'cardlet'});
-    host.appendChild(h('h4',{}, q.title || 'Quiz'));
+  const host = h('div',{class:'cardlet'});
+  host.appendChild(h('h4',{}, q.title || 'Quiz'));
 
-    const prior = quizResults[q.id];
-    const form  = h('form', {style:'margin-top:6px'});
-    q.questions.forEach((qq,qi)=>{
-      const fs = h('fieldset',{style:'border:0;border-top:1px dashed #2a3340;padding:10px 0;margin:8px 0 0'});
-      fs.appendChild(h('div',{style:'font-weight:600;margin-bottom:6px'}, `${qi+1}. ${qq.text}`));
-      (qq.options||[]).forEach((opt,oi)=>{
-        const id = `${q.id}-q${qi}-o${oi}`;
-        const lbl = h('label',{for:id,style:'display:flex;gap:8px;align-items:flex-start;margin:4px 0;cursor:pointer'});
-        const rb  = h('input',{type:'radio',name:`q${qi}`,id:valueSafe(id),value:String(oi)});
-        lbl.appendChild(rb);
-        lbl.appendChild(h('span',{}, opt));
-        fs.appendChild(lbl);
-      });
-      form.appendChild(fs);
+  const prior = quizResults[q.id];
+  const form  = h('form', {style:'margin-top:6px'});
+
+  // Questions
+  q.questions.forEach((qq,qi)=>{
+    const fs = h('fieldset',{style:'border:0;border-top:1px dashed #2a3340;padding:10px 0;margin:8px 0 0'});
+    fs.appendChild(h('div',{style:'font-weight:600;margin-bottom:6px'}, `${qi+1}. ${qq.text}`));
+    (qq.options||[]).forEach((opt,oi)=>{
+      const id = `${q.id}-q${qi}-o${oi}`;
+      const lbl = h('label',{for:id,style:'display:flex;gap:8px;align-items:flex-start;margin:4px 0;cursor:pointer'});
+      const rb  = h('input',{type:'radio',name:`q${qi}`,id:id.replace(/[^a-zA-Z0-9_-]/g,'_'),value:String(oi)});
+      lbl.appendChild(rb);
+      lbl.appendChild(h('span',{}, opt));
+      fs.appendChild(lbl);
     });
+    form.appendChild(fs);
+  });
 
-    const actions = h('div',{style:'margin-top:10px;display:flex;gap:8px;flex-wrap:wrap'});
-    const submit  = h('button',{type:'submit',class:'btn'}, prior ? 'Retake quiz' : 'Submit quiz');
-    const status  = h('div',{class:'muted',style:'margin-top:6px'});
-    actions.appendChild(submit);
-    host.append(form, actions, status);
-    MAIN.appendChild(host);
+  // Submit row **inside the form**
+  const buttonRow = h('div',{style:'margin-top:10px;display:flex;gap:8px;flex-wrap:wrap'});
+  const submit    = h('button',{type:'submit',class:'btn'}, prior ? 'Retake quiz' : 'Submit quiz');
+  buttonRow.appendChild(submit);
+  form.appendChild(buttonRow);
 
-    const lockForm = (lock) => {
-      form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.disabled = lock; });
-      submit.textContent = lock ? 'Retake quiz' : 'Submit quiz';
-    };
+  const status  = h('div',{class:'muted',style:'margin-top:6px'});
+  host.append(form, status);
+  MAIN.appendChild(host);
 
-    if (prior){
-      status.textContent = `Last score: ${prior.score}/${prior.total}`;
-      lockForm(true);
+  const lockForm = (lock) => {
+    form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.disabled = lock; });
+    submit.textContent = lock ? 'Retake quiz' : 'Submit quiz';
+  };
+
+  if (prior){
+    status.textContent = `Last score: ${prior.score}/${prior.total}`;
+    lockForm(true);
+  }
+
+  form.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    if(submit.textContent==='Retake quiz'){
+      form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.checked=false; });
+      status.textContent = '';
+      lockForm(false);
+      return;
     }
-
-    form.addEventListener('submit', (e)=>{
-      e.preventDefault();
-      if(submit.textContent==='Retake quiz'){
-        form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.checked=false; });
-        status.textContent = '';
-        lockForm(false);
-        return;
-      }
-      const answers = q.questions.map((_,qi)=>{
-        const sel = form.querySelector(`input[name="q${qi}"]:checked`);
-        return sel ? parseInt(sel.value,10) : -1;
-      });
-      let score=0;
-      q.questions.forEach((qq,qi)=>{
-        if(answers[qi]===qq.correctIndex) score++;
-      });
-      const res = { key, score, total:q.questions.length, answers, ts: Date.now() };
-      saveQuizResult(q.id, res);
-      status.textContent = `Score: ${score}/${q.questions.length}`;
-      lockForm(true);
+    const answers = q.questions.map((_,qi)=>{
+      const sel = form.querySelector(`input[name="q${qi}"]:checked`);
+      return sel ? parseInt(sel.value,10) : -1;
+    });
+    let score=0;
+    q.questions.forEach((qq,qi)=>{
+      if(answers[qi]===qq.correctIndex) score++;
+    });
+    const res = { key, score, total:q.questions.length, answers, ts: Date.now() };
+    saveQuizResult(q.id, res);
+    status.textContent = `Score: ${score}/${q.questions.length}`;
+    lockForm(true);
     });
   }
 
