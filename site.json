@@ -1,69 +1,63 @@
 {
-  "title": "Advice-Only® — Bookstore Preview",
+  "title": "Advice-Only® Bookstore",
   "about": {
-    "name": "Advice-Only®",
-    "location": "USA",
-    "bio": "Education-first financial guidance."
+    "name": "Your Name",
+    "location": "City, ST",
+    "bio": "Financial planner & educator.",
+    "specialties": ["Planning", "Behavior", "Retirement"],
+    "ctaUrl": "#",
+    "ctaLabel": "Work with me"
   },
   "events": [
-    {"title":"Orientation", "date":"2026-01-15", "time":"10:00", "tz":"America/New_York", "mode":"Virtual"}
+    {
+      "title": "Welcome Session",
+      "date": "2026-01-15",
+      "time": "13:00",
+      "tz": "America/New_York",
+      "mode": "Zoom",
+      "ctaUrl": "#",
+      "ctaLabel": "Details"
+    }
   ],
   "chapters": [
     {
-      "title": "Chapter 1 — Foundations",
+      "title": "Chapter 1 — Getting Started",
       "los": [
         {
-          "title": "1.1 — What ‘Advice-Only’ Means",
-          "preview": "A quick overview of the Advice-Only model.",
+          "title": "1.1 — What to expect",
+          "preview": "A quick overview of how this bookstore works.",
+          "images": [
+            "https://picsum.photos/seed/ao1/1200/800",
+            { "src": "https://picsum.photos/seed/ao2/1200/800", "alt": "Sample image", "caption": "Images can have captions." }
+          ],
           "snippets": [
             {
               "title": "Overview",
-              "body": "Advice-Only separates planning from product sales. [[img:1]] This model aligns incentives with client outcomes."
+              "body": "This is the first LO. Here’s an inline image [[img:1]]. You can also reference the second image [[img:2]]."
             }
-          ],
-          "images": [
-            {"src":"https://picsum.photos/seed/ao11/1200/700", "alt":"Diagram", "caption":"Alignment diagram (placeholder)."}
           ]
         },
         {
-          "title": "1.2 — Scope vs. Depth",
-          "preview": "How to think about scope and depth of planning work.",
+          "title": "1.2 — No tokens example",
+          "preview": "Shows the first media below when no [[img:n]] or [[vid:n]] tokens are present.",
+          "images": ["https://picsum.photos/seed/ao3/1200/800"],
           "snippets": [
-            {
-              "title": "Concept",
-              "body": "Scope is breadth; depth is the level of detail. Insert images inline by using tokens like [[img:1]]."
-            }
-          ],
-          "images": [
-            {"src":"https://picsum.photos/seed/ao12/1200/700", "alt":"Scope vs Depth", "caption":"Scope vs. depth illustration (placeholder)."}
+            { "title": "Body", "body": "No tokens used here—the first media will appear below automatically." }
           ]
         }
       ]
     },
     {
-      "title": "Chapter 2 — Client Workflows",
+      "title": "Chapter 2 — Deep Dive",
       "los": [
         {
-          "title": "2.1 — Intake",
-          "preview": "Collect what matters, nothing more.",
-          "snippets": [
-            {
-              "title": "Essentials",
-              "body": "Start light: goals, constraints, timelines. Use the search bar anytime to jump to topics."
-            }
-          ]
-        },
-        {
-          "title": "2.2 — Delivery",
-          "preview": "Present clearly; make actions obvious.",
-          "snippets": [
-            {
-              "title": "Principles",
-              "body": "Clarity beats cleverness. Keep artifacts portable. [[img:1]]"
-            }
-          ],
+          "title": "2.1 — Videos work too",
+          "preview": "Embed short demo videos.",
           "images": [
-            {"src":"https://picsum.photos/seed/ao22/1200/700", "alt":"Delivery example", "caption":"Sample delivery artifact (placeholder)."}
+            { "type": "video", "src": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm", "caption": "A short demo video." }
+          ],
+          "snippets": [
+            { "title": "Watch", "body": "Inline video token [[vid:1]]." }
           ]
         }
       ]
