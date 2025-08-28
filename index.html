@@ -1,5 +1,4 @@
 <!doctype html>
-
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
@@ -785,7 +784,7 @@ window.addEventListener('error', (ev) => {
         const when = new Date(res.ts||Date.now()).toLocaleString();
         qtb.appendChild(h('tr',{},
           h('td',{}, id),
-          h('td',}, `${res.score}/${res.total}`),
+          h('td',{}, `${res.score}/${res.total}`),
           h('td',{}, when),
           h('td',{}, res.key||'')
         ));
