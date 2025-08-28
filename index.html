@@ -1,16 +1,14 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta name="ao-root" content="/repo/" />
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Advice-Only® Bookstore (Preview)</title>
 <meta name="robots" content="noindex,nofollow"/>
 
-<!-- IMPORTANT: Set this to the public web root where site.json lives.
-     If your site is at https://example.com/              => content="/"
-     If it’s served under https://example.com/ao-v1/      => content="/ao-v1/"
-     If it’s served under https://example.com/learn/      => content="/learn/" -->
+<!-- Set this to the public root where site.json lives -->
+<!-- If the site is at https://example.com/         => content="/" -->
+<!-- If it’s at https://example.com/ao-v1/          => content="/ao-v1/" -->
 <meta name="ao-root" content="/" />
 
 <style>
@@ -145,16 +143,16 @@
   </div>
 
 <script>
-/* Show uncaught JS errors in the left nav so you see them immediately. */
+/* Surface any boot errors in the left nav */
 window.addEventListener('error', (ev) => {
   try {
     const n = document.getElementById('nav');
     if (!n) return;
     n.innerHTML = '';
-    n.appendChild(Object.assign(document.createElement('div'), {
-      className: 'muted',
-      textContent: 'Script error: ' + (ev.error?.message || ev.message || 'unknown')
-    }));
+    const d = document.createElement('div');
+    d.className = 'muted';
+    d.textContent = 'Script error: ' + (ev.error?.message || ev.message || 'unknown');
+    n.appendChild(d);
   } catch {}
 });
 
@@ -174,10 +172,12 @@ window.addEventListener('error', (ev) => {
   const LS_SEEN = 'ao.v2.seen';
   const LS_TIME = 'ao.v2.time';
   const LS_LAST = 'ao.v2.last';
+  const LS_QUIZ   = 'ao.v2.quiz';
+  const LS_ASSESS = 'ao.v2.assess';
   const COMP_THRESH = { red:20, yellow:60 };
 
   const params = new URLSearchParams(location.search);
-  const WANT_DEMO = params.get('demo') === '1';   // show demo only if requested
+  const WANT_DEMO = params.get('demo') === '1';   // only show demo if requested
   const WANT_FULL = params.get('full') === '1';   // load /full/site.json
 
   // ---------- Helpers ----------
@@ -203,13 +203,12 @@ window.addEventListener('error', (ev) => {
   };
   const loadJSON=(k,def)=>{ try{const v=JSON.parse(localStorage.getItem(k)||''); return v??def;}catch{ return def; } };
   const saveJSON=(k,v)=>localStorage.setItem(k, JSON.stringify(v));
-  const status = (msg)=>{
-    NAV.innerHTML=''; NAV.appendChild(h('div',{class:'muted'}, String(msg)));
-  };
 
   // ---------- State ----------
   const seen = new Set(loadJSON(LS_SEEN, []));
   const timeMap = loadJSON(LS_TIME, {});
+  const quizResults   = loadJSON(LS_QUIZ,   {});
+  const assessResults = loadJSON(LS_ASSESS, {});
   let currentTimer = null;
   let site=null, chapters=[], docs=[];
 
@@ -284,6 +283,168 @@ window.addEventListener('error', (ev) => {
   LB.addEventListener('click', (e)=>{ if(e.target===LB) closeZoom(); });
   document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeZoom(); });
 
+  // ---------- QUIZ & ASSESSMENT ----------
+  function valueSafe(s){ return String(s||'').replace(/[^a-zA-Z0-9_-]/g,'_'); }
+  function saveQuizResult(id, payload){ quizResults[id] = payload; saveJSON(LS_QUIZ, quizResults); }
+  function saveAssessResult(id, payload){ assessResults[id] = payload; saveJSON(LS_ASSESS, assessResults); }
+
+  function renderQuiz(lo, key){
+    const q = lo.quiz;
+    if(!q || !Array.isArray(q.questions) || !q.questions.length) return;
+
+    const host = h('div',{class:'cardlet'});
+    host.appendChild(h('h4',{}, q.title || 'Quiz'));
+
+    const prior = quizResults[q.id];
+    const form  = h('form', {style:'margin-top:6px'});
+    q.questions.forEach((qq,qi)=>{
+      const fs = h('fieldset',{style:'border:0;border-top:1px dashed #2a3340;padding:10px 0;margin:8px 0 0'});
+      fs.appendChild(h('div',{style:'font-weight:600;margin-bottom:6px'}, `${qi+1}. ${qq.text}`));
+      (qq.options||[]).forEach((opt,oi)=>{
+        const id = `${q.id}-q${qi}-o${oi}`;
+        const lbl = h('label',{for:id,style:'display:flex;gap:8px;align-items:flex-start;margin:4px 0;cursor:pointer'});
+        const rb  = h('input',{type:'radio',name:`q${qi}`,id:valueSafe(id),value:String(oi)});
+        lbl.appendChild(rb);
+        lbl.appendChild(h('span',{}, opt));
+        fs.appendChild(lbl);
+      });
+      form.appendChild(fs);
+    });
+
+    const actions = h('div',{style:'margin-top:10px;display:flex;gap:8px;flex-wrap:wrap'});
+    const submit  = h('button',{type:'submit',class:'btn'}, prior ? 'Retake quiz' : 'Submit quiz');
+    const status  = h('div',{class:'muted',style:'margin-top:6px'});
+    actions.appendChild(submit);
+    host.append(form, actions, status);
+    MAIN.appendChild(host);
+
+    const lockForm = (lock) => {
+      form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.disabled = lock; });
+      submit.textContent = lock ? 'Retake quiz' : 'Submit quiz';
+    };
+
+    if (prior){
+      status.textContent = `Last score: ${prior.score}/${prior.total}`;
+      lockForm(true);
+    }
+
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      if(submit.textContent==='Retake quiz'){
+        form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.checked=false; });
+        status.textContent = '';
+        lockForm(false);
+        return;
+      }
+      const answers = q.questions.map((_,qi)=>{
+        const sel = form.querySelector(`input[name="q${qi}"]:checked`);
+        return sel ? parseInt(sel.value,10) : -1;
+      });
+      let score=0;
+      q.questions.forEach((qq,qi)=>{
+        if(answers[qi]===qq.correctIndex) score++;
+      });
+      const res = { key, score, total:q.questions.length, answers, ts: Date.now() };
+      saveQuizResult(q.id, res);
+      status.textContent = `Score: ${score}/${q.questions.length}`;
+      lockForm(true);
+    });
+  }
+
+  function renderAssessment(ch, chIdx){
+    const a = ch.assessment;
+    if(!a || !Array.isArray(a.items) || !a.items.length) return;
+
+    const host = h('div',{class:'cardlet'});
+    host.appendChild(h('h4',{}, a.title || 'Assessment'));
+    if(a.intro) host.appendChild(h('p',{class:'muted',style:'margin-top:4px'}, a.intro));
+
+    const prior = assessResults[a.id];
+    const form  = h('form', {style:'margin-top:6px'});
+    const min = a.scale?.min ?? 1, max = a.scale?.max ?? 5;
+
+    a.items.forEach((it,ii)=>{
+      const row = h('div',{style:'padding:8px 0;border-top:1px dashed #2a3340'});
+      row.appendChild(h('div',{style:'font-weight:600;margin-bottom:6px'}, `${ii+1}. ${it.text}`));
+      const opts = h('div',{style:'display:flex;gap:10px;flex-wrap:wrap'});
+      for(let v=min; v<=max; v++){
+        const id = `${a.id}-i${ii}-v${v}`;
+        const lbl = h('label',{for:id,style:'display:flex;gap:6px;align-items:center;cursor:pointer'});
+        const rb  = h('input',{type:'radio',name:`i${ii}`,id:valueSafe(id),value:String(v)});
+        lbl.appendChild(rb);
+        const tag = (v===min && a.scale?.labels?.[String(min)]) ? ` (${a.scale.labels[String(min)]})`
+                  : (v===max && a.scale?.labels?.[String(max)]) ? ` (${a.scale.labels[String(max)]})` : '';
+        lbl.appendChild(h('span',{}, String(v)+tag));
+        opts.appendChild(lbl);
+      }
+      row.appendChild(opts);
+      form.appendChild(row);
+    });
+
+    const actions = h('div',{style:'margin-top:10px;display:flex;gap:8px;flex-wrap:wrap'});
+    const submit  = h('button',{type:'submit',class:'btn'}, prior ? 'Retake assessment' : 'Submit assessment');
+    const status  = h('div',{class:'muted',style:'margin-top:6px'});
+    actions.appendChild(submit);
+    host.append(form, actions, status);
+    MAIN.appendChild(host);
+
+    const lockForm = (lock) => {
+      form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.disabled = lock; });
+      submit.textContent = lock ? 'Retake assessment' : 'Submit assessment';
+    };
+
+    if (prior){
+      status.textContent = `Last: total=${prior.sum}, avg=${prior.avg.toFixed(2)}`;
+      lockForm(true);
+    }
+
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      if(submit.textContent==='Retake assessment'){
+        form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.checked=false; });
+        status.textContent = '';
+        lockForm(false);
+        return;
+      }
+      const vals = a.items.map((_,ii)=>{
+        const sel = form.querySelector(`input[name="i${ii}"]:checked`);
+        return sel ? parseInt(sel.value,10) : 0;
+      });
+      const sum = vals.reduce((s,v)=>s+v,0);
+      const avg = vals.length? sum/vals.length : 0;
+      const res = { chapter: chIdx+1, values: vals, sum, avg, ts: Date.now() };
+      saveAssessResult(a.id, res);
+      status.textContent = `Saved: total=${sum}, avg=${avg.toFixed(2)}`;
+      lockForm(true);
+    });
+  }
+
+  function downloadFile(name, text, mime='application/json'){
+    const blob = new Blob([text], {type:mime});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 500);
+  }
+  function buildCSV(){
+    const esc = s => `"${String(s??'').replace(/"/g,'""')}"`;
+    const lines = [];
+    lines.push('type,id,score,total,lo_key,ts_iso');
+    for(const [id,res] of Object.entries(quizResults||{})){
+      const ts = new Date(res.ts||Date.now()).toISOString();
+      lines.push(['quiz', id, res.score, res.total, res.key||'', ts].map(esc).join(','));
+    }
+    lines.push('type,id,sum,avg,chapter,ts_iso,values');
+    for(const [id,res] of Object.entries(assessResults||{})){
+      const ts = new Date(res.ts||Date.now()).toISOString();
+      lines.push(['assessment', id, res.sum, res.avg, res.chapter||'', ts, JSON.stringify(res.values||[])].map(esc).join(','));
+    }
+    return lines.join('\n');
+  }
+
   // ---------- Reader ----------
   function renderMain(ch, lo, chIdx, loIdx){
     const key = `${chIdx+1}.${loIdx+1}`;
@@ -341,6 +502,11 @@ window.addEventListener('error', (ev) => {
     // If no tokens, but media exists, show the first media once
     if(imgTokens.length===0 && vidTokens.length===0 && pool[0]) addFigure(pool[0]);
 
+    // Quiz & Assessment panels
+    try { renderQuiz(lo, key); } catch {}
+    try { renderAssessment(ch, chIdx); } catch {}
+
+    // Fallback copy
     if(!s && !pool.length){
       MAIN.append(h('div',{class:'muted'}, 'Data source: site.json.'));
     }
@@ -366,7 +532,6 @@ window.addEventListener('error', (ev) => {
     });
     NAV.append(list, h('a',{href:'#data',class:'meta-link'},'→ Open My Data'));
 
-    // Footer (copyright + privacy)
     const year = new Date().getFullYear();
     const foot = h('div',{class:'foot',id:'foot'});
     foot.appendChild(h('div',{html:`©${year} Hall Financial Services, Inc. d/b/a ADVICE ONLY.`}));
@@ -406,6 +571,7 @@ window.addEventListener('error', (ev) => {
   function refreshRail(){
     const evHost = document.getElementById('rail-events');
     const progHost = document.getElementById('rail-progress');
+
     // Events
     evHost.innerHTML = '<h4>Next event</h4>';
     const list=Array.isArray(site?.events)?site.events.slice():[];
@@ -418,11 +584,11 @@ window.addEventListener('error', (ev) => {
       if(ev.mode) evHost.appendChild(h('div',{class:'muted',style:'margin-top:2px'}, ev.mode));
       if(ev.ctaUrl && ev.ctaLabel) evHost.appendChild(h('div',{style:'margin-top:8px'}, h('a',{href:ev.ctaUrl,class:'btn',target:'_blank',rel:'noopener'}, ev.ctaLabel)));
     }
+
     // Progress
     const {done,total,pct}=totals();
     progHost.innerHTML = '<h4>Your progress</h4>';
     progHost.appendChild(h('div',{class:'muted'}, `${done} of ${total} (${pct}%)`));
-    // ✅ fixed missing parenthesis here
     progHost.appendChild(h('div',{class:'progress',style:'margin-top:6px'}, h('i',{style:`width:${pct}%;`})));
   }
 
@@ -504,9 +670,11 @@ window.addEventListener('error', (ev) => {
       )
     );
   }
-  const compColor = secs => secs < COMP_THRESH.red ? 'red' : (secs < COMP_THRESH.yellow ? 'yellow' : 'green');
+
   function renderMyData(){
     stopTiming();
+    const compColor = secs => secs < COMP_THRESH.red ? 'red' : (secs < COMP_THRESH.yellow ? 'yellow' : 'green');
+
     const agg = Object.entries(timeMap).reduce((acc,[,s])=>{
       const c=compColor(s); acc[c]++; acc.totalSecs+=s; return acc;
     }, {red:0,yellow:0,green:0,totalSecs:0});
@@ -515,7 +683,7 @@ window.addEventListener('error', (ev) => {
     MAIN.innerHTML='';
     MAIN.append(
       h('h1',{},'My Data'),
-      h('p',{class:'lead'},'Local-only engagement data (per learning objective).')
+      h('p',{class:'lead'},'Local-only engagement, quiz results, and assessments (nothing leaves your browser).')
     );
 
     MAIN.append(
@@ -526,7 +694,7 @@ window.addEventListener('error', (ev) => {
           h('div',{class:'progress',style:'margin-top:6px'}, h('i',{style:`width:${pct}%;`}))
         ),
         h('div',{class:'cardlet'},
-          h('h4',{},'Engagement balance'),
+          h('h4',},'Engagement balance'),
           h('div',{class:'legend',style:'margin-top:4px'},
             h('span',{}, h('i',{class:'dot red'}),'Under 20s'),
             h('span',{}, h('i',{class:'dot yellow'}),'20–59s'),
@@ -564,9 +732,63 @@ window.addEventListener('error', (ev) => {
     });
     MAIN.append(table);
 
+    const quizCard = h('div',{class:'cardlet',style:'margin-top:12px'});
+    quizCard.appendChild(h('h4',{},'Quizzes'));
+    if(Object.keys(quizResults||{}).length===0){
+      quizCard.appendChild(h('div',{class:'muted'},'No quiz attempts yet.'));
+    }else{
+      const qt = h('table',{class:'data-table',style:'margin-top:6px'});
+      qt.innerHTML = `<thead><tr>
+        <th>Quiz ID</th><th>Score</th><th>When</th><th>LO Key</th>
+      </tr></thead><tbody></tbody>`;
+      const qtb = qt.querySelector('tbody');
+      Object.entries(quizResults).forEach(([id,res])=>{
+        const when = new Date(res.ts||Date.now()).toLocaleString();
+        qtb.appendChild(h('tr',{},
+          h('td',{}, id),
+          h('td',{}, `${res.score}/${res.total}`),
+          h('td',{}, when),
+          h('td',{}, res.key||'')
+        ));
+      });
+      quizCard.appendChild(qt);
+    }
+    MAIN.append(quizCard);
+
+    const assessCard = h('div',{class:'cardlet',style:'margin-top:12px'});
+    assessCard.appendChild(h('h4',{},'Assessments'));
+    if(Object.keys(assessResults||{}).length===0){
+      assessCard.appendChild(h('div',{class:'muted'},'No assessments yet.'));
+    }else{
+      const at = h('table',{class:'data-table',style:'margin-top:6px'});
+      at.innerHTML = `<thead><tr>
+        <th>Assessment ID</th><th>Total</th><th>Average</th><th>Chapter</th><th>When</th>
+      </tr></thead><tbody></tbody>`;
+      const atb = at.querySelector('tbody');
+      Object.entries(assessResults).forEach(([id,res])=>{
+        const when = new Date(res.ts||Date.now()).toLocaleString();
+        atb.appendChild(h('tr',{},
+          h('td',{}, id),
+          h('td',{}, String(res.sum)),
+          h('td',{}, (res.avg??0).toFixed(2)),
+          h('td',{}, String(res.chapter||'')),
+          h('td',{}, when)
+        ));
+      });
+      assessCard.appendChild(at);
+    }
+    MAIN.append(assessCard);
+
     MAIN.append(h('div',{style:'margin-top:12px;display:flex;gap:8px;flex-wrap:wrap'},
       h('button',{class:'btn',onclick:()=>{ localStorage.removeItem(LS_SEEN); seen.clear(); refreshRail(); renderMyData(); }},'Clear progress'),
       h('button',{class:'btn',onclick:()=>{ localStorage.removeItem(LS_TIME); for(const k in timeMap) delete timeMap[k]; renderMyData(); }},'Clear time'),
+      h('button',{class:'btn',onclick:()=>{ localStorage.removeItem(LS_QUIZ); for(const k in quizResults) delete quizResults[k]; renderMyData(); }},'Clear quizzes'),
+      h('button',{class:'btn',onclick:()=>{ localStorage.removeItem(LS_ASSESS); for(const k in assessResults) delete assessResults[k]; renderMyData(); }},'Clear assessments'),
+      h('button',{class:'btn',onclick:()=>{
+        const payload = { seen:[...seen], timeMap, quizResults, assessResults };
+        downloadFile('my-data.json', JSON.stringify(payload,null,2), 'application/json');
+      }},'Download JSON'),
+      h('button',{class:'btn',onclick:()=>{ downloadFile('my-data.csv', buildCSV(), 'text/csv'); }},'Download CSV'),
       h('a',{href:'#home',class:'btn'},'Back to Home')
     ));
   }
@@ -662,45 +884,20 @@ window.addEventListener('error', (ev) => {
     if(!document.getElementById('search').contains(e.target)){ SEARCH_DD.classList.remove('show'); }
   });
 
-  // ---------- Boot (robust path + diagnostics) ----------
+  // ---------- Boot ----------
   async function boot(){
-    // Read <meta name="ao-root"> and normalize
-    const metaRoot = (document.querySelector('meta[name="ao-root"]')?.content || '/').trim();
-    const ROOT = metaRoot.endsWith('/') ? metaRoot : (metaRoot + '/');
+    const ROOT = document.querySelector('meta[name="ao-root"]')?.content || '/';
+    const url  = ROOT + (WANT_FULL ? 'full/site.json' : 'site.json');
 
-    // Current directory of this page (e.g., "/repo/" or "/docs/")
-    const DIR = location.pathname.replace(/[^/]*$/, '');
-    const rel = WANT_FULL ? 'full/site.json' : 'site.json';
-
-    // Try a few sensible candidates, left-to-right
-    const candidates = Array.from(new Set([
-      new URL(ROOT + rel, location.origin).toString(),
-      new URL(DIR + rel,  location.origin).toString(),
-      new URL('/' + rel,  location.origin).toString()
-    ]));
-
-    let errors = [];
-    for (const u of candidates) {
-      status('Loading ' + u + ' …');
-      try{
-        const res=await fetch(u, {cache:'no-store', credentials:'same-origin'});
-        if(!res.ok){ errors.push(`HTTP ${res.status} @ ${u}`); continue; }
-        const txt=await res.text();
-        site=JSON.parse(txt);
-        status('Loaded from: ' + u);
-        break;
-      }catch(e){
-        errors.push((e?.message || String(e)) + ' @ ' + u);
-      }
-    }
-
-    if(!site){
+    try{
+      const res=await fetch(url, {cache:'no-store', credentials:'same-origin'});
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const txt=await res.text();
+      site=JSON.parse(txt);
+    }catch(e){
       if(!WANT_DEMO){
         NAV.innerHTML='';
-        NAV.append(
-          h('div',{class:'muted'}, 'Could not load site.json.'),
-          h('div',{class:'muted',html:'Tried:<br>' + errors.map(x=>x.replace(/&/g,'&amp;').replace(/</g,'&lt;')).join('<br>')})
-        );
+        NAV.append(h('div',{class:'muted'}, `Could not load site.json (${e.message||e}).`));
         site = { title:'', chapters:[], events:[] };
       }else{
         site = makeDemoSite();
@@ -739,7 +936,6 @@ window.addEventListener('error', (ev) => {
       title:"Demo Samples",
       alerts:["Demo is enabled via ?demo=1. Remove the query parameter to hide."],
       events:[{title:"Live Q&A",date:"2026-01-08",time:"13:00",tz:"America/New_York",mode:"Zoom",ctaUrl:"#",ctaLabel:"Details"}],
-      about:{name:"Your Name",location:"City, ST",bio:"Financial planner, educator.",specialties:["Planning","Behavior","Retirement"]},
       chapters:[
         { title:"Demo Samples", los:[
           { title:"1.1 — Inline tokens", preview:"Two images and one short video, tokenized.",
@@ -749,10 +945,6 @@ window.addEventListener('error', (ev) => {
               {type:"video",src:"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm",caption:"Sample video"}
             ],
             snippets:[{title:"Body",body:"Here’s an image [[img:1]] in-line, then a video [[vid:3]], and later another image [[img:2]]."}]
-          },
-          { title:"1.2 — No tokens", preview:"Shows first media under text when no tokens.",
-            images:["https://picsum.photos/seed/c/1200/800"],
-            snippets:[{title:"Body",body:"No tokens here—first media appears below."}]
           }
         ]}
       ]
@@ -762,5 +954,6 @@ window.addEventListener('error', (ev) => {
   boot();
 })();
 </script>
+
 </body>
 </html>
