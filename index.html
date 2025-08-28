@@ -451,20 +451,42 @@ function renderAssessment(ch, chIdx){
     a.remove();
     setTimeout(()=>URL.revokeObjectURL(a.href), 500);
   }
-  function buildCSV(){
-    const esc = s => `"${String(s??'').replace(/"/g,'""')}"`;
-    const lines = [];
-    lines.push('type,id,score,total,lo_key,ts_iso');
-    for(const [id,res] of Object.entries(quizResults||{})){
-      const ts = new Date(res.ts||Date.now()).toISOString();
-      lines.push(['quiz', id, res.score, res.total, res.key||'', ts].map(esc).join(','));
-    }
-    lines.push('type,id,sum,avg,chapter,ts_iso,values');
-    for(const [id,res] of Object.entries(assessResults||{})){
-      const ts = new Date(res.ts||Date.now()).toISOString();
-      lines.push(['assessment', id, res.sum, res.avg, res.chapter||'', ts, JSON.stringify(res.values||[])].map(esc).join(','));
-    }
-    return lines.join('\n');
+function buildCSV(){
+  const esc = s => `"${String(s??'').replace(/"/g,'""')}"`;
+  const lines = [];
+
+  // Quizzes
+  lines.push("type,quiz_id,lo_key,score,total,ts_iso,question_index,question_text,selected_index,selected_text,correct_index");
+  for(const [id,res] of Object.entries(quizResults||{})){
+    const ts = new Date(res.ts||Date.now()).toISOString();
+    (res.questionText||[]).forEach((qt,qi)=>{
+      const selIdx = Array.isArray(res.answers) ? res.answers[qi] : null;
+      const selTxt = Array.isArray(res.answersText) ? res.answersText[qi] : null;
+      const corr   = (res.options?.[qi] && typeof qi==="number")
+        ? (res.options[qi].findIndex((_,i)=> i=== (qt.correctIndex ?? -999))) // fallback if not present
+        : "";
+      lines.push([
+        "quiz", id, res.key||"", res.score, res.total, ts,
+        qi, qt, selIdx, selTxt, (res.correctIndexArray ? res.correctIndexArray[qi] : "")
+      ].map(esc).join(","));
+    });
+  }
+
+  // Assessments
+  lines.push("type,assess_id,chapter,ts_iso,item_index,item_text,value,label,total,average");
+  for(const [id,res] of Object.entries(assessResults||{})){
+    const ts = new Date(res.ts||Date.now()).toISOString();
+    (res.itemText||[]).forEach((txt,ii)=>{
+      const val = Array.isArray(res.values) ? res.values[ii] : "";
+      const lab = Array.isArray(res.valueLabels) ? res.valueLabels[ii] : "";
+      lines.push([
+        "assessment", id, res.chapter||"", ts, ii, txt, val, lab, res.sum, res.avg
+      ].map(esc).join(","));
+    });
+  }
+
+  return lines.join("\n");
+}
   }
 
   // ---------- Reader ----------
