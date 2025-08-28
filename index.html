@@ -6,10 +6,10 @@
 <title>Advice-Only® Bookstore (Preview)</title>
 <meta name="robots" content="noindex,nofollow"/>
 
-<!-- Set this to the public root where site.json lives -->
-<!-- If the site is at https://example.com/         => content="/" -->
-<!-- If it’s at https://example.com/ao-v1/          => content="/ao-v1/" -->
-<meta name="ao-root" content="/" />
+<!-- Where site.json lives.
+     For local file:// double-clicks this can stay "".
+     If you serve from a subpath, e.g. /AO-V1/, set content="/AO-V1/". -->
+<meta name="ao-root" content=""/>
 
 <style>
   :root{
@@ -288,156 +288,153 @@ window.addEventListener('error', (ev) => {
   function saveQuizResult(id, payload){ quizResults[id] = payload; saveJSON(LS_QUIZ, quizResults); }
   function saveAssessResult(id, payload){ assessResults[id] = payload; saveJSON(LS_ASSESS, assessResults); }
 
-function renderQuiz(lo, key){
-  const q = lo.quiz;
-  if(!q || !Array.isArray(q.questions) || !q.questions.length) return;
+  function renderQuiz(lo, key){
+    const q = lo.quiz;
+    if(!q || !Array.isArray(q.questions) || !q.questions.length) return;
 
-  const host = h('div',{class:'cardlet'});
-  host.appendChild(h('h4',{}, q.title || 'Quiz'));
+    const host = h('div',{class:'cardlet'});
+    host.appendChild(h('h4',{}, q.title || 'Quiz'));
 
-  const prior = quizResults[q.id];
-  const form  = h('form', {style:'margin-top:6px'});
+    const prior = quizResults[q.id];
+    const form  = h('form', {style:'margin-top:6px'});
 
-  q.questions.forEach((qq,qi)=>{
-    const fs = h('fieldset',{style:'border:0;border-top:1px dashed #2a3340;padding:10px 0;margin:8px 0 0'});
-    fs.appendChild(h('div',{style:'font-weight:600;margin-bottom:6px'}, `${qi+1}. ${qq.text}`));
-    (qq.options||[]).forEach((opt,oi)=>{
-      const id = `${q.id}-q${qi}-o${oi}`.replace(/[^a-zA-Z0-9_-]/g,'_');
-      const lbl = h('label',{for:id,style:'display:flex;gap:8px;align-items:flex-start;margin:4px 0;cursor:pointer'});
-      const rb  = h('input',{type:'radio',name:`q${qi}`,id:id,value:String(oi)});
-      lbl.appendChild(rb);
-      lbl.appendChild(h('span',{}, opt));
-      fs.appendChild(lbl);
-    });
-    form.appendChild(fs);
-  });
-
-  const buttonRow = h('div',{style:'margin-top:10px;display:flex;gap:8px;flex-wrap:wrap'});
-  const submit    = h('button',{type:'submit',class:'btn'}, prior ? 'Retake quiz' : 'Submit quiz');
-  buttonRow.appendChild(submit);
-  form.appendChild(buttonRow);
-
-  const status  = h('div',{class:'muted',style:'margin-top:6px'});
-  host.append(form, status);
-  MAIN.appendChild(host);
-
-  const lockForm = (lock) => {
-    form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.disabled = lock; });
-    submit.textContent = lock ? 'Retake quiz' : 'Submit quiz';
-  };
-
-  if (prior){
-    status.textContent = `Last score: ${prior.score}/${prior.total}`;
-    lockForm(true);
-  }
-
-  form.addEventListener('submit', (e)=>{
-    e.preventDefault();
-    if(submit.textContent==='Retake quiz'){
-      form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.checked=false; });
-      status.textContent = '';
-      lockForm(false);
-      return;
-    }
-    const answers = q.questions.map((_,qi)=>{
-      const sel = form.querySelector(`input[name="q${qi}"]:checked`);
-      return sel ? parseInt(sel.value,10) : -1;
-    });
-    const answersText = answers.map((a,qi)=> a>=0 ? (q.questions[qi].options[a] ?? null) : null);
-    let score=0;
     q.questions.forEach((qq,qi)=>{
-      if(answers[qi]===qq.correctIndex) score++;
+      const fs = h('fieldset',{style:'border:0;border-top:1px dashed #2a3340;padding:10px 0;margin:8px 0 0'});
+      fs.appendChild(h('div',{style:'font-weight:600;margin-bottom:6px'}, `${qi+1}. ${qq.text}`));
+      (qq.options||[]).forEach((opt,oi)=>{
+        const id = valueSafe(`${q.id}-q${qi}-o${oi}`);
+        const lbl = h('label',{for:id,style:'display:flex;gap:8px;align-items:flex-start;margin:4px 0;cursor:pointer'});
+        const rb  = h('input',{type:'radio',name:`q${qi}`,id:id,value:String(oi)});
+        lbl.appendChild(rb);
+        lbl.appendChild(h('span',{}, opt));
+        fs.appendChild(lbl);
+      });
+      form.appendChild(fs);
     });
-    const res = {
-      key,
-      score,
-      total: q.questions.length,
-      answers,
-      answersText,
-      questionText: q.questions.map(x=>x.text),
-      options: q.questions.map(x=>x.options),
-      ts: Date.now()
+
+    const actions = h('div',{style:'margin-top:10px;display:flex;gap:8px;flex-wrap:wrap'});
+    const submit  = h('button',{type:'submit',class:'btn'}, prior ? 'Retake quiz' : 'Submit quiz');
+    actions.appendChild(submit);
+    const status  = h('div',{class:'muted',style:'margin-top:6px'});
+    host.append(form, actions, status);
+    MAIN.appendChild(host);
+
+    const lockForm = (lock) => {
+      form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.disabled = lock; });
+      submit.textContent = lock ? 'Retake quiz' : 'Submit quiz';
     };
-    saveQuizResult(q.id, res);
-    status.textContent = `Score: ${score}/${q.questions.length}`;
-    lockForm(true);
-  });
-}
-function renderAssessment(ch, chIdx){
-  const a = ch.assessment;
-  if(!a || !Array.isArray(a.items) || !a.items.length) return;
 
-  const host = h('div',{class:'cardlet'});
-  host.appendChild(h('h4',{}, a.title || 'Assessment'));
-  if(a.intro) host.appendChild(h('p',{class:'muted',style:'margin-top:4px'}, a.intro));
-
-  const prior = assessResults[a.id];
-  const form  = h('form', {style:'margin-top:6px'});
-  const min = a.scale?.min ?? 1, max = a.scale?.max ?? 5;
-
-  a.items.forEach((it,ii)=>{
-    const row = h('div',{style:'padding:8px 0;border-top:1px dashed #2a3340'});
-    row.appendChild(h('div',{style:'font-weight:600;margin-bottom:6px'}, `${ii+1}. ${it.text}`));
-    const opts = h('div',{style:'display:flex;gap:10px;flex-wrap:wrap'});
-    for(let v=min; v<=max; v++){
-      const id = `${a.id}-i${ii}-v${v}`.replace(/[^a-zA-Z0-9_-]/g,'_');
-      const lbl = h('label',{for:id,style:'display:flex;gap:6px;align-items:center;cursor:pointer'});
-      const rb  = h('input',{type:'radio',name:`i${ii}`,id:id,value:String(v)});
-      lbl.appendChild(rb);
-      const tag = (v===min && a.scale?.labels?.[String(min)]) ? ` (${a.scale.labels[String(min)]})`
-                : (v===max && a.scale?.labels?.[String(max)]) ? ` (${a.scale.labels[String(max)]})` : '';
-      lbl.appendChild(h('span',{}, String(v)+tag));
-      opts.appendChild(lbl);
+    if (prior){
+      status.textContent = `Last score: ${prior.score}/${prior.total}`;
+      lockForm(true);
     }
-    row.appendChild(opts);
-    form.appendChild(row);
-  });
 
-  const buttonRow = h('div',{style:'margin-top:10px;display:flex;gap:8px;flex-wrap:wrap'});
-  const submit    = h('button',{type:'submit',class:'btn'}, prior ? 'Retake assessment' : 'Submit assessment');
-  buttonRow.appendChild(submit);
-  form.appendChild(buttonRow);
-
-  const status  = h('div',{class:'muted',style:'margin-top:6px'});
-  host.append(form, status);
-  MAIN.appendChild(host);
-
-  const lockForm = (lock) => {
-    form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.disabled = lock; });
-    submit.textContent = lock ? 'Retake assessment' : 'Submit assessment';
-  };
-
-  if (prior){
-    status.textContent = `Last: total=${prior.sum}, avg=${prior.avg.toFixed(2)}`;
-    lockForm(true);
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      if(submit.textContent==='Retake quiz'){
+        form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.checked=false; });
+        status.textContent = '';
+        lockForm(false);
+        return;
+      }
+      const answers = q.questions.map((_,qi)=>{
+        const sel = form.querySelector(`input[name="q${qi}"]:checked`);
+        return sel ? parseInt(sel.value,10) : -1;
+      });
+      const answersText = answers.map((a,qi)=> a>=0 ? (q.questions[qi].options[a] ?? null) : null);
+      let score=0;
+      q.questions.forEach((qq,qi)=>{
+        if(answers[qi]===qq.correctIndex) score++;
+      });
+      const res = {
+        key,
+        score,
+        total: q.questions.length,
+        answers,
+        answersText,
+        questionText: q.questions.map(x=>x.text),
+        options: q.questions.map(x=>x.options),
+        ts: Date.now()
+      };
+      saveQuizResult(q.id, res);
+      status.textContent = `Score: ${score}/${q.questions.length}`;
+      lockForm(true);
+    });
   }
 
-  form.addEventListener('submit', (e)=>{
-    e.preventDefault();
-    if(submit.textContent==='Retake assessment'){
-      form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.checked=false; });
-      status.textContent = '';
-      lockForm(false);
-      return;
-    }
-    const vals = a.items.map((_,ii)=>{
-      const sel = form.querySelector(`input[name="i${ii}"]:checked`);
-      return sel ? parseInt(sel.value,10) : 0;
+  function renderAssessment(ch, chIdx){
+    const a = ch.assessment;
+    if(!a || !Array.isArray(a.items) || !a.items.length) return;
+
+    const host = h('div',{class:'cardlet'});
+    host.appendChild(h('h4',{}, a.title || 'Assessment'));
+    if(a.intro) host.appendChild(h('p',{class:'muted',style:'margin-top:4px'}, a.intro));
+
+    const prior = assessResults[a.id];
+    const form  = h('form', {style:'margin-top:6px'});
+    const min = a.scale?.min ?? 1, max = a.scale?.max ?? 5;
+
+    a.items.forEach((it,ii)=>{
+      const row = h('div',{style:'padding:8px 0;border-top:1px dashed #2a3340'});
+      row.appendChild(h('div',{style:'font-weight:600;margin-bottom:6px'}, `${ii+1}. ${it.text}`));
+      const opts = h('div',{style:'display:flex;gap:10px;flex-wrap:wrap'});
+      for(let v=min; v<=max; v++){
+        const id = valueSafe(`${a.id}-i${ii}-v${v}`);
+        const lbl = h('label',{for:id,style:'display:flex;gap:6px;align-items:center;cursor:pointer'});
+        const rb  = h('input',{type:'radio',name:`i${ii}`,id:id,value:String(v)});
+        lbl.appendChild(rb);
+        const tag = (v===min && a.scale?.labels?.[String(min)]) ? ` (${a.scale.labels[String(min)]})`
+                  : (v===max && a.scale?.labels?.[String(max)]) ? ` (${a.scale.labels[String(max)]})` : '';
+        lbl.appendChild(h('span',{}, String(v)+tag));
+        opts.appendChild(lbl);
+      }
+      row.appendChild(opts);
+      form.appendChild(row);
     });
-    const labels = vals.map(v => a.scale?.labels?.[String(v)] ?? null);
-    const sum = vals.reduce((s,v)=>s+v,0);
-    const avg = vals.length? sum/vals.length : 0;
-    const res = {
-      chapter: chIdx+1,
-      values: vals,
-      valueLabels: labels,
-      itemText: a.items.map(x=>x.text),
-      scale: a.scale || null,
-      sum, avg, ts: Date.now()
+
+    const actions = h('div',{style:'margin-top:10px;display:flex;gap:8px;flex-wrap:wrap'});
+    const submit  = h('button',{type:'submit',class:'btn'}, prior ? 'Retake assessment' : 'Submit assessment');
+    actions.appendChild(submit);
+    const status  = h('div',{class:'muted',style:'margin-top:6px'});
+    host.append(form, actions, status);
+    MAIN.appendChild(host);
+
+    const lockForm = (lock) => {
+      form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.disabled = lock; });
+      submit.textContent = lock ? 'Retake assessment' : 'Submit assessment';
     };
-    saveAssessResult(a.id, res);
-    status.textContent = `Saved: total=${sum}, avg=${avg.toFixed(2)}`;
-    lockForm(true);
+
+    if (prior){
+      status.textContent = `Last: total=${prior.sum}, avg=${prior.avg.toFixed(2)}`;
+      lockForm(true);
+    }
+
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      if(submit.textContent==='Retake assessment'){
+        form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.checked=false; });
+        status.textContent = '';
+        lockForm(false);
+        return;
+      }
+      const vals = a.items.map((_,ii)=>{
+        const sel = form.querySelector(`input[name="i${ii}"]:checked`);
+        return sel ? parseInt(sel.value,10) : 0;
+      });
+      const labels = vals.map(v => a.scale?.labels?.[String(v)] ?? null);
+      const sum = vals.reduce((s,v)=>s+v,0);
+      const avg = vals.length? sum/vals.length : 0;
+      const res = {
+        chapter: chIdx+1,
+        values: vals,
+        valueLabels: labels,
+        itemText: a.items.map(x=>x.text),
+        scale: a.scale || null,
+        sum, avg, ts: Date.now()
+      };
+      saveAssessResult(a.id, res);
+      status.textContent = `Saved: total=${sum}, avg=${avg.toFixed(2)}`;
+      lockForm(true);
     });
   }
 
@@ -451,42 +448,39 @@ function renderAssessment(ch, chIdx){
     a.remove();
     setTimeout(()=>URL.revokeObjectURL(a.href), 500);
   }
-function buildCSV(){
-  const esc = s => `"${String(s??'').replace(/"/g,'""')}"`;
-  const lines = [];
 
-  // Quizzes
-  lines.push("type,quiz_id,lo_key,score,total,ts_iso,question_index,question_text,selected_index,selected_text,correct_index");
-  for(const [id,res] of Object.entries(quizResults||{})){
-    const ts = new Date(res.ts||Date.now()).toISOString();
-    (res.questionText||[]).forEach((qt,qi)=>{
-      const selIdx = Array.isArray(res.answers) ? res.answers[qi] : null;
-      const selTxt = Array.isArray(res.answersText) ? res.answersText[qi] : null;
-      const corr   = (res.options?.[qi] && typeof qi==="number")
-        ? (res.options[qi].findIndex((_,i)=> i=== (qt.correctIndex ?? -999))) // fallback if not present
-        : "";
-      lines.push([
-        "quiz", id, res.key||"", res.score, res.total, ts,
-        qi, qt, selIdx, selTxt, (res.correctIndexArray ? res.correctIndexArray[qi] : "")
-      ].map(esc).join(","));
-    });
-  }
+  function buildCSV(){
+    const esc = s => `"${String(s??'').replace(/"/g,'""')}"`;
+    const lines = [];
 
-  // Assessments
-  lines.push("type,assess_id,chapter,ts_iso,item_index,item_text,value,label,total,average");
-  for(const [id,res] of Object.entries(assessResults||{})){
-    const ts = new Date(res.ts||Date.now()).toISOString();
-    (res.itemText||[]).forEach((txt,ii)=>{
-      const val = Array.isArray(res.values) ? res.values[ii] : "";
-      const lab = Array.isArray(res.valueLabels) ? res.valueLabels[ii] : "";
-      lines.push([
-        "assessment", id, res.chapter||"", ts, ii, txt, val, lab, res.sum, res.avg
-      ].map(esc).join(","));
-    });
-  }
+    // Quizzes (one row per question so selections are preserved)
+    lines.push("type,quiz_id,lo_key,score,total,ts_iso,question_index,question_text,selected_index,selected_text");
+    for(const [id,res] of Object.entries(quizResults||{})){
+      const ts = new Date(res.ts||Date.now()).toISOString();
+      (res.questionText||[]).forEach((qt,qi)=>{
+        const selIdx = Array.isArray(res.answers) ? res.answers[qi] : "";
+        const selTxt = Array.isArray(res.answersText) ? res.answersText[qi] : "";
+        lines.push([
+          "quiz", id, res.key||"", res.score, res.total, ts,
+          qi, qt, selIdx, selTxt
+        ].map(esc).join(","));
+      });
+    }
 
-  return lines.join("\n");
-}
+    // Assessments (one row per item)
+    lines.push("type,assess_id,chapter,ts_iso,item_index,item_text,value,label,total,average");
+    for(const [id,res] of Object.entries(assessResults||{})){
+      const ts = new Date(res.ts||Date.now()).toISOString();
+      (res.itemText||[]).forEach((txt,ii)=>{
+        const val = Array.isArray(res.values) ? res.values[ii] : "";
+        const lab = Array.isArray(res.valueLabels) ? res.valueLabels[ii] : "";
+        lines.push([
+          "assessment", id, res.chapter||"", ts, ii, txt, val, lab, res.sum, res.avg
+        ].map(esc).join(","));
+      });
+    }
+
+    return lines.join("\n");
   }
 
   // ---------- Reader ----------
@@ -733,7 +727,7 @@ function buildCSV(){
     MAIN.append(
       h('div',{class:'data-grid'},
         h('div',{class:'cardlet'},
-          h('h4',{,'Overall progress'),
+          h('h4',{},'Overall progress'),
           h('div',{class:'muted'}, `${done} of ${total} viewed (${pct}%)`),
           h('div',{class:'progress',style:'margin-top:6px'}, h('i',{style:`width:${pct}%;`}))
         ),
@@ -742,7 +736,7 @@ function buildCSV(){
           h('div',{class:'legend',style:'margin-top:4px'},
             h('span',{}, h('i',{class:'dot red'}),'Under 20s'),
             h('span',{}, h('i',{class:'dot yellow'}),'20–59s'),
-            h('span',{}, h('i',{class:'dot green'}),'60s+')
+            h('span',}, h('i',{class:'dot green'}),'60s+')
           ),
           h('div',{class:'muted',style:'margin-top:8px'}, `Total time: ${Math.round(agg.totalSecs/60)} min`)
         )
@@ -790,7 +784,7 @@ function buildCSV(){
         const when = new Date(res.ts||Date.now()).toLocaleString();
         qtb.appendChild(h('tr',{},
           h('td',{}, id),
-          h('td',{}, `${res.score}/${res.total}`),
+          h('td',}, `${res.score}/${res.total}`),
           h('td',{}, when),
           h('td',{}, res.key||'')
         ));
@@ -929,15 +923,30 @@ function buildCSV(){
   });
 
   // ---------- Boot ----------
-  async function boot(){
-    const ROOT = document.querySelector('meta[name="ao-root"]')?.content || '/';
-    const url  = ROOT + (WANT_FULL ? 'full/site.json' : 'site.json');
+  async function loadSiteJSON(){
+    const metaRoot = document.querySelector('meta[name="ao-root"]')?.content ?? '/';
+    const base = WANT_FULL ? 'full/site.json' : 'site.json';
+    const candidates = [];
+    const add=(u)=>{ if(!candidates.includes(u)) candidates.push(u); };
+    // Prefer metaRoot, but try robust fallbacks for file:// and subpaths.
+    add((metaRoot||'') + base);
+    add(base);
+    add('/' + base);
 
+    const errs=[];
+    for(const u of candidates){
+      try{
+        const res=await fetch(u, {cache:'no-store', credentials:'same-origin'});
+        if(res.ok){ return JSON.parse(await res.text()); }
+        errs.push(`${u} -> HTTP ${res.status}`);
+      }catch(e){ errs.push(`${u} -> ${e.message||e}`); }
+    }
+    throw new Error(errs.join(' | '));
+  }
+
+  async function boot(){
     try{
-      const res=await fetch(url, {cache:'no-store', credentials:'same-origin'});
-      if(!res.ok) throw new Error(`HTTP ${res.status}`);
-      const txt=await res.text();
-      site=JSON.parse(txt);
+      site = await loadSiteJSON();
     }catch(e){
       if(!WANT_DEMO){
         NAV.innerHTML='';
