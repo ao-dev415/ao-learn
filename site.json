@@ -27,22 +27,35 @@
           "title": "1.1 — What to expect",
           "preview": "A quick overview of how this bookstore works.",
           "images": [
-            "https://picsum.photos/seed/ao1/1200/800",
-            { "src": "https://picsum.photos/seed/ao2/1200/800", "alt": "Sample image", "caption": "Images can have captions." }
+            { "src": "media/ch01/lo1-1/ch01-lo01-bumper-01.jpg", "alt": "Bumper 01" }
           ],
           "snippets": [
             {
               "title": "Overview",
-              "body": "This is the first LO. Here’s an inline image [[img:1]]. You can also reference the second image [[img:2]]."
+              "body": "This is the first LO. Here’s an inline image [[img:1]]."
             }
           ]
         },
         {
           "title": "1.2 — No tokens example",
           "preview": "Shows the first media below when no [[img:n]] or [[vid:n]] tokens are present.",
-          "images": ["https://picsum.photos/seed/ao3/1200/800"],
+          "images": [
+            { "src": "media/ch01/lo1-2/ch01-lo02-bumper-03.png", "alt": "Bumper 03" },
+            { "src": "media/ch01/lo1-2/ch01-lo02-coffee-02.jpg", "alt": "Coffee 02" },
+            { "src": "media/ch01/lo1-2/ch01-lo02-rational-01.png", "alt": "Rational 01" }
+          ],
           "snippets": [
-            { "title": "Body", "body": "No tokens used here—the first media will appear below automatically." }
+            { "title": "Body", "body": "Bumper [[img:1]], coffee [[img:2]], and a rational graphic [[img:3]]." }
+          ]
+        },
+        {
+          "title": "1.3 — Mural example",
+          "preview": "Additional visual for Chapter 1.",
+          "images": [
+            { "src": "media/ch01/lo1-3/ch01-lo03-mural-01.jpg", "alt": "Mural 01" }
+          ],
+          "snippets": [
+            { "title": "Body", "body": "See the mural [[img:1]]." }
           ]
         }
       ]
@@ -52,12 +65,60 @@
       "los": [
         {
           "title": "2.1 — Videos work too",
-          "preview": "Embed short demo videos.",
+          "preview": "Graphic example (video coming later).",
           "images": [
-            { "type": "video", "src": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm", "caption": "A short demo video." }
+            { "src": "media/ch02/lo2-1/ch02-lo01-expected-retirement-01.png", "alt": "Expected retirement 01" }
           ],
           "snippets": [
-            { "title": "Watch", "body": "Inline video token [[vid:1]]." }
+            { "title": "Body", "body": "Expected retirement illustration [[img:1]]." }
+          ]
+        },
+        {
+          "title": "2.2 — Budget & calculator examples",
+          "preview": "Budget visuals and a calculator diagram.",
+          "images": [
+            { "src": "media/ch02/lo2-2/ch02-lo02-budget-01.png", "alt": "Budget 01" },
+            { "src": "media/ch02/lo2-2/ch02-lo02-budget-video-03.png", "alt": "Budget video panel 03" },
+            { "src": "media/ch02/lo2-2/ch02-lo02-calc-02.png", "alt": "Calculator 02" }
+          ],
+          "snippets": [
+            { "title": "Body", "body": "Budget [[img:1]], budget (image) panel [[img:2]], and calculator [[img:3]]." }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Chapter 3 — (set title)",
+      "los": [
+        {
+          "title": "3.1 — Savings",
+          "preview": "Savings illustration.",
+          "images": [
+            { "src": "media/ch03/lo3-1/ch03-lo01-savings-01.png", "alt": "Savings 01" }
+          ],
+          "snippets": [
+            { "title": "Body", "body": "Savings visual [[img:1]]." }
+          ]
+        },
+        {
+          "title": "3.2 — Battle plan & spiritual",
+          "preview": "Two images for this objective.",
+          "images": [
+            { "src": "media/ch03/lo3-2/ch03-lo02-battle-plan-01.png", "alt": "Battle plan 01" },
+            { "src": "media/ch03/lo3-2/ch03-lo02-spiritual-02.jpg", "alt": "Spiritual 02" }
+          ],
+          "snippets": [
+            { "title": "Body", "body": "Battle plan [[img:1]] and spiritual graphic [[img:2]]." }
+          ]
+        },
+        {
+          "title": "3.3 — Balance sheet",
+          "preview": "Balance sheet example.",
+          "images": [
+            { "src": "media/ch03/lo3-3/ch03-lo03-balance-sheet-01.png", "alt": "Balance sheet 01" }
+          ],
+          "snippets": [
+            { "title": "Body", "body": "Balance sheet example [[img:1]]." }
           ]
         }
       ]
