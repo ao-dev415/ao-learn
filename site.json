@@ -200,7 +200,33 @@
             {
               "src": "media/ch03/lo3-1/ch03-lo01-savings-01.png"
             }
-          ]
+"quiz": {
+  "id": "quiz-c3-1",
+  "title": "Savings basics",
+  "questions": [
+    {
+      "text": "Which account is generally best for an emergency fund?",
+      "options": ["Checking account", "High-yield savings account", "Brokerage margin account"],
+      "correctIndex": 1
+    },
+    {
+      "text": "Roughly how many months of expenses is a common emergency-fund target?",
+      "options": ["1–2 months", "3–6 months", "12–18 months"],
+      "correctIndex": 1
+    },
+    {
+      "text": "If your savings rate increases from 5% to 10%, what happens (all else equal)?",
+      "options": [
+        "Time to goals usually shortens",
+        "Investment risk increases automatically",
+        "Your take-home pay increases immediately"
+      ],
+      "correctIndex": 0
+    }
+  ]
+}
+          
+]
         },
         {
           "title": "Learning Objective 3.2 Positive Cash Flow",
