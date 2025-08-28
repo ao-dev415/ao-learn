@@ -736,7 +736,7 @@ window.addEventListener('error', (ev) => {
           h('div',{class:'legend',style:'margin-top:4px'},
             h('span',{}, h('i',{class:'dot red'}),'Under 20s'),
             h('span',{}, h('i',{class:'dot yellow'}),'20–59s'),
-            h('span',}, h('i',{class:'dot green'}),'60s+')
+            h('span',{}, h('i',{class:'dot green'}),'60s+')
           ),
           h('div',{class:'muted',style:'margin-top:8px'}, `Total time: ${Math.round(agg.totalSecs/60)} min`)
         )
