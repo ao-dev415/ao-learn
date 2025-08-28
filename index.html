@@ -355,72 +355,74 @@ function renderQuiz(lo, key){
     lockForm(true);
     });
   }
+function renderAssessment(ch, chIdx){
+  const a = ch.assessment;
+  if(!a || !Array.isArray(a.items) || !a.items.length) return;
 
-  function renderAssessment(ch, chIdx){
-    const a = ch.assessment;
-    if(!a || !Array.isArray(a.items) || !a.items.length) return;
+  const host = h('div',{class:'cardlet'});
+  host.appendChild(h('h4',{}, a.title || 'Assessment'));
+  if(a.intro) host.appendChild(h('p',{class:'muted',style:'margin-top:4px'}, a.intro));
 
-    const host = h('div',{class:'cardlet'});
-    host.appendChild(h('h4',{}, a.title || 'Assessment'));
-    if(a.intro) host.appendChild(h('p',{class:'muted',style:'margin-top:4px'}, a.intro));
+  const prior = assessResults[a.id];
+  const form  = h('form', {style:'margin-top:6px'});
+  const min = a.scale?.min ?? 1, max = a.scale?.max ?? 5;
 
-    const prior = assessResults[a.id];
-    const form  = h('form', {style:'margin-top:6px'});
-    const min = a.scale?.min ?? 1, max = a.scale?.max ?? 5;
-
-    a.items.forEach((it,ii)=>{
-      const row = h('div',{style:'padding:8px 0;border-top:1px dashed #2a3340'});
-      row.appendChild(h('div',{style:'font-weight:600;margin-bottom:6px'}, `${ii+1}. ${it.text}`));
-      const opts = h('div',{style:'display:flex;gap:10px;flex-wrap:wrap'});
-      for(let v=min; v<=max; v++){
-        const id = `${a.id}-i${ii}-v${v}`;
-        const lbl = h('label',{for:id,style:'display:flex;gap:6px;align-items:center;cursor:pointer'});
-        const rb  = h('input',{type:'radio',name:`i${ii}`,id:valueSafe(id),value:String(v)});
-        lbl.appendChild(rb);
-        const tag = (v===min && a.scale?.labels?.[String(min)]) ? ` (${a.scale.labels[String(min)]})`
-                  : (v===max && a.scale?.labels?.[String(max)]) ? ` (${a.scale.labels[String(max)]})` : '';
-        lbl.appendChild(h('span',{}, String(v)+tag));
-        opts.appendChild(lbl);
-      }
-      row.appendChild(opts);
-      form.appendChild(row);
-    });
-
-    const actions = h('div',{style:'margin-top:10px;display:flex;gap:8px;flex-wrap:wrap'});
-    const submit  = h('button',{type:'submit',class:'btn'}, prior ? 'Retake assessment' : 'Submit assessment');
-    const status  = h('div',{class:'muted',style:'margin-top:6px'});
-    actions.appendChild(submit);
-    host.append(form, actions, status);
-    MAIN.appendChild(host);
-
-    const lockForm = (lock) => {
-      form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.disabled = lock; });
-      submit.textContent = lock ? 'Retake assessment' : 'Submit assessment';
-    };
-
-    if (prior){
-      status.textContent = `Last: total=${prior.sum}, avg=${prior.avg.toFixed(2)}`;
-      lockForm(true);
+  a.items.forEach((it,ii)=>{
+    const row = h('div',{style:'padding:8px 0;border-top:1px dashed #2a3340'});
+    row.appendChild(h('div',{style:'font-weight:600;margin-bottom:6px'}, `${ii+1}. ${it.text}`));
+    const opts = h('div',{style:'display:flex;gap:10px;flex-wrap:wrap'});
+    for(let v=min; v<=max; v++){
+      const id = `${a.id}-i${ii}-v${v}`;
+      const lbl = h('label',{for:id,style:'display:flex;gap:6px;align-items:center;cursor:pointer'});
+      const rb  = h('input',{type:'radio',name:`i${ii}`,id:id.replace(/[^a-zA-Z0-9_-]/g,'_'),value:String(v)});
+      lbl.appendChild(rb);
+      const tag = (v===min && a.scale?.labels?.[String(min)]) ? ` (${a.scale.labels[String(min)]})`
+                : (v===max && a.scale?.labels?.[String(max)]) ? ` (${a.scale.labels[String(max)]})` : '';
+      lbl.appendChild(h('span',{}, String(v)+tag));
+      opts.appendChild(lbl);
     }
+    row.appendChild(opts);
+    form.appendChild(row);
+  });
 
-    form.addEventListener('submit', (e)=>{
-      e.preventDefault();
-      if(submit.textContent==='Retake assessment'){
-        form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.checked=false; });
-        status.textContent = '';
-        lockForm(false);
-        return;
-      }
-      const vals = a.items.map((_,ii)=>{
-        const sel = form.querySelector(`input[name="i${ii}"]:checked`);
-        return sel ? parseInt(sel.value,10) : 0;
-      });
-      const sum = vals.reduce((s,v)=>s+v,0);
-      const avg = vals.length? sum/vals.length : 0;
-      const res = { chapter: chIdx+1, values: vals, sum, avg, ts: Date.now() };
-      saveAssessResult(a.id, res);
-      status.textContent = `Saved: total=${sum}, avg=${avg.toFixed(2)}`;
-      lockForm(true);
+  // Submit row **inside the form**
+  const buttonRow = h('div',{style:'margin-top:10px;display:flex;gap:8px;flex-wrap:wrap'});
+  const submit    = h('button',{type:'submit',class:'btn'}, prior ? 'Retake assessment' : 'Submit assessment');
+  buttonRow.appendChild(submit);
+  form.appendChild(buttonRow);
+
+  const status  = h('div',{class:'muted',style:'margin-top:6px'});
+  host.append(form, status);
+  MAIN.appendChild(host);
+
+  const lockForm = (lock) => {
+    form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.disabled = lock; });
+    submit.textContent = lock ? 'Retake assessment' : 'Submit assessment';
+  };
+
+  if (prior){
+    status.textContent = `Last: total=${prior.sum}, avg=${prior.avg.toFixed(2)}`;
+    lockForm(true);
+  }
+
+  form.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    if(submit.textContent==='Retake assessment'){
+      form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.checked=false; });
+      status.textContent = '';
+      lockForm(false);
+      return;
+    }
+    const vals = a.items.map((_,ii)=>{
+      const sel = form.querySelector(`input[name="i${ii}"]:checked`);
+      return sel ? parseInt(sel.value,10) : 0;
+    });
+    const sum = vals.reduce((s,v)=>s+v,0);
+    const avg = vals.length? sum/vals.length : 0;
+    const res = { chapter: chIdx+1, values: vals, sum, avg, ts: Date.now() };
+    saveAssessResult(a.id, res);
+    status.textContent = `Saved: total=${sum}, avg=${avg.toFixed(2)}`;
+    lockForm(true);
     });
   }
 
