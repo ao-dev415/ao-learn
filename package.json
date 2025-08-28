@@ -1,0 +1,25 @@
+{
+  "name": "ao-v1",
+  "version": "1.0.0",
+  "description": "How to add & place images (recommended workflow) 1) Where to put files",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ao-dev415/ao-learn.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ao-dev415/ao-learn/issues"
+  },
+  "homepage": "https://github.com/ao-dev415/ao-learn#readme",
+  "dependencies": {
+    "jsdom": "^26.1.0",
+    "mammoth": "^1.10.0"
+  }
+}
