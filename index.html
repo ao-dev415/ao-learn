@@ -298,14 +298,13 @@ function renderQuiz(lo, key){
   const prior = quizResults[q.id];
   const form  = h('form', {style:'margin-top:6px'});
 
-  // Questions
   q.questions.forEach((qq,qi)=>{
     const fs = h('fieldset',{style:'border:0;border-top:1px dashed #2a3340;padding:10px 0;margin:8px 0 0'});
     fs.appendChild(h('div',{style:'font-weight:600;margin-bottom:6px'}, `${qi+1}. ${qq.text}`));
     (qq.options||[]).forEach((opt,oi)=>{
-      const id = `${q.id}-q${qi}-o${oi}`;
+      const id = `${q.id}-q${qi}-o${oi}`.replace(/[^a-zA-Z0-9_-]/g,'_');
       const lbl = h('label',{for:id,style:'display:flex;gap:8px;align-items:flex-start;margin:4px 0;cursor:pointer'});
-      const rb  = h('input',{type:'radio',name:`q${qi}`,id:id.replace(/[^a-zA-Z0-9_-]/g,'_'),value:String(oi)});
+      const rb  = h('input',{type:'radio',name:`q${qi}`,id:id,value:String(oi)});
       lbl.appendChild(rb);
       lbl.appendChild(h('span',{}, opt));
       fs.appendChild(lbl);
@@ -313,7 +312,6 @@ function renderQuiz(lo, key){
     form.appendChild(fs);
   });
 
-  // Submit row **inside the form**
   const buttonRow = h('div',{style:'margin-top:10px;display:flex;gap:8px;flex-wrap:wrap'});
   const submit    = h('button',{type:'submit',class:'btn'}, prior ? 'Retake quiz' : 'Submit quiz');
   buttonRow.appendChild(submit);
@@ -345,16 +343,26 @@ function renderQuiz(lo, key){
       const sel = form.querySelector(`input[name="q${qi}"]:checked`);
       return sel ? parseInt(sel.value,10) : -1;
     });
+    const answersText = answers.map((a,qi)=> a>=0 ? (q.questions[qi].options[a] ?? null) : null);
     let score=0;
     q.questions.forEach((qq,qi)=>{
       if(answers[qi]===qq.correctIndex) score++;
     });
-    const res = { key, score, total:q.questions.length, answers, ts: Date.now() };
+    const res = {
+      key,
+      score,
+      total: q.questions.length,
+      answers,
+      answersText,
+      questionText: q.questions.map(x=>x.text),
+      options: q.questions.map(x=>x.options),
+      ts: Date.now()
+    };
     saveQuizResult(q.id, res);
     status.textContent = `Score: ${score}/${q.questions.length}`;
     lockForm(true);
-    });
-  }
+  });
+}
 function renderAssessment(ch, chIdx){
   const a = ch.assessment;
   if(!a || !Array.isArray(a.items) || !a.items.length) return;
