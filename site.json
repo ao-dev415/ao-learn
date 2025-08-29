@@ -35,6 +35,11 @@
               "title": "Body",
               "body": "THE INDIVIDUAL holds the power to define what is the “perfect” financial plan. It’s their money, and they are the ones best equipped to make personal financial decisions, instilling a sense of control and confidence.\n\n[[img:2]]\n\nMost recognize “The Perfect Plan” when they see it.\n\nThe Perfect Plan tends to:\n\n• Be sustainable using realistic assumptions\n• Consider all variables and high-risk scenarios\n• Be fact-based and not solely opinion-based\n• Demonstrate a “vector\" to meet or exceed assumptions\n• Reasonably give all interested parties what they want\n\nKnow what you don’t know, yourself included.\n\nThis course will help by:\n\n• Saving time\n• Saving money\n• Avoiding mistakes\n• Reducing uncertainty\n• Identifying personal preferences\n• Developing a more cohesive strategy\n• Enhancing confidence with decisions"
             }
+          ],
+          "images": [
+            {
+              "src": "media/ch01/lo1-1/ch01-lo01-bumper-01.jpg"
+            }
           ]
         },
         {
@@ -52,6 +57,17 @@
             {
               "title": "How can I prioritize my lifestyle?",
               "body": "The lifestyle planner exercise is a crucial tool providing essential qualitative insights about yourself and your loved ones. This exercise will introduce the most common personal objectives in retirement planning, all tailored to your unique circumstances. Remember, it's not just about the numbers; understanding what truly matters to you is equally, if not more, important. So, while the financial aspects are crucial, maintaining a rich and fulfilling experience in retirement is equally important.\n\nTake a moment to reflect deeply on retirement objectives. Engage with the various aspects of the exercise, one by one, and start contemplating what holds the most significance and potential priorities over others. Some may be necessities, while others may be lifestyle choices. Remember, there are no right or wrong answers; embrace your unique perspective.\n\nExercise your freedom to assign a value to each of the categories. This process involves controlling your retirement planning and prioritizing according to your values. Consider adding notes for future reference to monitor how your priorities evolve, providing you with a sense of empowerment throughout the retirement journey.\n\nRemember, the lifestyle planner is not a one-time task. It's a dynamic tool that should reflect your evolving priorities. Feel free to add or adjust the values of the exercise. Your circumstances are unique, and general categories may benefit from specificity. The aim is to identify your current priorities and reevaluate them as retirement approaches or even after retirement. This process will assist you in gaining deeper insights into your qualitative priorities today and over time.\n\nIt's important to understand that priorities can shift once retired, and the actual landscape of formal retirement becomes clear. Retirement planning is a complex process, and your priorities may change as you navigate different stages of retirement. Embrace this fluidity and be prepared to adapt your plans accordingly.\n\nThe future of advice is an objective and personalized experience. But ultimately, that's up to you.\n\nBenefits of objective financial planning include:\n\n• Greater confidence with personal decisions\n• Simplicity and reduced anxiety\n• Better organization and higher participation\n• Greater financial stamina\n• Reduced “sales pitch” fatigue\n• Higher trust in end decisions and professional insight\n• More control and understanding over consequential decisions"
+            }
+          ],
+          "images": [
+            {
+              "src": "media/ch01/lo1-2/ch01-lo02-bumper-03.png"
+            },
+            {
+              "src": "media/ch01/lo1-2/ch01-lo02-coffee-02.jpg"
+            },
+            {
+              "src": "media/ch01/lo1-2/ch01-lo02-rational-01.png"
             }
           ]
         },
@@ -75,6 +91,11 @@
               "title": "When to consider professional help",
               "body": "Retirement decisions are often the most consequential decisions a person can make. They affect all aspects of life, happiness, and long-term financial success in retirement. Sound financial decisions will come with assurances and a reasonable certainty of success.\n\nThere is no better motivator or confidence builder than knowing what will probably happen financially.\n\nThere is value in the financial professional. This value is the direct, hands-on experience working with a multitude of clients. That experience includes evaluating how others accomplish goals, avoid failure, settle subjective matters, and ultimately bring those experiences to the discussion.\n\nWouldn’t someone who does plans and educates the public have the best insight into financial planning?\n\nAt some point, the individual must make the best judgment possible and ideally base these decisions on as much qualitative and quantitative information as possible. This is the critical moment when it makes the most sense to seek the counsel of a qualified, ideally objective, financial, tax, and estate planning professional(s).\n\nAs the landscape for objective advice begins to shape for the first time in history, opportunities to find professionals who offer this service will become more widely available.\n\nSituations when to consider professional advice include:\n\n• As a mediator or when seeking an outside perspective\n• Anytime one is feeling misinformed, overwhelmed, unclear, or unsure regarding important financial decisions\n• When seeking inspiration\n• To confirm whether an existing strategy is viable or if there needs to be a change"
             }
+          ],
+          "images": [
+            {
+              "src": "media/ch01/lo1-3/ch01-lo03-mural-01.jpg"
+            }
           ]
         }
       ]
@@ -94,6 +115,11 @@
               "title": "Are retirees being real?",
               "body": "Historically, the same study has consistently reported that of the individuals surveyed, 7 in 10 workers and 8 in 10 retirees were “confident in having enough for a comfortable retirement.”\n\nAdditionally, 70% of workers think they will continue to work for pay in retirement, yet only 27% of retirees reported actually doing so. This response has been consistent with responses in prior surveys.\n\nEarlier, EBRI Retirement Confidence surveys reported that most workers or their spouses have never tried to calculate how much money they will need to save for retirement to live comfortably. This response has also been consistent with EBRI survey responses over the past decade.\n\nOf those taking the survey and among those who have attempted to calculate expenses, most admit they have not relied on professional advice."
             }
+          ],
+          "images": [
+            {
+              "src": "media/ch02/lo2-1/ch02-lo01-expected-retirement-01.png"
+            }
           ]
         },
         {
@@ -107,6 +133,17 @@
             {
               "title": "How do I keep a budget?",
               "body": "Creating an accurate budget is not just a step in planning; it's the cornerstone of cash flow analysis. A realistic budget comes with understanding a financial plan's long-term sustainability. It can be simple but essential for many critical financial decisions.\n\nThe most challenging part of the budgeting process is gathering information. But don't worry, it's much more manageable than it seems. You can easily download all your year-end expenses from the bank in a .csv or spreadsheet format. Open the file and copy and paste all the values into the course material spreadsheet.\n\nOnce done, ensure the values are positive numbers. If not, you can quickly convert negative values to positive ones using the ABS function.\n\nTo simplify, Copy (ctrl+c) and Paste special → Values only (Ctrl+Shift+V). Now, all the hard work is done.\n\nOnce you've got all the numbers in the spreadsheet, classify them. The sheet should automatically populate the embedded chart with your data. But don't stop there. Add more colors, customize, and get creative to get the results you're looking for. Your budget reflects your financial goals and aspirations, so take pride in finessing them.\n\nFor most people, reworking a budget more than once a year is probably unnecessary. However, how frequently remains a personal choice. We recommend revisiting it every so often to maintain a sense of expense. It can be helpful when working with a financial professional who may need to know how much expense pressure to assume when modeling withdrawal scenarios. In particular, those approaching retirement should revisit the exercise before and after formal retirement."
+            }
+          ],
+          "images": [
+            {
+              "src": "media/ch02/lo2-2/ch02-lo02-budget-01.png"
+            },
+            {
+              "src": "media/ch02/lo2-2/ch02-lo02-budget-video-03.png"
+            },
+            {
+              "src": "media/ch02/lo2-2/ch02-lo02-calc-02.png"
             }
           ]
         },
@@ -134,6 +171,11 @@
               "title": "Economic powers beyond inflation",
               "body": "The Bureau of Labor Statistics (BLS) is the primary agency responsible for tracking inflation and wage-related statistics in the United States. The BLS publishes the Consumer Price Index (CPI) and the Producer Price Index (PPI), which are widely used measures of inflation.\n\nThe CPI measures the change in prices of a basket of goods and services purchased by consumers. The PPI measures the change in prices of goods sold by producers. Both the CPI and PPI are published monthly and can be found on the BLS website.\n\nWage growth can positively impact individuals and households by increasing their purchasing power and improving their standard of living.\n\nWhile wage growth exceeding inflation and falling unemployment rates can be indicators of mitigating inflation under certain conditions, they are not guaranteed solutions.\n\nIndications that support mitigating inflation.\n\n• Increased purchasing power: If wages grow faster than prices, people have more disposable income. This can stimulate demand, leading to increased production and economic growth, which can help counteract inflationary pressures.\n• Reduced unemployment: Falling unemployment rates usually mean more people are earning wages. This can increase overall economic activity and potentially dampen inflation through increased supply.\n• Increased productivity: Wage growth is sometimes tied to increased productivity. If workers produce more goods and services, this can help keep prices stable or even lower.\n\nIndications that do not support mitigating inflation.\n\n• The Wage-price spiral: Businesses sometimes raise prices to cover increased labor costs. These increases by businesses can lead to a cycle in which wages and prices trend upwards, potentially fueling inflation rather than mitigating it.\n• Demand-pull inflation: Increased purchasing power due to higher wages could lead to excessive demand for goods and services, exceeding supply and driving prices up.\n• Other factors: Supply chain disruptions and global events can also affect inflation, potentially counteracting any mitigating effects of wage growth and low unemployment.\n\nThe relationship between these factors and inflation is complex and influenced by various economic forces."
             }
+          ],
+          "images": [
+            {
+              "src": "media/ch02/lo2-3/ch02-lo03-calc-01.png"
+            }
           ]
         }
       ]
@@ -153,6 +195,11 @@
               "title": "How can I estimate my net worth?",
               "body": "A Net Worth statement, or Balance Sheet, is designed to be simple. It provides a comprehensive overview of your financial situation on a single page, clearly showing your net worth (assets - liabilities).\n\nStart by evaluating your financial life by jotting down your possessions: your home, car, retirement account, and even artwork. Assign a value to each item you think it could realistically fetch if sold. Next, think about your financial obligations: a mortgage, credit card debt, or loans against a 401(k). These are your liabilities.\n\nWhen filling out the balance sheet, start by entering the approximate gross values of your assets in the assets column. These are the values before any liabilities are deducted. Next, record any liabilities, which are the debts associated with your assets or separate financial obligations.\n\nTake greater control of your financial situation and track your net worth over time. Generally, the goal is to increase net worth as market investment performs, property values appreciate, and liabilities get paid off. However, it's also common (especially in retirement) for specific assets like investment accounts and cash reserves to decrease as money is spent.\n\nOver time, remember that the balance sheet is a flexible tool. It's important to keep it relevant, as it quickly and easily conveys your financial position to interested parties such as family or trusted professionals. A balance sheet also acts as a helpful resource when money needs to be raised for an unexpected event."
             }
+          ],
+          "images": [
+            {
+              "src": "media/ch03/lo3-1/ch03-lo01-savings-01.png"
+            }
           ]
         },
         {
@@ -167,6 +214,14 @@
               "title": "How can I calculate my savings?",
               "body": "Use this exercise to coordinate savings locations. Determine the current level of savings versus total gross income (or income before any deductions or taxes). Generally, retirement savings are money set aside for longer periods. These dollars are targeted for retirement income or to supplement future retirement expenses and likely have a much different strategy than more near-term dollars.\n\nStart by researching your various savings accounts. These could be employer retirement plans, such as a 401(k), or supplemental accounts, like a Roth or post-tax account. Typically, bank checking accounts are money set aside for emergencies or planned expenses, so contributions may not be part of retirement-oriented savings.\n\nNext, finalize the spreadsheet by adding the account name, type of account, taxable nature (e.g., Traditional or Roth), and contribution amount (bi-monthly, monthly, quarterly, or annual). If a participant has access to multiple plans, ensure the accuracy of contributions and that there is no overfunding. The spreadsheet should automatically validate total savings and then convert this total to a percentage relative to gross income. The beauty of this exercise is its flexibility. Our general guideline is to save approximately 15% of gross income; however, this can vary significantly depending on savings requirements and life stage.\n\nConsider other areas for savings, such as reducing discretionary spending, cutting down on unnecessary subscriptions, or finding ways to save on utilities. If needed, use our budget worksheet, a tool designed to help you track your income and expenses, to help identify these areas of improvement. You can then redirect these dollars toward savings.\n\nCommit to revisiting this worksheet periodically to ensure the current level of retirement savings is on pace. Remember to update gross income and individual savings amounts to reflect your overall savings accurately."
             }
+          ],
+          "images": [
+            {
+              "src": "media/ch03/lo3-2/ch03-lo02-battle-plan-01.png"
+            },
+            {
+              "src": "media/ch03/lo3-2/ch03-lo02-spiritual-02.jpg"
+            }
           ]
         },
         {
@@ -176,6 +231,11 @@
             {
               "title": "Body",
               "body": "COMPOUNDING INTEREST uses the reinvestment of interest to grow an investment over time. It is the key to offsetting long-term inflation and building foundational wealth, essential for any financial plan’s long-term stability.\n\n[[img:11]]\n\nThe essence of wealth creation is setting money aside for a very long time.\n\nInvestment results will vary from those shown here. Investing involves risk, inconsistent returns, and the possibility of a loss of principal. The investment results shown are hypothetical and are for illustrative purposes only. The calculations do not consider any taxes, inflation, or fees. The figures do not represent past or future investment results and do not represent any specific product.\n\nDisclosure: The Securities and Exchange Commission has not approved or reviewed the content of this application. By clicking, you are linking to an external S.E.C. website."
+            }
+          ],
+          "images": [
+            {
+              "src": "media/ch03/lo3-3/ch03-lo03-balance-sheet-01.png"
             }
           ]
         }
