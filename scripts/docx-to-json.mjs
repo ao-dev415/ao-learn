@@ -158,7 +158,7 @@ async function main() {
     console.log(`Merged quiz and assessment data from ${QUIZ_FILE}`);
   }
 
-  fs.writeFileSync(OUT_JSON, JSON.stringify(out, null, 2), "utf8");
+  fs.writeFileSync("temp.html", html, "utf8");
   console.log(`Wrote ${OUT_JSON} from ${SRC_DOCX} (${chapters.length} chapters).`);
 }
 
