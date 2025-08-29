@@ -49,6 +49,7 @@
   .nav button:hover{background:var(--hover)}
   .nav .lo{padding-left:18px;color:#cfe0ee}
   .nav button[aria-current="true"]{background:#0e2723;outline:1px solid #11433b}
+  .nav .assessment-link{padding-left:18px;font-style:italic;color:var(--muted);}
   .nav .meta-link{margin:12px 8px 6px;display:block;color:var(--muted);font-size:13px}
   .foot{margin:14px 8px 4px;color:#8ea1b2;font-size:12px;border-top:1px dashed #2a3340;padding-top:10px}
   .foot a{color:#9ab0c3;text-decoration:underline}
@@ -284,143 +285,143 @@ window.addEventListener('error', (ev) => {
   function saveAssessResult(id, payload){ assessResults[id] = payload; saveJSON(LS_ASSESS, assessResults); }
 
   function renderQuiz(lo, key){
-  const q = lo.quiz;
-  if(!q || !Array.isArray(q.questions) || !q.questions.length) return;
+    const q = lo.quiz;
+    if(!q || !Array.isArray(q.questions) || !q.questions.length) return;
 
-  const host = h('div',{class:'cardlet'});
-  host.appendChild(h('h4',{}, q.title || 'Quiz'));
+    const host = h('div',{class:'cardlet'});
+    host.appendChild(h('h4',{}, q.title || 'Quiz'));
 
-  const prior = quizResults[q.id];
-  const form  = h('form', {style:'margin-top:6px'});
+    const prior = quizResults[q.id];
+    const form  = h('form', {style:'margin-top:6px'});
 
-  // Questions
-  q.questions.forEach((qq,qi)=>{
-    const fs = h('fieldset',{style:'border:0;border-top:1px dashed #2a3340;padding:10px 0;margin:8px 0 0'});
-    fs.appendChild(h('div',{style:'font-weight:600;margin-bottom:6px'}, `${qi+1}. ${qq.text}`));
-    (qq.options||[]).forEach((opt,oi)=>{
-      const id = `${q.id}-q${qi}-o${oi}`;
-      const lbl = h('label',{for:id,style:'display:flex;gap:8px;align-items:flex-start;margin:4px 0;cursor:pointer'});
-      const rb  = h('input',{type:'radio',name:`q${qi}`,id:id.replace(/[^a-zA-Z0-9_-]/g,'_'),value:String(oi)});
-      lbl.appendChild(rb);
-      lbl.appendChild(h('span',{}, opt));
-      fs.appendChild(lbl);
-    });
-    form.appendChild(fs);
-  });
-
-  // Submit row **inside the form**
-  const buttonRow = h('div',{style:'margin-top:10px;display:flex;gap:8px;flex-wrap:wrap'});
-  const submit    = h('button',{type:'submit',class:'btn'}, prior ? 'Retake quiz' : 'Submit quiz');
-  buttonRow.appendChild(submit);
-  form.appendChild(buttonRow);
-
-  const status  = h('div',{class:'muted',style:'margin-top:6px'});
-  host.append(form, status);
-  MAIN.appendChild(host);
-
-  const lockForm = (lock) => {
-    form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.disabled = lock; });
-    submit.textContent = lock ? 'Retake quiz' : 'Submit quiz';
-  };
-
-  if (prior){
-    status.textContent = `Last score: ${prior.score}/${prior.total}`;
-    lockForm(true);
-  }
-
-  form.addEventListener('submit', (e)=>{
-    e.preventDefault();
-    if(submit.textContent==='Retake quiz'){
-      form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.checked=false; });
-      status.textContent = '';
-      lockForm(false);
-      return;
-    }
-    const answers = q.questions.map((_,qi)=>{
-      const sel = form.querySelector(`input[name="q${qi}"]:checked`);
-      return sel ? parseInt(sel.value,10) : -1;
-    });
-    let score=0;
+    // Questions
     q.questions.forEach((qq,qi)=>{
-      if(answers[qi]===qq.correctIndex) score++;
+      const fs = h('fieldset',{style:'border:0;border-top:1px dashed #2a3340;padding:10px 0;margin:8px 0 0'});
+      fs.appendChild(h('div',{style:'font-weight:600;margin-bottom:6px'}, `${qi+1}. ${qq.text}`));
+      (qq.options||[]).forEach((opt,oi)=>{
+        const id = `${q.id}-q${qi}-o${oi}`;
+        const lbl = h('label',{for:id,style:'display:flex;gap:8px;align-items:flex-start;margin:4px 0;cursor:pointer'});
+        const rb  = h('input',{type:'radio',name:`q${qi}`,id:id.replace(/[^a-zA-Z0-9_-]/g,'_'),value:String(oi)});
+        lbl.appendChild(rb);
+        lbl.appendChild(h('span',{}, opt));
+        fs.appendChild(lbl);
+      });
+      form.appendChild(fs);
     });
-    const res = { key, score, total:q.questions.length, answers, ts: Date.now() };
-    saveQuizResult(q.id, res);
-    status.textContent = `Score: ${score}/${q.questions.length}`;
-    lockForm(true);
-  });
-}
 
- function renderAssessment(ch, chIdx){
-  const a = ch.assessment;
-  if(!a || !Array.isArray(a.items) || !a.items.length) return;
+    // Submit row **inside the form**
+    const buttonRow = h('div',{style:'margin-top:10px;display:flex;gap:8px;flex-wrap:wrap'});
+    const submit    = h('button',{type:'submit',class:'btn'}, prior ? 'Retake quiz' : 'Submit quiz');
+    buttonRow.appendChild(submit);
+    form.appendChild(buttonRow);
 
-  const host = h('div',{class:'cardlet'});
-  host.appendChild(h('h4',{}, a.title || 'Assessment'));
-  if(a.intro) host.appendChild(h('p',{class:'muted',style:'margin-top:4px'}, a.intro));
+    const status  = h('div',{class:'muted',style:'margin-top:6px'});
+    host.append(form, status);
+    MAIN.appendChild(host);
 
-  const prior = assessResults[a.id];
-  const form  = h('form', {style:'margin-top:6px'});
-  const min = a.scale?.min ?? 1, max = a.scale?.max ?? 5;
+    const lockForm = (lock) => {
+      form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.disabled = lock; });
+      submit.textContent = lock ? 'Retake quiz' : 'Submit quiz';
+    };
 
-  a.items.forEach((it,ii)=>{
-    const row = h('div',{style:'padding:8px 0;border-top:1px dashed #2a3340'});
-    row.appendChild(h('div',{style:'font-weight:600;margin-bottom:6px'}, `${ii+1}. ${it.text}`));
-    const opts = h('div',{style:'display:flex;gap:10px;flex-wrap:wrap'});
-    for(let v=min; v<=max; v++){
-      const id = `${a.id}-i${ii}-v${v}`;
-      const lbl = h('label',{for:id,style:'display:flex;gap:6px;align-items:center;cursor:pointer'});
-      const rb  = h('input',{type:'radio',name:`i${ii}`,id:id.replace(/[^a-zA-Z0-9_-]/g,'_'),value:String(v)});
-      lbl.appendChild(rb);
-      const tag = (v===min && a.scale?.labels?.[String(min)]) ? ` (${a.scale.labels[String(min)]})`
-              : (v===max && a.scale?.labels?.[String(max)]) ? ` (${a.scale.labels[String(max)]})` : '';
-      lbl.appendChild(h('span',{}, String(v)+tag));
-      opts.appendChild(lbl);
+    if (prior){
+      status.textContent = `Last score: ${prior.score}/${prior.total}`;
+      lockForm(true);
     }
-    row.appendChild(opts);
-    form.appendChild(row);
-  });
 
-  // Submit row **inside the form**
-  const buttonRow = h('div',{style:'margin-top:10px;display:flex;gap:8px;flex-wrap:wrap'});
-  const submit    = h('button',{type:'submit',class:'btn'}, prior ? 'Retake assessment' : 'Submit assessment');
-  buttonRow.appendChild(submit);
-  form.appendChild(buttonRow);
-
-  const status  = h('div',{class:'muted',style:'margin-top:6px'});
-  host.append(form, status);
-  MAIN.appendChild(host);
-
-  const lockForm = (lock) => {
-    form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.disabled = lock; });
-    submit.textContent = lock ? 'Retake assessment' : 'Submit assessment';
-  };
-
-  if (prior){
-    status.textContent = `Last: total=${prior.sum}, avg=${prior.avg.toFixed(2)}`;
-    lockForm(true);
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      if(submit.textContent==='Retake quiz'){
+        form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.checked=false; });
+        status.textContent = '';
+        lockForm(false);
+        return;
+      }
+      const answers = q.questions.map((_,qi)=>{
+        const sel = form.querySelector(`input[name="q${qi}"]:checked`);
+        return sel ? parseInt(sel.value,10) : -1;
+      });
+      let score=0;
+      q.questions.forEach((qq,qi)=>{
+        if(answers[qi]===qq.correctIndex) score++;
+      });
+      const res = { key, score, total:q.questions.length, answers, ts: Date.now() };
+      saveQuizResult(q.id, res);
+      status.textContent = `Score: ${score}/${q.questions.length}`;
+      lockForm(true);
+    });
   }
 
-  form.addEventListener('submit', (e)=>{
-    e.preventDefault();
-    if(submit.textContent==='Retake assessment'){
-      form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.checked=false; });
-      status.textContent = '';
-      lockForm(false);
-      return;
-    }
-    const vals = a.items.map((_,ii)=>{
-      const sel = form.querySelector(`input[name="i${ii}"]:checked`);
-      return sel ? parseInt(sel.value,10) : 0;
+  function renderAssessment(ch, chIdx){
+    const a = ch.assessment;
+    if(!a || !Array.isArray(a.items) || !a.items.length) return;
+
+    const host = h('div',{class:'cardlet'});
+    host.appendChild(h('h4',{}, a.title || 'Assessment'));
+    if(a.intro) host.appendChild(h('p',{class:'muted',style:'margin-top:4px'}, a.intro));
+
+    const prior = assessResults[a.id];
+    const form  = h('form', {style:'margin-top:6px'});
+    const min = a.scale?.min ?? 1, max = a.scale?.max ?? 5;
+
+    a.items.forEach((it,ii)=>{
+      const row = h('div',{style:'padding:8px 0;border-top:1px dashed #2a3340'});
+      row.appendChild(h('div',{style:'font-weight:600;margin-bottom:6px'}, `${ii+1}. ${it.text}`));
+      const opts = h('div',{style:'display:flex;gap:10px;flex-wrap:wrap'});
+      for(let v=min; v<=max; v++){
+        const id = `${a.id}-i${ii}-v${v}`;
+        const lbl = h('label',{for:id,style:'display:flex;gap:6px;align-items:center;cursor:pointer'});
+        const rb  = h('input',{type:'radio',name:`i${ii}`,id:id.replace(/[^a-zA-Z0-9_-]/g,'_'),value:String(v)});
+        lbl.appendChild(rb);
+        const tag = (v===min && a.scale?.labels?.[String(min)]) ? ` (${a.scale.labels[String(min)]})`
+                : (v===max && a.scale?.labels?.[String(max)]) ? ` (${a.scale.labels[String(max)]})` : '';
+        lbl.appendChild(h('span',{}, String(v)+tag));
+        opts.appendChild(lbl);
+      }
+      row.appendChild(opts);
+      form.appendChild(row);
     });
-    const sum = vals.reduce((s,v)=>s+v,0);
-    const avg = vals.length? sum/vals.length : 0;
-    const res = { chapter: chIdx+1, values: vals, sum, avg, ts: Date.now() };
-    saveAssessResult(a.id, res);
-    status.textContent = `Saved: total=${sum}, avg=${avg.toFixed(2)}`;
-    lockForm(true);
-  });
-}
+
+    // Submit row **inside the form**
+    const buttonRow = h('div',{style:'margin-top:10px;display:flex;gap:8px;flex-wrap:wrap'});
+    const submit    = h('button',{type:'submit',class:'btn'}, prior ? 'Retake assessment' : 'Submit assessment');
+    buttonRow.appendChild(submit);
+    form.appendChild(buttonRow);
+
+    const status  = h('div',{class:'muted',style:'margin-top:6px'});
+    host.append(form, status);
+    MAIN.appendChild(host);
+
+    const lockForm = (lock) => {
+      form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.disabled = lock; });
+      submit.textContent = lock ? 'Retake assessment' : 'Submit assessment';
+    };
+
+    if (prior){
+      status.textContent = `Last: total=${prior.sum}, avg=${prior.avg.toFixed(2)}`;
+      lockForm(true);
+    }
+
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      if(submit.textContent==='Retake assessment'){
+        form.querySelectorAll('input[type="radio"]').forEach(i=>{ i.checked=false; });
+        status.textContent = '';
+        lockForm(false);
+        return;
+      }
+      const vals = a.items.map((_,ii)=>{
+        const sel = form.querySelector(`input[name="i${ii}"]:checked`);
+        return sel ? parseInt(sel.value,10) : 0;
+      });
+      const sum = vals.reduce((s,v)=>s+v,0);
+      const avg = vals.length? sum/vals.length : 0;
+      const res = { chapter: chIdx+1, values: vals, sum, avg, ts: Date.now() };
+      saveAssessResult(a.id, res);
+      status.textContent = `Saved: total=${sum}, avg=${avg.toFixed(2)}`;
+      lockForm(true);
+    });
+  }
 
   function downloadFile(name, text, mime='application/json'){
     const blob = new Blob([text], {type:mime});
@@ -488,12 +489,6 @@ window.addEventListener('error', (ev) => {
       pool.push(...normalizeMedia(s.images), ...normalizeMedia(s.image||s.img));
     });
 
-    // ========================================================================
-    // START OF THE FIX
-    // The old code that only showed the first snippet has been replaced
-    // with this loop that shows ALL snippets.
-    // ========================================================================
-    
     // Render ALL snippets by looping through them
     (lo.snippets || []).forEach(s => {
       if (!s) return; // Skips any empty items in the array
@@ -511,10 +506,6 @@ window.addEventListener('error', (ev) => {
         }
       }
     });
-
-    // ========================================================================
-    // END OF THE FIX
-    // ========================================================================
 
     // This media logic now runs AFTER all the text content has been rendered.
     // It will render media found in the main LO or in *any* of the snippets.
@@ -560,6 +551,8 @@ window.addEventListener('error', (ev) => {
     const list=h('ul');
     chapters.forEach((ch,chIdx)=>{
       list.append(h('h3',{}, ch.title || `Chapter ${chIdx+1}`));
+      
+      // This existing loop creates all the Learning Objective links first
       (ch.los||[]).forEach((lo,loIdx)=>{
         const btn=h('button',{
           class:'lo',
@@ -572,6 +565,19 @@ window.addEventListener('error', (ev) => {
         }, loLabel(lo));
         list.append(h('li',{}, btn));
       });
+
+      // After the LOs, check for and add the Assessment link
+      if (ch.assessment) {
+        const assessmentBtn = h('button', {
+          class: 'assessment-link', 
+          onclick: () => { 
+            // Placeholder action: Log a message to the browser console
+            console.log('Clicked assessment for:', ch.title);
+            // Later, this will call a function like: renderAssessmentView(ch);
+          }
+        }, ch.assessment.title || 'Chapter Assessment');
+        list.append(h('li', {}, assessmentBtn));
+      }
     });
     NAV.append(list, h('a',{href:'#data',class:'meta-link'},'→ Open My Data'));
 
