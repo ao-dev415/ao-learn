@@ -136,6 +136,27 @@ async function main() {
     events: existing.events || [],
     chapters
   };
+  
+  // --- Start of new code to merge quizzes and assessments ---
+  const QUIZ_FILE = path.join(process.cwd(), "quizzes.json");
+  if (fs.existsSync(QUIZ_FILE)) {
+    const quizzes = JSON.parse(fs.readFileSync(QUIZ_FILE, "utf8"));
+    for (const quiz of quizzes) {
+      const chapter = out.chapters.find(c => c.title === quiz.chapter);
+      if (chapter) {
+        const lo = chapter.los.find(l => l.title === quiz.lo);
+        if (lo) {
+          if (quiz.id.startsWith("quiz-")) {
+            lo.quiz = quiz.data;
+          } else if (quiz.id.startsWith("assess-")) {
+            lo.assessment = quiz.data;
+          }
+        }
+      }
+    }
+    console.log(`Merged quiz and assessment data from ${QUIZ_FILE}`);
+  }
+  // --- End of new code ---
 
   fs.writeFileSync(OUT_JSON, JSON.stringify(out, null, 2), "utf8");
   console.log(`Wrote ${OUT_JSON} from ${SRC_DOCX} (${chapters.length} chapters).`);
