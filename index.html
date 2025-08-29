@@ -546,6 +546,16 @@ window.addEventListener('error', (ev) => {
     }
   }
 
+  function renderAssessmentView(ch, chIdx) {
+    stopTiming();
+    MAIN.innerHTML = ''; // Clear the main content area
+    MAIN.append(
+      h('h1', {}, `${ch.title || 'Chapter'} — Assessment`)
+    );
+    // Call the existing function to build the assessment form
+    renderAssessment(ch, chIdx);
+  }
+
   function buildLeftNav(){
     NAV.innerHTML='';
     const list=h('ul');
@@ -571,9 +581,9 @@ window.addEventListener('error', (ev) => {
         const assessmentBtn = h('button', {
           class: 'assessment-link', 
           onclick: () => { 
-            // Placeholder action: Log a message to the browser console
-            console.log('Clicked assessment for:', ch.title);
-            // Later, this will call a function like: renderAssessmentView(ch);
+            renderAssessmentView(ch, chIdx);
+            location.hash = `#ch${chIdx+1}-assessment`;
+            setActiveLO(assessmentBtn);
           }
         }, ch.assessment.title || 'Chapter Assessment');
         list.append(h('li', {}, assessmentBtn));
@@ -594,16 +604,38 @@ window.addEventListener('error', (ev) => {
     btn?.scrollIntoView({block:'nearest', inline:'nearest'});
   }
   function openFromHash(){
-    const m=location.hash.match(/^#ch(\d+)-lo(\d+)$/);
-    const ch=chapters[(m?+m[1]:1)-1];
-    const lo=ch?.los?.[(m?+m[2]:1)-1];
-    if(ch && lo){
-      renderMain(ch,lo,(m?+m[1]:1)-1,(m?+m[2]:1)-1);
-      const btns = NAV.querySelectorAll('button.lo');
-      let flat=0,target=0;
-      chapters.forEach((c)=>{(c.los||[]).forEach((l)=>{ if(c===ch&&l===lo) target=flat; flat++; });});
-      setActiveLO(btns[target]);
-      return true;
+    const m_lo = location.hash.match(/^#ch(\d+)-lo(\d+)$/);
+    if(m_lo){
+        const ch=chapters[+m_lo[1]-1];
+        const lo=ch?.los?.[+m_lo[2]-1];
+        if(ch && lo){
+          renderMain(ch,lo,+m_lo[1]-1,+m_lo[2]-1);
+          const btns = NAV.querySelectorAll('button');
+          let flat=0,target=-1;
+          chapters.forEach((c,ci)=>{
+              (c.los||[]).forEach((l,li)=>{ if(c===ch&&l===lo) target=flat; flat++; });
+              if(c.assessment) flat++;
+          });
+          if(target !== -1) setActiveLO(btns[target]);
+          return true;
+        }
+    }
+    
+    const m_as = location.hash.match(/^#ch(\d+)-assessment$/);
+    if(m_as){
+        const ch=chapters[+m_as[1]-1];
+        if(ch && ch.assessment){
+            renderAssessmentView(ch, +m_as[1]-1);
+            const btns = NAV.querySelectorAll('button');
+            let flat=0,target=-1;
+            chapters.forEach((c,ci)=>{
+                flat += (c.los||[]).length;
+                if(c===ch) target=flat;
+                if(c.assessment) flat++;
+            });
+            if(target !== -1) setActiveLO(btns[target]);
+            return true;
+        }
     }
     return false;
   }
