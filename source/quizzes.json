@@ -1,8 +1,8 @@
 [
   {
     "id": "quiz-c3-1",
-    "chapter": "Cash Flow & Net Worth",
-    "lo": "3.1: Key Planning Documents",
+    "chapter": "Chapter 3",
+    "lo": "Learning Objective 3.1",
     "data": {
       "id": "quiz_c3_1",
       "title": "Savings basics",
@@ -39,7 +39,7 @@
   },
   {
     "id": "assess-c3",
-    "chapter": "Cash Flow & Net Worth",
+    "chapter": "Chapter 3",
     "lo": null,
     "data": {
       "id": "assess_c3",
