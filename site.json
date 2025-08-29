@@ -37,6 +37,11 @@
               "title": "What is Lorem Ipsum3?",
               "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
             }
+          ],
+          "images": [
+            {
+              "src": "media/ch01/lo1-1/ch01-lo01-bumper-01.jpg"
+            }
           ]
         },
         {
@@ -59,6 +64,17 @@
               "title": "What is Lorem Ipsum6?",
               "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
             }
+          ],
+          "images": [
+            {
+              "src": "media/ch01/lo1-2/ch01-lo02-bumper-03.png"
+            },
+            {
+              "src": "media/ch01/lo1-2/ch01-lo02-coffee-02.jpg"
+            },
+            {
+              "src": "media/ch01/lo1-2/ch01-lo02-rational-01.png"
+            }
           ]
         },
         {
@@ -80,6 +96,11 @@
             {
               "title": "What is Lorem Ipsum9?",
               "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+            }
+          ],
+          "images": [
+            {
+              "src": "media/ch01/lo1-3/ch01-lo03-mural-01.jpg"
             }
           ]
         }
@@ -108,6 +129,11 @@
               "title": "What is Lorem Ipsum3?",
               "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
             }
+          ],
+          "images": [
+            {
+              "src": "media/ch02/lo2-1/ch02-lo01-expected-retirement-01.png"
+            }
           ]
         },
         {
@@ -130,6 +156,17 @@
               "title": "What is Lorem Ipsum6?",
               "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
             }
+          ],
+          "images": [
+            {
+              "src": "media/ch02/lo2-2/ch02-lo02-budget-01.png"
+            },
+            {
+              "src": "media/ch02/lo2-2/ch02-lo02-budget-video-03.png"
+            },
+            {
+              "src": "media/ch02/lo2-2/ch02-lo02-calc-02.png"
+            }
           ]
         },
         {
@@ -151,6 +188,11 @@
             {
               "title": "What is Lorem Ipsum9?",
               "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+            }
+          ],
+          "images": [
+            {
+              "src": "media/ch02/lo2-3/ch02-lo03-calc-01.png"
             }
           ]
         }
@@ -179,6 +221,11 @@
               "title": "What is Lorem Ipsum3?",
               "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
             }
+          ],
+          "images": [
+            {
+              "src": "media/ch03/lo3-1/ch03-lo01-savings-01.png"
+            }
           ]
         },
         {
@@ -201,6 +248,14 @@
               "title": "What is Lorem Ipsum6?",
               "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
             }
+          ],
+          "images": [
+            {
+              "src": "media/ch03/lo3-2/ch03-lo02-battle-plan-01.png"
+            },
+            {
+              "src": "media/ch03/lo3-2/ch03-lo02-spiritual-02.jpg"
+            }
           ]
         },
         {
@@ -222,6 +277,11 @@
             {
               "title": "What is Lorem Ipsum9?",
               "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+            }
+          ],
+          "images": [
+            {
+              "src": "media/ch03/lo3-3/ch03-lo03-balance-sheet-01.png"
             }
           ]
         }
