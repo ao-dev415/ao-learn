@@ -70,8 +70,10 @@ function buildFromHtml(html) {
       continue;
     }
 
-    if (tag === "H3") {
-      if (curSnippet && curLo) pushSnippet(curLo, curSnippet);
+    if (curLo && tag === "H3") {
+      if (curSnippet) {
+        pushSnippet(curLo, curSnippet);
+      }
       curSnippet = { title: normalizeText(el), parts: [] };
       continue;
     }
@@ -137,8 +139,7 @@ async function main() {
     chapters
   };
   
-  // --- Start of new code to merge quizzes and assessments ---
-  const QUIZ_FILE = path.join(process.cwd(), "quizzes.json");
+  const QUIZ_FILE = path.join(path.dirname(SRC_DOCX), "quizzes.json");
   if (fs.existsSync(QUIZ_FILE)) {
     const quizzes = JSON.parse(fs.readFileSync(QUIZ_FILE, "utf8"));
     for (const quiz of quizzes) {
@@ -156,7 +157,6 @@ async function main() {
     }
     console.log(`Merged quiz and assessment data from ${QUIZ_FILE}`);
   }
-  // --- End of new code ---
 
   fs.writeFileSync(OUT_JSON, JSON.stringify(out, null, 2), "utf8");
   console.log(`Wrote ${OUT_JSON} from ${SRC_DOCX} (${chapters.length} chapters).`);

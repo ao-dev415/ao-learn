@@ -6,9 +6,6 @@
 <title>Advice-Only® Bookstore (Preview)</title>
 <meta name="robots" content="noindex,nofollow"/>
 
-<!-- Where site.json lives.
-     For local file:// double-clicks this can stay "".
-     If you serve from a subpath, e.g. /AO-V1/, set content="/AO-V1/". -->
 <meta name="ao-root" content="/ao-learn/"/>
 
 <style>
@@ -95,7 +92,6 @@
 </head>
 <body>
 
-  <!-- Top bar -->
   <header class="top" id="top">
     <div class="top-wrap">
       <div class="logo">
@@ -116,7 +112,6 @@
     </div>
   </header>
 
-  <!-- Columns -->
   <div class="wrap">
     <aside class="card nav" id="nav"><div class="muted">Loading…</div></aside>
 
@@ -136,7 +131,6 @@
     </aside>
   </div>
 
-  <!-- Lightbox (zoom) -->
   <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Zoom" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);align-items:center;justify-content:center;z-index:100">
     <button class="btn" id="lbClose" style="position:absolute;top:14px;right:14px">Close</button>
     <div id="lbSlot" style="max-width:92vw;max-height:92vh;margin:auto"></div>
@@ -999,3 +993,4 @@ window.addEventListener('error', (ev) => {
 
 </body>
 </html>
+}
