@@ -24,15 +24,6 @@
             "12–18 months"
           ],
           "correctIndex": 1
-        },
-        {
-          "text": "If your savings rate increases from 5% to 10%, what happens (all else equal)?",
-          "options": [
-            "Time to goals usually shortens",
-            "Investment risk increases automatically",
-            "Your take-home pay increases immediately"
-          ],
-          "correctIndex": 0
         }
       ]
     }
@@ -44,22 +35,9 @@
     "data": {
       "id": "assess_c3",
       "title": "Financial Readiness Assessment",
-      "intro": "Rate each statement 1–5 (1=Strongly disagree, 5=Strongly agree).",
-      "scale": {
-        "min": 1,
-        "max": 5,
-        "labels": {
-          "1": "Strongly disagree",
-          "5": "Strongly agree"
-        }
-      },
       "items": [
         { "text": "I have 3–6 months of expenses in an emergency fund." },
-        { "text": "I contribute enough to capture my full employer 401(k) match." },
-        { "text": "I pay my credit cards in full every month." },
-        { "text": "I track my cash flow monthly." },
-        { "text": "I know my target savings rate and hit it most months." },
-        { "text": "My debt payoff plan is clear and realistic." }
+        { "text": "I contribute enough to capture my full employer 401(k) match." }
       ]
     }
   }
