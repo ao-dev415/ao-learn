@@ -138,7 +138,7 @@ async function main() {
     events: existing.events || [],
     chapters
   };
-  
+
   const QUIZ_FILE = path.join(path.dirname(SRC_DOCX), "quizzes.json");
   if (fs.existsSync(QUIZ_FILE)) {
     const quizzes = JSON.parse(fs.readFileSync(QUIZ_FILE, "utf8"));
