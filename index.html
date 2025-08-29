@@ -56,6 +56,7 @@
   /* Reader */
   .main h1{margin:0 0 14px;font-size:22px}
   .main h2{margin:20px 0 8px;font-size:16px}
+  .main h3{margin:20px 0 8px;font-size:14px; font-weight: 600; color: #bcd0e0;}
   .main .lead{margin:0 0 16px;color:#c7d7e6}
   figure{margin:10px 0}
   figure img, figure video{display:block;max-width:100%;height:auto;border:1px solid var(--border);border-radius:10px;background:#000}
@@ -166,7 +167,7 @@ window.addEventListener('error', (ev) => {
   const LS_SEEN = 'ao.v2.seen';
   const LS_TIME = 'ao.v2.time';
   const LS_LAST = 'ao.v2.last';
-  const LS_QUIZ   = 'ao.v2.quiz';
+  const LS_QUIZ     = 'ao.v2.quiz';
   const LS_ASSESS = 'ao.v2.assess';
   const COMP_THRESH = { red:20, yellow:60 };
 
@@ -201,7 +202,7 @@ window.addEventListener('error', (ev) => {
   // ---------- State ----------
   const seen = new Set(loadJSON(LS_SEEN, []));
   const timeMap = loadJSON(LS_TIME, {});
-  const quizResults   = loadJSON(LS_QUIZ,   {});
+  const quizResults     = loadJSON(LS_QUIZ,    {});
   const assessResults = loadJSON(LS_ASSESS, {});
   let currentTimer = null;
   let site=null, chapters=[], docs=[];
@@ -372,7 +373,7 @@ window.addEventListener('error', (ev) => {
       const rb  = h('input',{type:'radio',name:`i${ii}`,id:id.replace(/[^a-zA-Z0-9_-]/g,'_'),value:String(v)});
       lbl.appendChild(rb);
       const tag = (v===min && a.scale?.labels?.[String(min)]) ? ` (${a.scale.labels[String(min)]})`
-                : (v===max && a.scale?.labels?.[String(max)]) ? ` (${a.scale.labels[String(max)]})` : '';
+              : (v===max && a.scale?.labels?.[String(max)]) ? ` (${a.scale.labels[String(max)]})` : '';
       lbl.appendChild(h('span',{}, String(v)+tag));
       opts.appendChild(lbl);
     }
@@ -487,18 +488,39 @@ window.addEventListener('error', (ev) => {
       pool.push(...normalizeMedia(s.images), ...normalizeMedia(s.image||s.img));
     });
 
-    // Render first snippet text
-    const s = (lo.snippets||[])[0];
-    let body = s?.body || '';
-    if (s?.title) MAIN.append(h('h2',{}, s.title));
+    // ========================================================================
+    // START OF THE FIX
+    // The old code that only showed the first snippet has been replaced
+    // with this loop that shows ALL snippets.
+    // ========================================================================
+    
+    // Render ALL snippets by looping through them
+    (lo.snippets || []).forEach(s => {
+      if (!s) return; // Skips any empty items in the array
 
-    // Tokens: [[img:n]] and [[vid:n]]
-    const imgTokens = extractTokenIndices(body,'img').filter(i=>pool[i] && pool[i].kind==='image');
-    const vidTokens = extractTokenIndices(body,'vid').filter(i=>pool[i] && pool[i].kind==='video');
+      if (s.title) {
+        // This creates the heading. Using 'h3' as originally requested.
+        MAIN.append(h('h3', {}, s.title));
+      }
 
-    // Strip tokens from text and append
-    const stripped = body.replace(/\[\[(img|vid):\d+\]\]/gi,'').replace(/\s{2,}/g,' ').trim();
-    if(stripped) MAIN.append(h('p',{}, stripped));
+      if (s.body) {
+        // This strips media tokens from the body text and adds it as a paragraph.
+        const strippedBody = s.body.replace(/\[\[(img|vid):\d+\]\]/gi, '').trim();
+        if (strippedBody) {
+          MAIN.append(h('p', {}, strippedBody));
+        }
+      }
+    });
+
+    // ========================================================================
+    // END OF THE FIX
+    // ========================================================================
+
+    // This media logic now runs AFTER all the text content has been rendered.
+    // It will render media found in the main LO or in *any* of the snippets.
+    const allBodyText = (lo.snippets||[]).map(s => s.body || '').join(' ');
+    const imgTokens = extractTokenIndices(allBodyText,'img').filter(i=>pool[i] && pool[i].kind==='image');
+    const vidTokens = extractTokenIndices(allBodyText,'vid').filter(i=>pool[i] && pool[i].kind==='video');
 
     // Insert tokened media in order
     const addFigure = (item)=>{
@@ -528,7 +550,7 @@ window.addEventListener('error', (ev) => {
     try { renderAssessment(ch, chIdx); } catch {}
 
     // Fallback copy
-    if(!s && !pool.length){
+    if(!(lo.snippets && lo.snippets.length > 0) && !pool.length){
       MAIN.append(h('div',{class:'muted'}, 'Data source: site.json.'));
     }
   }
@@ -820,7 +842,7 @@ window.addEventListener('error', (ev) => {
     (chapters||[]).forEach((ch,ci)=>{
       (ch.los||[]).forEach((lo,li)=>{
         const fields = [];
-        if (lo.title)   fields.push({text:lo.title, w:3});
+        if (lo.title)    fields.push({text:lo.title, w:3});
         if (lo.preview) fields.push({text:lo.preview, w:2});
         (lo.snippets||[]).forEach(s=>{
           if (s.title) fields.push({text:s.title, w:2});
@@ -957,11 +979,11 @@ window.addEventListener('error', (ev) => {
     setActiveMenu();
     const hash = location.hash || '#home';
     if (/^#ch\d+-lo\d+$/.test(hash)) { if(!openFromHash()) renderHome(); return; }
-    if (hash.startsWith('#home'))     { renderHome(); return; }
-    if (hash.startsWith('#data'))     { renderMyData(); return; }
-    if (hash.startsWith('#events'))   { renderEvents(); return; }
+    if (hash.startsWith('#home'))      { renderHome(); return; }
+    if (hash.startsWith('#data'))      { renderMyData(); return; }
+    if (hash.startsWith('#events'))    { renderEvents(); return; }
     if (hash.startsWith('#privacy'))  { renderPrivacy(); return; }
-    if (hash.startsWith('#about'))    { renderAbout(); return; }
+    if (hash.startsWith('#about'))     { renderAbout(); return; }
     if (hash.startsWith('#search:'))  { runSearch(decodeURIComponent(hash.split(':')[1]||''),'page'); return; }
     if(chapters[0]?.los?.length){ location.hash = '#ch1-lo1'; openFromHash(); } else { renderHome(); }
   }
