@@ -603,6 +603,7 @@ window.addEventListener('error', (ev) => {
     btn?.setAttribute('aria-current','true');
     btn?.scrollIntoView({block:'nearest', inline:'nearest'});
   }
+
   function openFromHash(){
     const m_lo = location.hash.match(/^#ch(\d+)-lo(\d+)$/);
     if(m_lo){
@@ -1017,6 +1018,7 @@ window.addEventListener('error', (ev) => {
     setActiveMenu();
     const hash = location.hash || '#home';
     if (/^#ch\d+-lo\d+$/.test(hash)) { if(!openFromHash()) renderHome(); return; }
+    if (/^#ch\d+-assessment$/.test(hash)) { if(!openFromHash()) renderHome(); return; }
     if (hash.startsWith('#home'))      { renderHome(); return; }
     if (hash.startsWith('#data'))      { renderMyData(); return; }
     if (hash.startsWith('#events'))    { renderEvents(); return; }
