@@ -1,6 +1,64 @@
 # Advice-Only® Bookstore (Preview)
 
+No, that's not the correct order. You must run **both scripts locally first**, and then do **one final push** at the end.
 
+To prevent the overwriting problem, you have to save your progress with Git **in between** running the two scripts.
+
+-----
+
+### \#\# The Correct Turnkey Process
+
+Here is the exact, step-by-step workflow you should follow every time.
+
+#### 1\. Run the Main Build Script
+
+This creates the `site.json` file with all your text, quizzes, and assessments.
+
+```bash
+node scripts/docx-to-json.mjs
+```
+
+-----
+
+#### 2\. Save Your Progress (Commit \#1)
+
+This is the most important step. It saves the version of `site.json` with all your important data before the next script can touch it.
+
+```bash
+git add site.json
+git commit -m "Build: Generate site.json with content and quizzes"
+```
+
+-----
+
+#### 3\. Run the Media Script
+
+This script now safely modifies the saved `site.json` to add the image paths.
+
+```bash
+node scripts/scan-media.mjs
+```
+
+-----
+
+#### 4\. Save the Media Updates (Commit \#2)
+
+This saves the final version of `site.json` with the media updates included.
+
+```bash
+git add site.json
+git commit -m "Build: Update media paths in site.json"
+```
+
+-----
+
+#### 5\. Push Everything to the Live Site
+
+This uploads both of your new commits to the server at once.
+
+```bash
+git push origin main
+```
 
 How to add & place images (recommended workflow)
 1) Where to put files
