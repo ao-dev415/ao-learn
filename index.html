@@ -88,12 +88,13 @@
 window.addEventListener('error', (ev) => {
   try {
     const n = document.getElementById('nav');
-    if (!n) return;
-    n.innerHTML = '';
-    const d = document.createElement('div');
-    d.className = 'muted';
-    d.textContent = 'Script error: ' + (ev.error?.message || ev.message || 'unknown');
-    n.appendChild(d);
+if (n) {
+      n.innerHTML = '';
+      const d = document.createElement('div');
+      d.className = 'muted';
+      d.textContent = 'Script error: ' + (ev.error?.message || ev.message || 'unknown');
+      n.appendChild(d);
+    }
   } catch {}
 });
 
@@ -125,7 +126,7 @@ window.addEventListener('error', (ev) => {
   const h=(t,a={},...c)=>{const e=document.createElement(t);
     for(const[k,v]of Object.entries(a)){
       if(k==='class')e.className=v;
-      else if(k==='html')e.innerHTML=v;
+      else if(k==='html' && e) e.innerHTML=v;
       else if(k.startsWith('on')&&typeof v==='function')e.addEventListener(k.slice(2),v);
       else e.setAttribute(k,v);
     }
@@ -210,16 +211,19 @@ window.addEventListener('error', (ev) => {
     return inds;
   }
   function openZoom(node){
-    LB_SLOT.innerHTML='';
+    if (LB_SLOT) LB_SLOT.innerHTML='';
     if(node.tagName==='IMG'){
       LB_SLOT.appendChild(h('img',{src:node.src, alt:node.alt||'', style:'max-width:92vw;max-height:92vh;border-radius:10px'}));
     }else if(node.tagName==='VIDEO'){
       const v = h('video',{src:node.currentSrc||node.src, controls:true, autoplay:true, style:'max-width:92vw;max-height:92vh;border-radius:10px'});
       LB_SLOT.appendChild(v);
     }
-    LB.style.display='flex';
+    if (LB) LB.style.display = 'flex';
   }
-  function closeZoom(){ LB.style.display='none'; LB_SLOT.innerHTML=''; }
+  function closeZoom(){
+    if (LB) LB.style.display='none';
+    if (LB_SLOT) LB_SLOT.innerHTML='';
+  }
   LB_CLOSE.addEventListener('click', closeZoom);
   LB.addEventListener('click', (e)=>{ if(e.target===LB) closeZoom(); });
   document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeZoom(); });
@@ -332,8 +336,8 @@ window.addEventListener('error', (ev) => {
     MAIN.appendChild(host);
 
     const showResult = (score) => {
-      const profile = a.scoring.find(p => score >= p.minScore && score <= p.maxScore);
-      resultDisplay.innerHTML = '';
+  const profile = a.scoring.find(p => score >= p.minScore && score <= p.maxScore);
+  if (resultDisplay) resultDisplay.innerHTML = '';
       if (profile) {
         resultDisplay.appendChild(h('h4',{}, `Result: ${profile.profile} (Score: ${score})`));
         resultDisplay.appendChild(h('p',{}, profile.interpretation));
@@ -426,7 +430,7 @@ window.addEventListener('error', (ev) => {
     if(!seen.has(key)){ seen.add(key); saveJSON(LS_SEEN,[...seen]); }
     stopTiming(); startTiming(key);
 
-    MAIN.innerHTML='';
+    if (MAIN) MAIN.innerHTML='';
     MAIN.append(
       h('h1',{}, `${ch.title || 'Chapter'} — ${lo.title || 'Learning Objective'}`),
       h('p',{class:'lead'}, lo.preview || 'This is preview text for this learning objective.')
@@ -502,7 +506,7 @@ window.addEventListener('error', (ev) => {
 
   function renderAssessmentView(ch, chIdx) {
     stopTiming();
-    MAIN.innerHTML = ''; // Clear the main content area
+    if (MAIN) MAIN.innerHTML = ''; // Clear the main content area
     MAIN.append(
       h('h1', {}, `${ch.title || 'Chapter'} — Assessment`)
     );
@@ -524,7 +528,7 @@ window.addEventListener('error', (ev) => {
   }
 
   function buildLeftNav(){
-    NAV.innerHTML='';
+    if (NAV) NAV.innerHTML='';
     const list=h('ul');
     chapters.forEach((ch,chIdx)=>{
       list.append(h('h3',{}, ch.title || `Chapter ${chIdx+1}`));
@@ -622,7 +626,7 @@ window.addEventListener('error', (ev) => {
     const progHost = document.getElementById('rail-progress');
 
     // Events
-    evHost.innerHTML = '<h4>Next event</h4>';
+    if (evHost) evHost.innerHTML = '<h4>Next event</h4>';
     const list=Array.isArray(site?.events)?site.events.slice():[];
     if(!list.length){ evHost.appendChild(h('div',{class:'muted'},'No events')); }
     else{
@@ -636,7 +640,7 @@ window.addEventListener('error', (ev) => {
 
     // Progress
     const {done,total,pct}=totals();
-    progHost.innerHTML = '<h4>Your progress</h4>';
+    if (progHost) progHost.innerHTML = '<h4>Your progress</h4>';
     progHost.appendChild(h('div',{class:'muted'}, `${done} of ${total} (${pct}%)`));
     progHost.appendChild(h('div',{class:'progress',style:'margin-top:6px'}, h('i',{style:`width:${pct}%;`})));
   }
@@ -650,7 +654,7 @@ window.addEventListener('error', (ev) => {
   }
   function renderHome(){
     stopTiming();
-    MAIN.innerHTML='';
+   if (MAIN) MAIN.innerHTML ='';
     MAIN.append(
       h('h1',{}, site?.title || site?.book || 'Advice-Only®'),
       h('p',{class:'lead'}, 'Welcome. Browse chapters on the left, or use search above.')
@@ -670,7 +674,7 @@ window.addEventListener('error', (ev) => {
   }
   function renderEvents(){
     stopTiming();
-    MAIN.innerHTML='';
+  if (MAIN) MAIN.innerHTML = '';
     MAIN.append(h('h1',{},'Events'), h('p',{class:'lead'},'Upcoming and past sessions.'));
     const list=Array.isArray(site?.events)?site.events.slice():[];
     if(!list.length){ MAIN.append(h('div',{class:'muted'},'No events found.')); return; }
@@ -686,7 +690,7 @@ window.addEventListener('error', (ev) => {
   }
   function renderPrivacy(){
     stopTiming();
-    MAIN.innerHTML='';
+    if (MAIN) MAIN.innerHTML = '';
     MAIN.append(
       h('h1',{},'Privacy Policy (US/California)'),
       h('p',{class:'lead'}, 'Summary: We don’t collect personal information on our servers. Your reading progress and quiz results are saved on your device only.')
@@ -718,13 +722,13 @@ window.addEventListener('error', (ev) => {
   }
 function renderAbout(){
     stopTiming();
-    MAIN.innerHTML = ''; // Clear the main content area
-    RAIL.innerHTML = ''; // Clear the right sidebar as well
+    if (MAIN) MAIN.innerHTML = ''; // Clear the main content area
+    if (RAIL) RAIL.innerHTML = ''; // Clear the right sidebar as well
 
     const a = site?.about;
     if (!a) {
       MAIN.append(h('h1', {}, 'About'));
-      MAIN.append(h('div', { class: 'muted' }, 'No about/profile information in site.json.'));
+      MAIN.append(h('div', { class: 'muted' }, 'No about information in site.json.'));
       return;
     }
 
@@ -783,6 +787,7 @@ function renderAbout(){
 
   function renderMyData(){
     stopTiming();
+if (MAIN) MAIN.innerHTML = '';
     const compColor = secs => secs < COMP_THRESH.red ? 'red' : (secs < COMP_THRESH.yellow ? 'yellow' : 'green');
 
     const agg = Object.entries(timeMap).reduce((acc,[,s])=>{
@@ -790,7 +795,6 @@ function renderAbout(){
     }, {red:0,yellow:0,green:0,totalSecs:0});
     const {done,total,pct} = totals();
 
-    MAIN.innerHTML='';
     MAIN.append(
       h('h1',{},'My Data'),
       h('p',{class:'lead'},'Local-only engagement, quiz results, and assessments (nothing leaves your browser).')
@@ -816,7 +820,7 @@ function renderAbout(){
     );
 
     const table=h('table',{class:'data-table', style:'margin-top:8px'});
-    table.innerHTML=`<thead>
+    if (table) table.innerHTML = `<thead>`;
       <tr><th>Chapter / LO</th><th style="text-align:right">Time (s)</th><th style="text-align:right">Status</th></tr>
     </thead><tbody></tbody>`;
     const tb=table.querySelector('tbody');
@@ -848,7 +852,7 @@ function renderAbout(){
       quizCard.appendChild(h('div',{class:'muted'},'No quiz attempts yet.'));
     }else{
       const qt = h('table',{class:'data-table',style:'margin-top:6px'});
-      qt.innerHTML = `<thead><tr>
+      if (qt) qt.innerHTML = `<thead><tr>`;
         <th>Quiz ID</th><th>Score</th><th>When</th><th>LO Key</th>
       </tr></thead><tbody></tbody>`;
       const qtb = qt.querySelector('tbody');
@@ -871,7 +875,7 @@ function renderAbout(){
       assessCard.appendChild(h('div',{class:'muted'},'No assessments yet.'));
     }else{
       const at = h('table',{class:'data-table',style:'margin-top:6px'});
-      at.innerHTML = `<thead><tr>
+      if (at) at.innerHTML = `<thead><tr>`;
         <th>Assessment ID</th><th>Total</th><th>Average</th><th>Chapter</th><th>When</th>
       </tr></thead><tbody></tbody>`;
       const atb = at.querySelector('tbody');
@@ -942,7 +946,7 @@ function renderAbout(){
     return out;
   }
   function showSearchDD(results, qTokens){
-    SEARCH_DD.innerHTML='';
+    if (SEARCH_DD) SEARCH_DD.innerHTML ='';
     if(!results.length){ SEARCH_DD.classList.remove('show'); return; }
     results.slice(0,8).forEach(r=>{
       const pv = (chapters[r.ci].los[r.li].snippets?.[0]?.body) || (chapters[r.ci].los[r.li].preview) || '';
@@ -966,7 +970,7 @@ function renderAbout(){
     if(mode==='dd'){ showSearchDD(results, qTokens); return; }
     stopTiming();
     SEARCH_DD.classList.remove('show');
-    MAIN.innerHTML='';
+    if (MAIN) MAIN.innerHTML='';
     MAIN.append(h('h1',{},'Search'), h('p',{class:'lead'}, `Results for “${q}”`));
     if(!results.length){ MAIN.append(h('div',{class:'muted'},'No matches.')); return; }
     results.slice(0,30).forEach(r=>{
@@ -1021,7 +1025,7 @@ function renderAbout(){
       site = await loadSiteJSON();
     }catch(e){
       if(!WANT_DEMO){
-        NAV.innerHTML='';
+       if (NAV) NAV.innerHTML='';
         NAV.append(h('div',{class:'muted'}, `Could not load site.json (${e.message||e}).`));
         site = { title:'', chapters:[], events:[] };
       }else{
@@ -1166,7 +1170,7 @@ function buildPopup(){
   const wrap = document.createElement('div');
   wrap.className = 'ao-pp-backdrop';
   wrap.id = 'ao-privacy-popup';
-  wrap.innerHTML = `
+  if (wrap) wrap.innerHTML = `
     <div class="ao-pp" role="dialog" aria-label="Privacy choices">
       <h3>Privacy choices</h3>
       <p>We don’t collect personal information on our servers. Your reading progress, quiz and assessment results are kept

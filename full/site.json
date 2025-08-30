@@ -5,14 +5,14 @@
   "alerts": [
     "“Site accessibility tutorial” lives here for now. Later: notifications for subscribed users."
   ],
-  "profile": {
+  "about": {
     "name": "Quincy Hall, CFP®",
     "subtitle": "Objective retirement planning",
     "avatar": "/static/media/avatar.png",
     "mode": "Online",
     "ctaLabel": "Register",
     "ctaUrl": "https://example.com/register-walkthrough"
-  ],
+  },
   "events": [
     {
       "title": "Advisor CE — Advice Only in Practice (Online)",
