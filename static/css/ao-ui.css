@@ -14,6 +14,13 @@ a{color:var(--brand);text-decoration:none}
 
 /* Top bar */
 .top{position:sticky;top:0;z-index:50;background:var(--panel);border-bottom:1px solid var(--border)}
+html.light .top {
+  background: var(--bg);
+}
+
+html.light .menu a {
+  color: var(--muted);
+}
 html.light .top{background:var(--bg);}
 .top-wrap{display:grid;grid-template-columns:auto 1fr auto auto;gap:16px;align-items:center;padding:10px 16px}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800}
