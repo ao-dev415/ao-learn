@@ -37,11 +37,6 @@
               "title": "What is Lorem Ipsum3?",
               "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
             }
-          ],
-          "images": [
-            {
-              "src": "media/ch01/lo1-1/ch01-lo01-bumper-01.jpg"
-            }
           ]
         },
         {
@@ -64,17 +59,6 @@
               "title": "What is Lorem Ipsum6?",
               "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
             }
-          ],
-          "images": [
-            {
-              "src": "media/ch01/lo1-2/ch01-lo02-bumper-03.png"
-            },
-            {
-              "src": "media/ch01/lo1-2/ch01-lo02-coffee-02.jpg"
-            },
-            {
-              "src": "media/ch01/lo1-2/ch01-lo02-rational-01.png"
-            }
           ]
         },
         {
@@ -96,11 +80,6 @@
             {
               "title": "What is Lorem Ipsum9?",
               "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-            }
-          ],
-          "images": [
-            {
-              "src": "media/ch01/lo1-3/ch01-lo03-mural-01.jpg"
             }
           ]
         }
@@ -129,11 +108,6 @@
               "title": "What is Lorem Ipsum3?",
               "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
             }
-          ],
-          "images": [
-            {
-              "src": "media/ch02/lo2-1/ch02-lo01-expected-retirement-01.png"
-            }
           ]
         },
         {
@@ -156,17 +130,6 @@
               "title": "What is Lorem Ipsum6?",
               "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
             }
-          ],
-          "images": [
-            {
-              "src": "media/ch02/lo2-2/ch02-lo02-budget-01.png"
-            },
-            {
-              "src": "media/ch02/lo2-2/ch02-lo02-budget-video-03.png"
-            },
-            {
-              "src": "media/ch02/lo2-2/ch02-lo02-calc-02.png"
-            }
           ]
         },
         {
@@ -188,11 +151,6 @@
             {
               "title": "What is Lorem Ipsum9?",
               "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-            }
-          ],
-          "images": [
-            {
-              "src": "media/ch02/lo2-3/ch02-lo03-calc-01.png"
             }
           ]
         }
@@ -223,34 +181,29 @@
             }
           ],
           "quiz": {
-            "id": "quiz_c3_1",
-            "title": "Savings basics",
+            "id": "unique_quiz_id_3_1",
+            "title": "Quiz for Learning Objective 3.1",
             "questions": [
               {
-                "text": "Which account is generally best for an emergency fund?",
+                "text": "This is the first question text.",
                 "options": [
-                  "Checking account",
-                  "High-yield savings account",
-                  "Brokerage margin account"
+                  "This is option A.",
+                  "This is the correct option B.",
+                  "This is option C."
                 ],
                 "correctIndex": 1
               },
               {
-                "text": "Roughly how many months of expenses is a common emergency-fund target?",
+                "text": "This is the second question text.",
                 "options": [
-                  "1–2 months",
-                  "3–6 months",
-                  "12–18 months"
+                  "This is the correct option A.",
+                  "This is option B.",
+                  "This is option C."
                 ],
-                "correctIndex": 1
+                "correctIndex": 0
               }
             ]
-          },
-          "images": [
-            {
-              "src": "media/ch03/lo3-1/ch03-lo01-savings-01.png"
-            }
-          ]
+          }
         },
         {
           "title": "Learning Objective 3.2",
@@ -271,14 +224,6 @@
             {
               "title": "What is Lorem Ipsum6?",
               "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-            }
-          ],
-          "images": [
-            {
-              "src": "media/ch03/lo3-2/ch03-lo02-battle-plan-01.png"
-            },
-            {
-              "src": "media/ch03/lo3-2/ch03-lo02-spiritual-02.jpg"
             }
           ]
         },
@@ -302,23 +247,66 @@
               "title": "What is Lorem Ipsum9?",
               "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
             }
-          ],
-          "images": [
-            {
-              "src": "media/ch03/lo3-3/ch03-lo03-balance-sheet-01.png"
-            }
           ]
         }
       ],
       "assessment": {
-        "id": "assess_c3",
-        "title": "Financial Readiness Assessment",
-        "items": [
+        "id": "risk_tolerance_ch3",
+        "title": "Chapter 3 Risk Tolerance Assessment",
+        "questions": [
           {
-            "text": "I have 3–6 months of expenses in an emergency fund."
+            "text": "Question 1: How would you react to a sudden drop in your investments?",
+            "options": [
+              {
+                "text": "Panic and sell everything.",
+                "points": 0
+              },
+              {
+                "text": "Wait and see if it recovers.",
+                "points": 1
+              },
+              {
+                "text": "View it as a buying opportunity.",
+                "points": 2
+              }
+            ]
           },
           {
-            "text": "I contribute enough to capture my full employer 401(k) match."
+            "text": "Question 2: How long is your investment horizon?",
+            "options": [
+              {
+                "text": "Less than 5 years.",
+                "points": 0
+              },
+              {
+                "text": "5-10 years.",
+                "points": 1
+              },
+              {
+                "text": "More than 10 years.",
+                "points": 2
+              }
+            ]
+          }
+        ],
+        "scoring": [
+          {
+            "minScore": 0,
+            "maxScore": 1,
+            "profile": "Conservative",
+            "interpretation": "You prioritize safety and stability."
+          },
+          {
+            "minScore": 2,
+            "maxScore": 3,
+            "profile": "Balanced",
+            "interpretation": "You seek a balance between risk and return."
+          },
+          {
+            "minScore": 4,
+            "maxScore": 4,
+            "profile": "Aggressive",
+            "interpretation": "You are comfortable with higher risk for higher returns."
           }
         ]
       }
