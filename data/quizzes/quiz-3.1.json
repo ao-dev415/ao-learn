@@ -1,0 +1,29 @@
+{
+  "id": "quiz-c3-1",
+  "chapter": "Chapter 3",
+  "lo": "Learning Objective 3.1",
+  "data": {
+    "id": "unique_quiz_id_3_1",
+    "title": "Quiz for Learning Objective 3.1",
+    "questions": [
+      {
+        "text": "This is the first question text.",
+        "options": [
+          "This is option A.",
+          "This is the correct option B.",
+          "This is option C."
+        ],
+        "correctIndex": 1
+      },
+      {
+        "text": "This is the second question text.",
+        "options": [
+          "This is the correct option A.",
+          "This is option B.",
+          "This is option C."
+        ],
+        "correctIndex": 0
+      }
+    ]
+  }
+}

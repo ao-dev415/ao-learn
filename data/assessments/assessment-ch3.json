@@ -1,0 +1,32 @@
+{
+  "id": "assess-c3",
+  "chapter": "Chapter 3",
+  "lo": null,
+  "data": {
+    "id": "risk_tolerance_ch3",
+    "title": "Chapter 3 Risk Tolerance Assessment",
+    "questions": [
+      {
+        "text": "Question 1: How would you react to a sudden drop in your investments?",
+        "options": [
+          { "text": "Panic and sell everything.", "points": 0 },
+          { "text": "Wait and see if it recovers.", "points": 1 },
+          { "text": "View it as a buying opportunity.", "points": 2 }
+        ]
+      },
+      {
+        "text": "Question 2: How long is your investment horizon?",
+        "options": [
+          { "text": "Less than 5 years.", "points": 0 },
+          { "text": "5-10 years.", "points": 1 },
+          { "text": "More than 10 years.", "points": 2 }
+        ]
+      }
+    ],
+    "scoring": [
+      { "minScore": 0, "maxScore": 1, "profile": "Conservative", "interpretation": "You prioritize safety and stability." },
+      { "minScore": 2, "maxScore": 3, "profile": "Balanced", "interpretation": "You seek a balance between risk and return." },
+      { "minScore": 4, "maxScore": 4, "profile": "Aggressive", "interpretation": "You are comfortable with higher risk for higher returns." }
+    ]
+  }
+}

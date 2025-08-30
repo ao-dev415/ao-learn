@@ -139,26 +139,45 @@ async function main() {
     chapters
   };
 
-  const QUIZ_FILE = path.join(path.dirname(SRC_DOCX), "quizzes.json");
-  if (fs.existsSync(QUIZ_FILE)) {
-    const quizzes = JSON.parse(fs.readFileSync(QUIZ_FILE, "utf8"));
+// --- NEW SCRIPT LOGIC TO READ FROM DATA SUBFOLDERS ---
+const DATA_DIR = path.resolve(path.dirname(SRC_DOCX), '../data');
+const allItems = [];
 
-    for (const item of quizzes) {
-      const chapter = out.chapters.find(c => c.title === item.chapter);
-      if (!chapter) continue;
+const readDataFromDir = (dirPath) => {
+  const fullPath = path.join(DATA_DIR, dirPath);
+  if (!fs.existsSync(fullPath)) return;
 
-      if (item.id.startsWith("assess-")) {
-        chapter.assessment = item.data;
-      } else if (item.id.startsWith("quiz-")) {
-        const lo = chapter.los.find(l => l.title === item.lo);
-        if (lo) {
-          lo.quiz = item.data;
-        }
+  const files = fs.readdirSync(fullPath).filter(f => f.endsWith('.json'));
+  for (const file of files) {
+    try {
+      const content = fs.readFileSync(path.join(fullPath, file), 'utf8');
+      allItems.push(JSON.parse(content));
+    } catch (e) {
+      console.error(`Error parsing ${file}:`, e);
+    }
+  }
+};
+
+readDataFromDir('quizzes');
+readDataFromDir('assessments');
+
+if (allItems.length > 0) {
+  for (const item of allItems) {
+    const chapter = out.chapters.find(c => c.title === item.chapter);
+    if (!chapter) continue;
+
+    if (item.id.startsWith("assess-")) {
+      chapter.assessment = item.data;
+    } else if (item.id.startsWith("quiz-")) {
+      const lo = chapter.los.find(l => l.title === item.lo);
+      if (lo) {
+        lo.quiz = item.data;
       }
     }
-
-    console.log(`Merged quiz and assessment data from ${QUIZ_FILE}`);
   }
+  console.log(`Merged ${allItems.length} quiz/assessment items from the data/ folder.`);
+}
+// --- END OF NEW SCRIPT LOGIC ---
 
   fs.writeFileSync(OUT_JSON, JSON.stringify(out, null, 2), "utf8");
   console.log(`Wrote ${OUT_JSON} from ${SRC_DOCX} (${chapters.length} chapters).`);
