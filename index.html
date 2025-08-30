@@ -716,9 +716,9 @@ window.addEventListener('error', (ev) => {
       )
     );
   }
-  function renderAbout(){
+function renderAbout(){
     stopTiming();
-    MAIN.innerHTML = '';
+    MAIN.innerHTML = ''; // Clear the main content area
     RAIL.innerHTML = ''; // Clear the right sidebar as well
 
     const a = site?.about;
