@@ -7,90 +7,8 @@
 <meta name="robots" content="noindex,nofollow"/>
 
 <meta name="ao-root" content="/"/>
+<link rel="stylesheet" href="static/css/ao-ui.css"/>
 
-<style>
-  :root{
-    --bg:#0b0d10;--panel:#12151a;--muted:#8ea1b2;--fg:#e8eef3;--brand:#00d0b6;
-    --border:#1e242c;--hover:#171c24;--danger:#ff5d5d;--warn:#ffcc66;--ok:#25d18a
-  }
-  *{box-sizing:border-box}html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,"Helvetica Neue",Arial,sans-serif}
-  a{color:var(--brand);text-decoration:none}
-
-  /* Top bar */
-  .top{position:sticky;top:0;z-index:50;background:#0c1015;border-bottom:1px solid var(--border)}
-  .top-wrap{display:grid;grid-template-columns:220px 1fr 380px;gap:12px;align-items:center;padding:10px 16px}
-  .logo{display:flex;align-items:center;gap:10px;font-weight:800}
-  .logo img{height:26px;width:auto;display:block}
-  .menu{display:flex;gap:6px;flex-wrap:wrap}
-  .menu a{padding:6px 10px;border-radius:8px;color:#cfe0ee}
-  .menu a[aria-current="page"], .menu a:hover{background:var(--hover)}
-  .search{position:relative}
-  .search input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #233041;background:#0d131a;color:var(--fg)}
-  .search .dd{position:absolute;inset:auto 0 auto 0;top:42px;background:#0f141b;border:1px solid #223042;border-radius:10px;max-height:50vh;overflow:auto;box-shadow:0 10px 30px rgba(0,0,0,.35);display:none}
-  .search .dd.show{display:block}
-  .search .res{padding:10px;border-bottom:1px dashed #223042;cursor:pointer}
-  .search .res:hover{background:#131a23}
-  .search .res small{display:block;color:#98a9ba;margin-top:4px}
-  .search mark{background:transparent;color:#e4faff;border-bottom:1px solid #2c4655}
-
-  /* Columns */
-  .wrap{display:grid;grid-template-columns:280px 1fr 320px;gap:16px;min-height:calc(100vh - 58px);padding:16px}
-  .card{background:var(--panel);border:1px solid var(--border);border-radius:10px}
-  .nav{padding:12px;overflow:auto;max-height:calc(100vh - 98px)}
-  .main{padding:16px;overflow:auto}
-  .rail{padding:12px}
-
-  /* Left nav */
-  .nav h3{margin:12px 8px 6px;color:#bcd0e0;font-weight:600;font-size:13px}
-  .nav ul{list-style:none;margin:0;padding:0}
-  .nav li{margin:0}
-  .nav button{display:block;width:100%;text-align:left;background:transparent;border:0;color:var(--fg);padding:8px 10px;border-radius:8px;cursor:pointer}
-  .nav button:hover{background:var(--hover)}
-  .nav .lo{padding-left:18px;color:#cfe0ee}
-  .nav button[aria-current="true"]{background:#0e2723;outline:1px solid #11433b}
-  .nav .assessment-link{padding-left:18px;font-style:italic;color:var(--muted);}
-  .nav .meta-link{margin:12px 8px 6px;display:block;color:var(--muted);font-size:13px}
-  .foot{margin:14px 8px 4px;color:#8ea1b2;font-size:12px;border-top:1px dashed #2a3340;padding-top:10px}
-  .foot a{color:#9ab0c3;text-decoration:underline}
-
-  /* Reader */
-  .main h1{margin:0 0 14px;font-size:22px}
-  .main h2{margin:20px 0 8px;font-size:16px}
-  .main h3{margin:20px 0 8px;font-size:14px; font-weight: 600; color: #bcd0e0;}
-  .main .lead{margin:0 0 16px;color:#c7d7e6}
-  figure{margin:10px 0}
-  figure img, figure video{display:block;max-width:100%;height:auto;border:1px solid var(--border);border-radius:10px;background:#000}
-  figure figcaption{font-size:12px;color:#9ab0c3;margin-top:4px;line-height:1.3}
-
-  /* Small components */
-  .muted{color:var(--muted)}
-  .kbd{font:12px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#0d1117;padding:2px 6px;border-radius:6px;border:1px solid #222a33;color:#a3b4c5}
-  .btn{display:inline-block;padding:8px 10px;border-radius:8px;border:1px solid #11433b;background:#0e2723;color:#e8eef3;text-decoration:none;font-weight:600;cursor:pointer}
-  .btn:hover{filter:brightness(1.08)}
-  .pill{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #2a3340;background:#0d1117;color:#9ab0c3}
-  .cardlet{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px;margin:0 0 12px}
-  .cardlet h4{margin:0 0 8px;color:#bcd0e0;font-weight:600;font-size:14px}
-  .progress{height:10px;background:#0d1117;border:1px solid #222a33;border-radius:999px;overflow:hidden}
-  .progress>i{display:block;height:100%;width:0%;background:linear-gradient(90deg,#00d0b6,#35e0a5)}
-
-  /* Data table */
-  .data-grid{display:grid;grid-template-columns:1fr;gap:12px}
-  .data-table{width:100%;border-collapse:collapse;font-size:14px}
-  .data-table th,.data-table td{padding:8px;border-bottom:1px dashed #2a3340}
-  .data-table th{border-bottom:1px solid #2a3340;color:#bcd0e0;font-weight:600;text-align:left}
-  .data-table td:last-child,.data-table th:last-child{text-align:right}
-  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:-1px;margin-right:6px}
-  .dot.red{background:var(--danger)} .dot.yellow{background:var(--warn)} .dot.green{background:var(--ok)}
-  .legend{display:flex;gap:12px;align-items:center}
-  .legend span{display:inline-flex;align-items:center;gap:6px;color:#9ab0c3;font-size:12px}
-
-  @media (max-width:1100px){
-    .top-wrap{grid-template-columns:1fr}
-    .wrap{grid-template-columns:1fr}
-    .nav{order:1}.main{order:2}.rail{order:3}
-  }
-</style>
 </head>
 <body>
 
@@ -111,6 +29,17 @@
         <input id="q" placeholder="Search or ask (Enter to view all)…" autocomplete="off"/>
         <div class="dd" id="dd"></div>
       </div>
+      <button id="theme-toggle" aria-label="Toggle theme">
+        <svg class="icon-dark" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <title>Activate light mode</title>
+          <circle cx="12" cy="12" r="5"></circle>
+          <path d="M12 1v2m0 18v2m11-11h-2M3 12H1m16.95 7.05-1.41-1.41M6.46 6.46 5.05 5.05m13.9 0-1.41 1.41M6.46 17.54 5.05 18.95"></path>
+        </svg>
+        <svg class="icon-light" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <title>Activate dark mode</title>
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
     </div>
   </header>
 
@@ -138,6 +67,22 @@
     <div id="lbSlot" style="max-width:92vw;max-height:92vh;margin:auto"></div>
   </div>
 
+<script>
+(function(){
+  const KEY='ao.theme';
+  const root=document.documentElement;
+  const btn=document.getElementById('theme-toggle');
+  const apply=isLight=>root.classList.toggle('light', isLight);
+  let saved=false;
+  try{ saved = localStorage.getItem(KEY)==='light'; }catch{}
+  apply(saved);
+  btn?.addEventListener('click', ()=>{
+    const next=!root.classList.contains('light');
+    apply(next);
+    try{ localStorage.setItem(KEY, next?'light':'dark'); }catch{}
+  });
+})();
+</script>
 <script>
 /* Surface any boot errors in the left nav */
 window.addEventListener('error', (ev) => {
@@ -296,7 +241,7 @@ window.addEventListener('error', (ev) => {
 
     // Questions
     q.questions.forEach((qq,qi)=>{
-      const fs = h('fieldset',{style:'border:0;border-top:1px dashed #2a3340;padding:10px 0;margin:8px 0 0'});
+      const fs = h('fieldset',{style:'border:0;border-top:1px dashed var(--border);padding:10px 0;margin:8px 0 0'});
       fs.appendChild(h('div',{style:'font-weight:600;margin-bottom:6px'}, `${qi+1}. ${qq.text}`));
       (qq.options||[]).forEach((opt,oi)=>{
         const id = `${q.id}-q${qi}-o${oi}`;
@@ -365,7 +310,7 @@ window.addEventListener('error', (ev) => {
     const min = a.scale?.min ?? 1, max = a.scale?.max ?? 5;
 
     a.items.forEach((it,ii)=>{
-      const row = h('div',{style:'padding:8px 0;border-top:1px dashed #2a3340'});
+      const row = h('div',{style:'padding:8px 0;border-top:1px dashed var(--border);padding:10px 0;margin:8px 0 0'});
       row.appendChild(h('div',{style:'font-weight:600;margin-bottom:6px'}, `${ii+1}. ${it.text}`));
       const opts = h('div',{style:'display:flex;gap:10px;flex-wrap:wrap'});
       for(let v=min; v<=max; v++){
@@ -538,7 +483,9 @@ window.addEventListener('error', (ev) => {
 
     // Quiz & Assessment panels
     try { renderQuiz(lo, key); } catch {}
-    try { renderAssessment(ch, chIdx); } catch {}
+    if (ch.assessment && loIdx === (ch.los.length - 1)) {
+      renderAssessmentInvitation(ch, chIdx);
+    }
 
     // Fallback copy
     if(!(lo.snippets && lo.snippets.length > 0) && !pool.length){
@@ -554,6 +501,19 @@ window.addEventListener('error', (ev) => {
     );
     // Call the existing function to build the assessment form
     renderAssessment(ch, chIdx);
+  }
+  
+  function renderAssessmentInvitation(ch, chIdx) {
+    if (!ch.assessment) return;
+    const host = h('div', { class: 'cardlet' });
+    host.appendChild(h('h4', {}, 'Chapter Assessment'));
+    host.appendChild(h('p', { class: 'muted' }, 'You have completed the learning objectives for this chapter.'));
+    const assessButton = h('a', {
+      class: 'btn',
+      href: `#ch${chIdx + 1}-assessment`
+    }, ch.assessment.title || 'Begin Assessment');
+    host.appendChild(h('div', { style: 'margin-top:12px;' }, assessButton));
+    MAIN.appendChild(host);
   }
 
   function buildLeftNav(){
