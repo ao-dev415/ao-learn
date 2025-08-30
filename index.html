@@ -721,14 +721,31 @@ window.addEventListener('error', (ev) => {
     stopTiming();
     MAIN.innerHTML='';
     MAIN.append(
-      h('h1',{},'Privacy'),
-      h('p',{class:'lead'}, 'Local-only analytics; nothing leaves your browser.')
+      h('h1',{},'Privacy Policy (US/California)'),
+      h('p',{class:'lead'}, 'Summary: We don’t collect personal information on our servers. Your reading progress and quiz results are saved on your device only.')
     );
     MAIN.append(
-      h('div',{class:'cardlet'},
-        h('h4',{},'What is stored'),
-        h('p',{},'Completion status and time-on-page for each learning objective (via localStorage).'),
-        h('p',{},'Clear your data in My Data with “Clear progress” and “Clear time”.')
+      h('div', {class:'cardlet'},
+        h('h4', {}, 'What we collect'),
+        h('p', {}, '• On-device data: Learning progress, time-on-page counters, and quiz/assessment answers. This stays on your device unless you choose to export it.'),
+        h('p', {}, '• Server logs: Basic device/browser information for security and reliability (e.g., IP address). We don’t link this to your on-device data.'),
+        h('p', {}, '• Forms you send us: If you email us or submit a contact form, we’ll use it to reply and support you.')
+      ),
+      h('div', {class:'cardlet'},
+        h('h4', {}, 'Optional analytics (off by default)'),
+        h('p', {}, 'We may offer Google Analytics and/or Microsoft Clarity to understand aggregate usage. These are disabled by default and only load if you turn them on. We also honor Global Privacy Control (GPC) signals by keeping optional analytics disabled when GPC is present.'),
+        h('div', {style:'margin-top:12px'},
+          h('button', {
+            class: 'btn',
+            onclick: () => { window.AOPrivacy.open(); }
+          }, 'Change Privacy Choices')
+        )
+      ),
+      h('div', {class:'cardlet'},
+        h('h4', {}, 'What we don’t do'),
+        h('p', {}, '• We do not sell your personal information.'),
+        h('p', {}, '• We do not share your personal information for cross-context behavioral advertising.'),
+        h('p', {}, '• We do not combine your on-device learning data with server logs or third-party data.')
       )
     );
   }
@@ -1052,6 +1069,171 @@ window.addEventListener('error', (ev) => {
   boot();
 })();
 </script>
+<script>
+/* ===== AO Privacy Popup & Consent (standalone) =====
+   Configure these IDs (or leave empty to keep disabled):
+*/
+window.GA_MEASUREMENT_ID   = "";   // e.g. "G-ABC123XYZ"
+window.CLARITY_PROJECT_ID  = "";   // e.g. "abc123xyz"
 
+/* ---- LocalStorage keys (namespaced) ---- */
+const LS = {
+  banner: 'ao.v2.privacyBanner',     // '1' once seen/saved
+  ga:     'ao.v2.analytics.ga',      // '1' if user enabled GA
+  cl:     'ao.v2.analytics.clarity', // '1' if user enabled Clarity
+  dns:    'ao.v2.doNotShare'         // '1' if user opted "Do Not Sell/Share" (optional)
+};
+
+/* ---- Helpers ---- */
+const hasGPC = () => (typeof navigator.globalPrivacyControl !== 'undefined' && navigator.globalPrivacyControl === true);
+const get = (k,def=null)=>{ try{ const v=localStorage.getItem(k); return v===null?def:v; }catch{ return def; } };
+const set = (k,v)=>{ try{ localStorage.setItem(k,v); }catch{} };
+const on  = (sel,ev,fn,root=document)=> root.querySelector(sel)?.addEventListener(ev,fn);
+
+/* ---- Loaders (only called when allowed) ---- */
+function loadGA(id){
+  if (!id || window.__gaLoaded) return;
+  window.__gaLoaded = true;
+  const s = document.createElement('script');
+  s.async = true; s.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`;
+  document.head.appendChild(s);
+  window.dataLayer = window.dataLayer || [];
+  function g(){ dataLayer.push(arguments); }
+  window.gtag = g;
+  g('js', new Date());
+  g('config', id, { anonymize_ip: true });
+}
+function loadClarity(projectId){
+  if (!projectId || window.__clarityLoaded) return;
+  window.__clarityLoaded = true;
+  (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments);};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", projectId);
+}
+
+/* ---- Apply (and gate) analytics based on stored consent ---- */
+function applyAnalyticsFromConsent(){
+  const doNotShare = get(LS.dns)==='1';
+  if (hasGPC() || doNotShare) return;            // Honor GPC / CPRA opt-out
+  if (get(LS.ga)==='1') loadGA(window.GA_MEASUREMENT_ID);
+  if (get(LS.cl)==='1') loadClarity(window.CLARITY_PROJECT_ID);
+}
+
+/* ---- Build popup UI once ---- */
+function ensureStyles(){
+  if (document.getElementById('ao-privacy-styles')) return;
+  const css = `
+  .ao-pp-backdrop{position:fixed;inset:0;display:flex;align-items:flex-end;justify-content:center;z-index:9999;background:transparent;}
+  .ao-pp{width:min(720px,94vw);margin:14px;background:var(--panel,#12151a);color:var(--fg,#e8eef3);
+         border:1px solid var(--border,#1e242c);border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.45);padding:14px;}
+  .ao-pp h3{margin:0 0 6px;font:600 16px/1.2 system-ui,Segoe UI,Inter,sans-serif;}
+  .ao-pp p{margin:6px 0;color:var(--muted,#8ea1b2);font-size:14px}
+  .ao-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px}
+  .ao-card{flex:1 1 240px;border:1px dashed var(--border,#1e242c);border-radius:10px;padding:10px}
+  .ao-card label{display:flex;gap:10px;align-items:center;cursor:pointer}
+  .ao-card input[type=checkbox]{transform:scale(1.1)}
+  .ao-badges{display:flex;gap:8px;margin-top:6px}
+  .ao-badge{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--border,#1e242c);background:#0d1117;color:#9ab0c3}
+  .ao-gpc{margin-top:8px;font-size:12px;color:#9ab0c3}
+  .ao-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-top:10px}
+  .ao-btn{padding:8px 10px;border-radius:8px;border:1px solid #22333f;background:#0e2723;color:#e8eef3;font-weight:600;cursor:pointer}
+  .ao-btn:hover{filter:brightness(1.08)}
+  .ao-link{align-self:center;margin-right:auto;color:var(--brand,#00d0b6);text-decoration:none;font-weight:600}
+  `;
+  const s = document.createElement('style'); s.id='ao-privacy-styles'; s.textContent = css;
+  document.head.appendChild(s);
+}
+function buildPopup(){
+  if (document.getElementById('ao-privacy-popup')) return;
+
+  const gpc = hasGPC();
+  const gaPref = get(LS.ga)==='1';
+  const clPref = get(LS.cl)==='1';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'ao-pp-backdrop';
+  wrap.id = 'ao-privacy-popup';
+  wrap.innerHTML = `
+    <div class="ao-pp" role="dialog" aria-label="Privacy choices">
+      <h3>Privacy choices</h3>
+      <p>We don’t collect personal information on our servers. Your reading progress, quiz and assessment results are kept
+         <strong>on this device only</strong> (localStorage). You can export or clear them anytime from <a href="#data" class="ao-link">My Data</a>.</p>
+      <div class="ao-row">
+        <div class="ao-card">
+          <label>
+            <input id="ao-consent-ga" type="checkbox" ${gaPref ? 'checked':''} ${gpc ? 'disabled':''}>
+            <div><strong>Google Analytics</strong><br><span class="muted">Helps us understand traffic. Off by default.</span></div>
+          </label>
+        </div>
+        <div class="ao-card">
+          <label>
+            <input id="ao-consent-clarity" type="checkbox" ${clPref ? 'checked':''} ${gpc ? 'disabled':''}>
+            <div><strong>Microsoft Clarity</strong><br><span class="muted">UX telemetry. Off by default.</span></div>
+          </label>
+        </div>
+      </div>
+      <div class="ao-badges">
+        <div class="ao-badge">No sale or sharing</div>
+        <div class="ao-badge">Data stays on your device</div>
+        <div class="ao-badge">GPC honored</div>
+      </div>
+      ${gpc ? '<div class="ao-gpc">Global Privacy Control (GPC) detected — analytics are disabled.</div>' : ''}
+      <div class="ao-actions">
+        <a class="ao-link" href="#privacy">Privacy &amp; choices</a>
+        <button id="ao-pp-save"  class="ao-btn">Save</button>
+        <button id="ao-pp-allow" class="ao-btn">Allow analytics</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(wrap);
+
+  // Wire buttons
+  on('#ao-pp-save','click',()=>{
+    // Save current checkbox states
+    const ga = document.getElementById('ao-consent-ga')?.checked && !gpc;
+    const cl = document.getElementById('ao-consent-clarity')?.checked && !gpc;
+    set(LS.ga, ga ? '1':'0');
+    set(LS.cl, cl ? '1':'0');
+    set(LS.banner,'1');
+    document.getElementById('ao-privacy-popup')?.remove();
+    applyAnalyticsFromConsent();
+  }, wrap);
+
+  on('#ao-pp-allow','click',()=>{
+    if (!gpc){
+      set(LS.ga,'1');
+      set(LS.cl,'1');
+    }
+    set(LS.banner,'1');
+    document.getElementById('ao-privacy-popup')?.remove();
+    applyAnalyticsFromConsent();
+  }, wrap);
+
+  // Click backdrop to close (same as Save)
+  wrap.addEventListener('click', (e)=>{
+    if (e.target === wrap){
+      document.getElementById('ao-pp-save')?.click();
+    }
+  });
+}
+
+/* ---- Public API to reopen from your Privacy page ---- */
+window.AOPrivacy = {
+  open(){
+    ensureStyles(); buildPopup();
+  }
+};
+
+/* ---- Init on first load ---- */
+document.addEventListener('DOMContentLoaded', ()=>{
+  ensureStyles();
+  // If user has never seen/saved choices, show popup:
+  if (get(LS.banner) !== '1') buildPopup();
+  // Apply consent (might load analytics if user previously opted in)
+  applyAnalyticsFromConsent();
+});
+</script>
 </body>
 </html>
