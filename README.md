@@ -50,6 +50,163 @@ git add site.json
 git commit -m "Build: Update media paths in site.json"
 ```
 
+
+
+This is a great next step for making your project more interactive and valuable. You're right to think about organization now, as it will save you a lot of time later.
+The suggestion from your other resource is about implementing a light/dark theme, which is a great feature, but we can set it aside for now to focus on the assessments.
+To handle complex, scored assessments for all 9 chapters in a clean, turnkey way, I recommend a three-part approach: organizing your data into separate files, creating a more powerful JSON structure for the assessments, and updating your HTML to render these new interactive forms.
+
+## 1. The Best Way to Organize Your Files
+Your current quizzes.json file will become very large and difficult to manage with 9 complex assessments and dozens of quizzes. The best practice is to break them into separate files.
+Recommendation: Create a new top-level folder named data/. Inside it, create two subfolders: assessments/ and quizzes/.
+Your new structure would look like this:
+
+
+AO-V1/
+├── data/
+│   ├── assessments/
+│   │   ├── ch1.json  <-- Assessment for Chapter 1
+│   │   ├── ch2.json  <-- Assessment for Chapter 2
+│   │   └── ...
+│   └── quizzes/
+│       ├── 1.1.json  <-- Quiz for LO 1.1
+│       ├── 1.2.json  <-- Quiz for LO 1.2
+│       └── ...
+├── source/
+│   └── book.docx
+├── scripts/
+│   └── docx-to-json.mjs
+└── ...
+
+
+This keeps each assessment and quiz completely separate and easy to edit. Your main build script (docx-to-json.mjs) would then be updated to read all files from these directories and merge them into the final site.json.
+
+## 2. The New JSON Structure for Assessments
+Your Risk Tolerance Questionnaire needs a more advanced JSON structure to handle point-based scoring and result profiles. Each assessment file (e.g., data/assessments/ch1.json) would look like this:
+JSON
+
+
+{
+  "id": "assess-ch1",
+  "chapter": "Chapter 1",
+  "data": {
+    "id": "risk_tolerance_ch1",
+    "title": "Risk Tolerance Questionnaire",
+    "questions": [
+      {
+        "text": "If the value of your $100,000 investment dropped to $70,000 overnight, how would you react?",
+        "options": [
+          { "text": "Panic and sell all of your investments.", "points": 0 },
+          { "text": "Be concerned but wait for it to recover.", "points": 1 },
+          { "text": "View it as a buying opportunity and invest more.", "points": 2 }
+        ]
+      },
+      {
+        "text": "Which investment would you be most comfortable with?",
+        "options": [
+          { "text": "A single stock with high risk/return.", "points": 2 },
+          { "text": "A diversified portfolio of stocks and bonds.", "points": 1 },
+          { "text": "A savings account with low risk/return.", "points": 0 }
+        ]
+      }
+    ],
+    "scoring": [
+      { "minScore": 0, "maxScore": 1, "profile": "Conservative", "interpretation": "You prioritize the safety and stability of your investments over potential high returns." },
+      { "minScore": 2, "maxScore": 3, "profile": "Balanced", "interpretation": "You seek a balance between risk and return, using a mix of stocks and bonds." },
+      { "minScore": 4, "maxScore": 4, "profile": "Aggressive", "interpretation": "You are comfortable with higher levels of risk in pursuit of potentially higher returns." }
+    ]
+  }
+}
+
+
+
+## 3. The New renderAssessment Function
+Finally, your index.html file needs a new, more powerful renderAssessment function that can build the questionnaire, calculate the score, and show the correct profile.
+You would replace your entire existing renderAssessment function with this new version:
+JavaScript
+
+
+function renderAssessment(ch, chIdx) {
+  const a = ch.assessment;
+  if (!a || !Array.isArray(a.questions) || !a.questions.length) return;
+
+  const host = h('div', { class: 'cardlet' });
+  host.appendChild(h('h4', {}, a.title || 'Assessment'));
+  if (a.intro) host.appendChild(h('p', { class: 'muted', style: 'margin-top:4px' }, a.intro));
+
+  const prior = assessResults[a.id];
+  const form = h('form', { style: 'margin-top:6px' });
+
+  // Build Questions
+  a.questions.forEach((q, qi) => {
+    const fs = h('fieldset', { style: 'border:0;border-top:1px dashed var(--border);padding:10px 0;margin:8px 0 0' });
+    fs.appendChild(h('div', { style: 'font-weight:600;margin-bottom:6px' }, `${qi + 1}. ${q.text}`));
+    (q.options || []).forEach((opt, oi) => {
+      const id = `${a.id}-q${qi}-o${oi}`;
+      const lbl = h('label', { for: id, style: 'display:flex;gap:8px;align-items:center;margin:4px 0;cursor:pointer' });
+      const rb = h('input', { type: 'radio', name: `q${qi}`, id: id.replace(/[^a-zA-Z0-9_-]/g, '_'), value: String(opt.points) });
+      lbl.appendChild(rb);
+      lbl.appendChild(h('span', {}, opt.text));
+      fs.appendChild(lbl);
+    });
+    form.appendChild(fs);
+  });
+
+  const buttonRow = h('div', { style: 'margin-top:10px;display:flex;gap:8px;flex-wrap:wrap' });
+  const submit = h('button', { type: 'submit', class: 'btn' }, prior ? 'Retake Assessment' : 'Submit Assessment');
+  buttonRow.appendChild(submit);
+  form.appendChild(buttonRow);
+
+  const resultDisplay = h('div', { class: 'cardlet', style: 'display:none; margin-top:12px;' });
+  host.append(form, resultDisplay);
+  MAIN.appendChild(host);
+
+  const showResult = (score) => {
+    const profile = a.scoring.find(p => score >= p.minScore && score <= p.maxScore);
+    resultDisplay.innerHTML = ''; // Clear previous results
+    if (profile) {
+      resultDisplay.appendChild(h('h4', {}, `Result: ${profile.profile} (Score: ${score})`));
+      resultDisplay.appendChild(h('p', {}, profile.interpretation));
+    } else {
+      resultDisplay.appendChild(h('h4', {}, `Result (Score: ${score})`));
+    }
+    resultDisplay.style.display = 'block';
+    form.querySelectorAll('input, button').forEach(el => el.disabled = true);
+    submit.textContent = 'Retake Assessment';
+  };
+
+  if (prior) {
+    showResult(prior.score);
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (submit.textContent === 'Retake Assessment') {
+      form.querySelectorAll('input').forEach(i => { i.checked = false; i.disabled = false; });
+      submit.disabled = false;
+      submit.textContent = 'Submit Assessment';
+      resultDisplay.style.display = 'none';
+      return;
+    }
+    
+    let totalScore = 0;
+    const answers = a.questions.map((_, qi) => {
+      const sel = form.querySelector(`input[name="q${qi}"]:checked`);
+      if (sel) {
+        totalScore += parseInt(sel.value, 10);
+        return sel.value;
+      }
+      return -1;
+    });
+
+    const res = { chapter: chIdx + 1, score: totalScore, answers, ts: Date.now() };
+    saveAssessResult(a.id, res);
+    showResult(totalScore);
+  });
+}
+
+
+
 -----
 
 #### 5\. Push Everything to the Live Site
