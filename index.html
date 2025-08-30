@@ -718,23 +718,67 @@ window.addEventListener('error', (ev) => {
   }
   function renderAbout(){
     stopTiming();
-    MAIN.innerHTML='';
-    MAIN.append(h('h1',{},'About'));
-    const a = site?.about || site?.profile || null;
-    if(!a){ MAIN.append(h('div',{class:'muted'},'No about/profile information in site.json.')); return; }
-    const name = a.name || '';
-    const location = a.location || a.address || '';
-    const bio = a.bio || a.subtitle || '';
-    const specialties = Array.isArray(a.specialties) ? a.specialties : (a.specialty ? [a.specialty] : []);
-    MAIN.append(
-      h('div',{class:'cardlet'},
-        h('div',{style:'font-size:18px;font-weight:700'}, name),
-        location ? h('div',{class:'muted',style:'margin-top:2px'}, location) : null,
-        bio ? h('p',{style:'margin-top:8px'}, bio) : null,
-        specialties.length ? h('div',{style:'margin-top:6px'}, h('span',{class:'pill'}, `Specialties: ${specialties.join(', ')}`)) : null,
-        (a.ctaUrl && a.ctaLabel) ? h('div',{style:'margin-top:12px'}, h('a',{href:a.ctaUrl,class:'btn',target:'_blank',rel:'noopener'}, a.ctaLabel)) : null
+    MAIN.innerHTML = '';
+    RAIL.innerHTML = ''; // Clear the right sidebar as well
+
+    const a = site?.about;
+    if (!a) {
+      MAIN.append(h('h1', {}, 'About'));
+      MAIN.append(h('div', { class: 'muted' }, 'No about/profile information in site.json.'));
+      return;
+    }
+
+    // Build the main content panel
+    const profileCard = h('div', { class: 'profile-card card' },
+      h('img', { 
+        class: 'profile-card-image',
+        src: a.imageSrc || '', 
+        alt: a.name || 'Profile picture'
+      }),
+      h('div', {},
+        h('p', { class: 'muted', style: 'margin-top:0' }, 
+          (a.socials || []).map(s => s.text).join(' • ')
+        ),
+        h('div', { class: 'profile-card-links' },
+          ...(a.socials || []).map(s => 
+            h('a', { class: 'btn', href: s.url, target: '_blank', rel: 'noopener' }, s.text)
+          ),
+          a.cta ? h('a', { class: 'btn btn-brand', href: a.cta.url, target: '_blank', rel: 'noopener' }, a.cta.text) : null
+        )
       )
     );
+
+    MAIN.append(
+      h('h1', {}, a.name || 'Profile'),
+      h('p', { class: 'lead' }, a.location || ''),
+      profileCard
+    );
+
+    if (a.office) {
+      MAIN.append(
+        h('h2', {}, 'Office'),
+        h('div', { class: 'card', style: 'padding:12px;margin:12px 0' },
+          h('h3', { style: 'margin:.25rem 0' }, a.office.location),
+          h('iframe', {
+            title: `${a.office.location} map`,
+            width: '100%',
+            height: '220',
+            style: 'border:0; border-radius:10px;',
+            loading: 'lazy',
+            allowfullscreen: true,
+            referrerpolicy: 'no-referrer-when-downgrade',
+            src: a.office.mapUrl || ''
+          })
+        )
+      );
+    }
+
+    // Build the right sidebar (rail)
+    const aboutCard = h('div', {class:'cardlet'},
+      h('h4', {}, 'About'),
+      h('p', {class:'muted'}, a.bio || '')
+    );
+    RAIL.appendChild(aboutCard);
   }
 
   function renderMyData(){

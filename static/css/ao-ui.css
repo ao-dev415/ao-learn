@@ -110,4 +110,28 @@ html.light .data-table th{color:#344151}
   .top-wrap{grid-template-columns:auto 1fr auto}
   .wrap{grid-template-columns:1fr}
   .nav{order:1}.main{order:2}.rail{order:3}
+
+/* Profile Page Styles */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+}
+.brand img {
+  height: 28px;
+}
+.btn-brand {
+  background-color: var(--brand);
+  color: #fff;
+}
+html.light .btn-brand {
+  color: var(--fg);
+}
 }
