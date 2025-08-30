@@ -124,17 +124,23 @@ async function main() {
   const { value: html } = await mammoth.convertToHtml({ path: SRC_DOCX }, { styleMap: [] });
   const chapters = buildFromHtml(html);
 
-  const existing = loadExisting();
+const existing = loadExisting();
+  const ABOUT_FILE = path.resolve(path.dirname(SRC_DOCX), '../data/about.json');
+  
+  let aboutData = {
+    name: "Your Name",
+    location: "City, ST",
+    bio: "Financial planner & educator."
+  };
+
+  if (fs.existsSync(ABOUT_FILE)) {
+    aboutData = JSON.parse(fs.readFileSync(ABOUT_FILE, 'utf8'));
+    console.log(`Merged about page data from ${ABOUT_FILE}`);
+  }
+
   const out = {
     title: existing.title || "Advice-Only® Bookstore",
-    about: existing.about || {
-      name: "Your Name",
-      location: "City, ST",
-      bio: "Financial planner & educator.",
-      specialties: ["Planning", "Behavior", "Retirement"],
-      ctaUrl: "#",
-      ctaLabel: "Work with me"
-    },
+    about: aboutData,
     events: existing.events || [],
     chapters
   };
