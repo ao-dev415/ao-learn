@@ -142,19 +142,21 @@ async function main() {
   const QUIZ_FILE = path.join(path.dirname(SRC_DOCX), "quizzes.json");
   if (fs.existsSync(QUIZ_FILE)) {
     const quizzes = JSON.parse(fs.readFileSync(QUIZ_FILE, "utf8"));
-    for (const quiz of quizzes) {
-      const chapter = out.chapters.find(c => c.title === quiz.chapter);
-      if (chapter) {
-        const lo = chapter.los.find(l => l.title === quiz.lo);
+
+    for (const item of quizzes) {
+      const chapter = out.chapters.find(c => c.title === item.chapter);
+      if (!chapter) continue;
+
+      if (item.id.startsWith("assess-")) {
+        chapter.assessment = item.data;
+      } else if (item.id.startsWith("quiz-")) {
+        const lo = chapter.los.find(l => l.title === item.lo);
         if (lo) {
-          if (quiz.id.startsWith("quiz-")) {
-            lo.quiz = quiz.data;
-          } else if (quiz.id.startsWith("assess-")) {
-            lo.assessment = quiz.data;
-          }
+          lo.quiz = item.data;
         }
       }
     }
+
     console.log(`Merged quiz and assessment data from ${QUIZ_FILE}`);
   }
 
