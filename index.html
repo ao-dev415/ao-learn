@@ -875,9 +875,9 @@ if (MAIN) MAIN.innerHTML = '';
       assessCard.appendChild(h('div',{class:'muted'},'No assessments yet.'));
     }else{
       const at = h('table',{class:'data-table',style:'margin-top:6px'});
-      if (at) at.innerHTML = `<thead><tr>`;
-        <th>Assessment ID</th><th>Total</th><th>Average</th><th>Chapter</th><th>When</th>
-      </tr></thead><tbody></tbody>`;
+      at.innerHTML = `<thead><tr>
+  <th>Assessment ID</th><th>Total</th><th>Average</th><th>Chapter</th><th>When</th>
+</tr></thead><tbody></tbody>`;
       const atb = at.querySelector('tbody');
       Object.entries(assessResults).forEach(([id,res])=>{
         const when = new Date(res.ts||Date.now()).toLocaleString();
