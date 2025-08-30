@@ -725,35 +725,42 @@ if (n) {
       )
     );
   }
-function renderAbout(){
+  async function renderAbout(){
     stopTiming();
-    if (MAIN) MAIN.innerHTML = ''; // Clear the main content area
-    if (RAIL) RAIL.innerHTML = ''; // Clear the right sidebar as well
+    if (MAIN) MAIN.innerHTML = '';
+    if (RAIL) RAIL.innerHTML = '';
 
-    const a = site?.about;
-    if (!a) {
+    let a = null;
+    try {
+      // Fetch the dedicated about.json file directly
+      const response = await fetch('data/about.json');
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      a = await response.json();
+    } catch (e) {
+      console.error("Failed to load about.json", e);
       MAIN.append(h('h1', {}, 'About'));
-      MAIN.append(h('div', { class: 'muted' }, 'No about information in site.json.'));
+      MAIN.append(h('div', { class: 'muted' }, 'Could not load about information.'));
       return;
     }
-
-    // Build the main content panel
-    const profileCard = h('div', { class: 'profile-card card' },
-      h('img', { 
-        class: 'profile-card-image',
-        src: a.imageSrc || '', 
-        alt: a.name || 'Profile picture'
-      }),
-      h('div', {},
-        h('p', { class: 'muted', style: 'margin-top:0' }, 
-          (a.socials || []).map(s => s.text).join(' • ')
-        ),
-        h('div', { class: 'profile-card-links' },
-          ...(a.socials || []).map(s => 
+    
+    // The rest of the rendering logic remains the same, using the fetched data 'a'
+    const socialLinksContainer = h('div', { class: 'social-links' });
+    (a.socials || []).forEach(s => {
+        socialLinksContainer.appendChild(
             h('a', { class: 'btn', href: s.url, target: '_blank', rel: 'noopener' }, s.text)
-          ),
-          a.cta ? h('a', { class: 'btn btn-brand', href: a.cta.url, target: '_blank', rel: 'noopener' }, a.cta.text) : null
-        )
+        );
+    });
+    if (a.cta) {
+        socialLinksContainer.appendChild(
+            h('a', { class: 'btn btn-brand', href: a.cta.url, target: '_blank', rel: 'noopener' }, a.cta.text)
+        );
+    }
+
+    const profileCard = h('div', { class: 'card profile-card' },
+      h('img', { src: a.imageSrc || '', alt: a.name || 'Profile picture' }),
+      h('div', {},
+        h('p', { class: 'muted' }, (a.socials || []).map(s => s.text).join(' • ')),
+        socialLinksContainer
       )
     );
 
@@ -763,29 +770,23 @@ function renderAbout(){
       profileCard
     );
 
-    if (a.office) {
+    if (a.office && a.office.mapUrl) {
       MAIN.append(
         h('h2', {}, 'Office'),
-        h('div', { class: 'card', style: 'padding:12px;margin:12px 0' },
-          h('h3', { style: 'margin:.25rem 0' }, a.office.location),
+        h('div', { class: 'card office-map' },
+          h('h3', {}, a.office.location),
           h('iframe', {
             title: `${a.office.location} map`,
-            width: '100%',
-            height: '220',
-            style: 'border:0; border-radius:10px;',
-            loading: 'lazy',
-            allowfullscreen: true,
-            referrerpolicy: 'no-referrer-when-downgrade',
-            src: a.office.mapUrl || ''
+            width: '100%', height: '220', loading: 'lazy', allowfullscreen: true,
+            referrerpolicy: 'no-referrer-when-downgrade', src: a.office.mapUrl || ''
           })
         )
       );
     }
 
-    // Build the right sidebar (rail)
     const aboutCard = h('div', {class:'cardlet'},
       h('h4', {}, 'About'),
-      h('p', {class:'muted'}, a.bio || '')
+      h('div', {class: 'alert'}, a.bio || '')
     );
     RAIL.appendChild(aboutCard);
   }
@@ -1257,5 +1258,3 @@ document.addEventListener('DOMContentLoaded', ()=>{
 </script>
 </body>
 </html>
-}
-[Content of all requested items is omitted here because it may be found above or below.]
