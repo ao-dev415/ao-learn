@@ -820,9 +820,9 @@ if (MAIN) MAIN.innerHTML = '';
     );
 
     const table=h('table',{class:'data-table', style:'margin-top:8px'});
-    if (table) table.innerHTML = `<thead>`;
-      <tr><th>Chapter / LO</th><th style-align="right">Time (s)</th><th style-align="right">Status</th></tr>
-    </thead><tbody></tbody>`;
+    table.innerHTML=`<thead>
+  <tr><th>Chapter / LO</th><th style-align="right">Time (s)</th><th style-align="right">Status</th></tr>
+</thead><tbody></tbody>`;
     const tb=table.querySelector('tbody');
 
     (chapters||[]).forEach((ch,ci)=>{
