@@ -852,9 +852,9 @@ if (MAIN) MAIN.innerHTML = '';
       quizCard.appendChild(h('div',{class:'muted'},'No quiz attempts yet.'));
     }else{
       const qt = h('table',{class:'data-table',style:'margin-top:6px'});
-      if (qt) qt.innerHTML = `<thead><tr>`;
-        <th>Quiz ID</th><th>Score</th><th>When</th><th>LO Key</th>
-      </tr></thead><tbody></tbody>`;
+      qt.innerHTML = `<thead><tr>
+  <th>Quiz ID</th><th>Score</th><th>When</th><th>LO Key</th>
+</tr></thead><tbody></tbody>`;
       const qtb = qt.querySelector('tbody');
       Object.entries(quizResults).forEach(([id,res])=>{
         const when = new Date(res.ts||Date.now()).toLocaleString();
