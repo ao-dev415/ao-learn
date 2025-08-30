@@ -642,10 +642,12 @@ if (n) {
     }
 
     // Progress
-    const {done,total,pct}=totals();
-    if (progHost) progHost.innerHTML = '<h4>Your progress</h4>';
-    progHost.appendChild(h('div',{class:'muted'}, `${done} of ${total} (${pct}%)`));
-    progHost.appendChild(h('div',{class:'progress',style:'margin-top:6px'}, h('i',{style:`width:${pct}%;`})));
+        if (progHost) {
+      const {done,total,pct} = totals();
+      progHost.innerHTML = '<h4>Your progress</h4>';
+      progHost.appendChild(h('div',{class:'muted'}, `${done} of ${total} (${pct}%)`));
+      progHost.appendChild(h('div',{class:'progress',style:'margin-top:6px'}, h('i',{style:`width:${pct}%;`})));
+    }
   }
 
   // ---------- Pages ----------
@@ -966,7 +968,7 @@ if (MAIN) MAIN.innerHTML = '';
     const qTokens = tokenize(q);
     if(!qTokens.length){ SEARCH_DD.classList.remove('show'); return; }
     const results = docs.map(d=>{
-      const pv = (chapters[d.ci].los[d.li].snippets?.[0]?.body) || (chapters[d.ci].los[r.li].preview) || '';
+      const pv = (chapters[d.ci].los[d.li].snippets?.[0]?.body) || (chapters[d.ci].los[d.li].preview) || '';
       return { ...d, score: scoreDoc(qTokens, d), preview: pv };
     }).filter(r=>r.score>0).sort((a,b)=>b.score-a.score);
 
