@@ -1,13 +1,88 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Advice-Only® Learning Management System (Preview)</title>
-<meta name="robots" content="noindex,nofollow"/>
+  <!-- Charset & viewport -->
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
 
-<meta name="ao-root" content="/"/>
-<link rel="stylesheet" href="static/css/ao-ui.css"/>
+  <!-- Page meta -->
+  <title>Advice-Only® Learning Management System (Preview)</title>
+  <meta name="robots" content="noindex,nofollow"/>
+  <meta name="ao-root" content="/"/>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="static/css/ao-ui.css"/>
+
+  <!-- (Optional perf) Preconnects for analytics -->
+  <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+  <link rel="preconnect" href="https://www.google-analytics.com" crossorigin>
+  <link rel="preconnect" href="https://www.clarity.ms" crossorigin>
+
+  <!-- Analytics loader: GA4 + Microsoft Clarity
+       – Default ON unless GPC or prior opt-out
+       – Public IDs are OK to embed client-side -->
+  <script>
+  (function() {
+    // ===== CONFIG =====
+    const GA_ID = 'G-L33G4DBGTB';     // <-- TODO: replace with your GA4 Measurement ID
+    const CLARITY_ID = 't38u1ekrco';  // <-- Microsoft Clarity Project ID
+    const LS_KEY = 'analytics_consent';
+
+    // Honor Global Privacy Control (GPC)
+    const GPC = (typeof navigator !== 'undefined' && navigator.globalPrivacyControl === true);
+
+    // Prior choice? else default ON (unless GPC)
+    const prior = (typeof localStorage !== 'undefined') ? localStorage.getItem(LS_KEY) : null;
+    const consentOn = prior ? (prior === 'on') : !GPC;
+
+    function loadGA() {
+      if (!GA_ID) return;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(GA_ID);
+      document.head.appendChild(s);
+
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ dataLayer.push(arguments); }
+      window.gtag = gtag;
+
+      gtag('js', new Date());
+      gtag('config', GA_ID, {
+        anonymize_ip: true
+        // If you later want cross-subdomain for *.adviceonly.org:
+        // , cookie_domain: 'adviceonly.org'
+      });
+    }
+
+    function loadClarity() {
+      if (!CLARITY_ID) return;
+      (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){ (c[a].q=c[a].q||[]).push(arguments); };
+        t=l.createElement(r); t.async=1; t.src='https://www.clarity.ms/tag/' + i;
+        y=l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t,y);
+      })(window, document, 'clarity', 'script', CLARITY_ID);
+    }
+
+    function enable() {
+      try { localStorage.setItem(LS_KEY, 'on'); } catch(e) {}
+      loadGA(); loadClarity();
+    }
+    function disable() {
+      try { localStorage.setItem(LS_KEY, 'off'); } catch(e) {}
+      // If scripts were previously loaded, a reload fully stops future hits.
+    }
+
+    if (consentOn) { enable(); } else { disable(); }
+
+    // Expose simple controls for your UI/buttons
+    window.AOAnalytics = {
+      enable, disable,
+      isOn: () => (typeof localStorage !== 'undefined' && localStorage.getItem(LS_KEY) === 'on')
+    };
+  })();
+  </script>
+</head>
+
 
 </head>
 <body>
@@ -1254,6 +1329,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
   if (get(LS.banner) !== '1') buildPopup();
   // Apply consent (might load analytics if user previously opted in)
   applyAnalyticsFromConsent();
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const allow = document.getElementById('allow-analytics');
+  if (allow) allow.addEventListener('click', () => AOAnalytics.enable());
 });
 </script>
 </body>
