@@ -36,7 +36,8 @@
     const consentOn = prior ? (prior === 'on') : !GPC;
 
     function loadGA() {
-      if (!GA_ID) return;
+      if (!GA_ID || window.__gaLoaded) return;          // NEW
+    window.__gaLoaded = true;                          // NEW
       var s = document.createElement('script');
       s.async = true;
       s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(GA_ID);
@@ -55,7 +56,8 @@
     }
 
     function loadClarity() {
-      if (!CLARITY_ID) return;
+      if (!CLARITY_ID || window.__clarityLoaded) return; // NEW
+    window.__clarityLoaded = true;
       (function(c,l,a,r,i,t,y){
         c[a]=c[a]||function(){ (c[a].q=c[a].q||[]).push(arguments); };
         t=l.createElement(r); t.async=1; t.src='https://www.clarity.ms/tag/' + i;
@@ -81,9 +83,6 @@
     };
   })();
   </script>
-</head>
-
-
 </head>
 <body>
 
@@ -1169,7 +1168,7 @@ if (MAIN) MAIN.innerHTML = '';
 /* ===== AO Privacy Popup & Consent (standalone) =====
    Configure these IDs (or leave empty to keep disabled):
 */
-window.GA_MEASUREMENT_ID   = "G-C2E79R93CQ";   // e.g. "G-ABC123XYZ"
+window.GA_MEASUREMENT_ID   = "G-L33G4DBGTB";   // e.g. "G-ABC123XYZ"
 window.CLARITY_PROJECT_ID  = "t38u1ekrco";   // e.g. "abc123xyz"
 
 /* ---- LocalStorage keys (namespaced) ---- */
@@ -1260,13 +1259,13 @@ function buildPopup(){
         <div class="ao-card">
           <label>
             <input id="ao-consent-ga" type="checkbox" ${gaPref ? 'checked':''} ${gpc ? 'disabled':''}>
-            <div><strong>Google Analytics</strong><br><span class="muted">Helps us understand traffic. Off by default.</span></div>
+            <div><strong>Google Analytics</strong><br><span class="muted">Helps us understand traffic. On by default in the U.S.</span></div>
           </label>
         </div>
         <div class="ao-card">
           <label>
             <input id="ao-consent-clarity" type="checkbox" ${clPref ? 'checked':''} ${gpc ? 'disabled':''}>
-            <div><strong>Microsoft Clarity</strong><br><span class="muted">UX telemetry. Off by default.</span></div>
+            <div><strong>Microsoft Clarity</strong><br><span class="muted">UX telemetry. On by default in the U.S.</span></div>
           </label>
         </div>
       </div>
@@ -1326,7 +1325,13 @@ window.AOPrivacy = {
 document.addEventListener('DOMContentLoaded', ()=>{
   ensureStyles();
   // If user has never seen/saved choices, show popup:
-  if (get(LS.banner) !== '1') buildPopup();
+  if (get(LS.banner) !== '1') {
+    if (!hasGPC()) {                    // NEW: default ON in US
+      set(LS.ga, '1');                  // NEW
+      set(LS.cl, '1');                  // NEW
+    }
+    buildPopup();
+  }
   // Apply consent (might load analytics if user previously opted in)
   applyAnalyticsFromConsent();
 });
