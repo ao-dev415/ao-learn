@@ -13,7 +13,7 @@
   },
   "office": {
     "location": "Corte Madera, CA",
-    "mapUrl": "https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=Corte+Madera,CA"
+    "mapUrl": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3148.203892794412!2d-122.5209015236894!3d37.9251817042885!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80859a5a3811f67b%3A0x4ba2d5440a4980a3!2sAdvice%20Only!5e0!3m2!1sen!2sus!4v1724449830848!5m2!1sen!2sus"
   },
   "bio": "Advice-only planning. No commissions. This is the longer descriptive text that appears in the right sidebar rail when viewing the About page."
 }
