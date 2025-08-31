@@ -12,7 +12,35 @@
     "ctaUrl": "#",
     "ctaLabel": "Work with me"
   },
-  "events": [],
+  "events": [
+  {
+    "title": "Walkthrough of the platform",
+    "date": "2025-11-03",
+    "time": "16:00",
+    "tz": "America/Los_Angeles",
+    "mode": "Online",
+    "ctaUrl": "https://eventbright.com",
+    "ctaLabel": "Register"
+  },
+  {
+    "title": "Advisor CE: Advice Only methodology in practice",
+    "date": "2025-10-01",
+    "time": "16:00",
+    "tz": "America/Los_Angeles",
+    "mode": "Online",
+    "ctaUrl": "https://eventbright.com",
+    "ctaLabel": "Register"
+  },
+  {
+    "title": "Advisor CE: Advice Only methodology in practice",
+    "date": "2025-10-01",
+    "time": "16:00",
+    "tz": "America/Los_Angeles",
+    "mode": "In Person • San Mateo, CA",
+    "ctaUrl": "https://eventbright.com",
+    "ctaLabel": "Register"
+  }
+],
   "chapters": [
     {
       "title": "Chapter 1",
