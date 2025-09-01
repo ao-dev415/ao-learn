@@ -126,7 +126,7 @@ async function main() {
 
   const existing = loadExisting();
   const out = {
-    title: existing.title || "Advice-Only® Bookstore",
+    title: existing.title || "Advice-Only® Learning Management System",
     about: existing.about || {
       name: "Your Name",
       location: "City, ST",

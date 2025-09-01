@@ -139,7 +139,7 @@ const existing = loadExisting();
   }
 
   const out = {
-    title: existing.title || "Advice-Only® Bookstore",
+    title: existing.title || "Advice-Only® Learning Management System",
     about: aboutData,
     events: existing.events || [],
     chapters
