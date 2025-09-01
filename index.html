@@ -596,13 +596,4 @@ window.addEventListener('error', (ev) => {
 </script>
 <script>
 /* ===== AO Privacy Popup & Consent (standalone) ===== */
-window.AOPrivacy={open(){ensureStyles();buildPopup();}};document.addEventListener('DOMContentLoaded',()=>{ensureStyles();const LS={banner:'ao.v2.privacyBanner',ga:'ao.v2.analytics.ga',cl:'ao.v2.analytics.clarity'};const hasGPC=()=>(typeof navigator.globalPrivacyControl!=='undefined'&&navigator.globalPrivacyControl===true);const get=(k,def=null)=>{try{const v=localStorage.getItem(k);return v===null?def:v;}catch{return def;}};const set=(k,v)=>{try{localStorage.setItem(k,v);}catch{}};if(get(LS.banner)!=='1'){if(!hasGPC()){set(LS.ga,'1');set(LS.cl,'1');}buildPopup();}applyAnalyticsFromConsent();});
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const allow = document.getElementById('allow-analytics');
-  if (allow) allow.addEventListener('click', () => AOAnalytics.enable());
-});
-</script>
-</body>
-</html>
+window.AOPrivacy={open(){ensureStyles();buildPopup();}};document.addEventListener('DOMContentLoaded',()=>{ensureStyles();const LS={banner:'ao.v2.privacyBanner',ga:'ao.v2.analytics.ga',cl:'ao.v2.analytics.clarity'};const hasGPC=()=>(typeof navigator.globalPrivacyControl!=='undefined'&&navigator.globalPrivacyControl===true);const get=(k,def=null)=>{try{const v=localStorage.getItem(k);return v===null?def:v;}catch{return def;}};const set=(k,v)=>{try{localStorage.setItem(k,v);}catch{}};if(get(LS.banner)!=='1'){if(!hasGPC()){set(LS.ga,'1');set(LS.cl,'I'm sorrry, I do not have access to the file you are referring to.
