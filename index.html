@@ -579,8 +579,24 @@ window.addEventListener('error', (ev) => {
   function buildDocs(){docs=[];(chapters||[]).forEach((ch,ci)=>{(ch.los||[]).forEach((lo,li)=>{const fields=[];if(lo.title)fields.push({text:lo.title,w:3});if(lo.preview)fields.push({text:lo.preview,w:2});(lo.snippets||[]).forEach(s=>{if(s.title)fields.push({text:s.title,w:2});if(s.body)fields.push({text:s.body,w:1});});docs.push({ci,li,chTitle:ch.title||`Chapter ${ci+1}`,loTitle:lo.title||`LO ${li+1}`,fields});});});}
   function scoreDoc(qTokens,doc){let score=0;for(const f of doc.fields){const fTokens=tokenize(f.text);for(const qt of qTokens){const hits=fTokens.filter(t=>t===qt).length;if(hits)score+=hits*f.w;}}const lt=(doc.loTitle||'').toLowerCase();if(qTokens.some(q=>lt.includes(q)))score+=2;return score;}
   function hilite(text,qTokens){if(!text)return'';let out=text;qTokens.forEach(q=>{const esc=q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');out=out.replace(new RegExp(`(${esc})`,'ig'),'<mark>$1</mark>');});return out;}
-  function showSearchDD(results,qTokens){if(SEARCH_DD)SEARCH_DD.innerHTML='';if(!results.length){SEARCH_DD.classList.remove('show');return;}results.slice(0,8).forEach(r=>{const pv=(chapters[d.ci].los[d.li].snippets?.[0]?.body)||(chapters[d.ci].los[d.li].preview)||'';SEARCH_DD.appendChild(h('div',{class:'res',onclick:()=>{location.hash=`#ch${r.ci+1}-lo${r.li+1}`;SEARCH_DD.classList.remove('show');SEARCH_BOX.blur();}},h('div',{html:hilite(`${r.chTitle} — ${r.loTitle}`,qTokens)}),h('small',{html:hilite(pv,qTokens)})));});SEARCH_DD.classList.add('show');}
+  
+  function showSearchDD(results, qTokens){
+    if (SEARCH_DD) SEARCH_DD.innerHTML ='';
+    if(!results.length){ SEARCH_DD.classList.remove('show'); return; }
+    results.slice(0,8).forEach(r=>{
+      const pv = (chapters[r.ci].los[r.li].snippets?.[0]?.body) || (chapters[r.ci].los[r.li].preview) || '';
+      SEARCH_DD.appendChild(
+        h('div',{class:'res', onclick:()=>{ location.hash = `#ch${r.ci+1}-lo${r.li+1}`; SEARCH_DD.classList.remove('show'); SEARCH_BOX.blur(); }},
+          h('div',{html: hilite(`${r.chTitle} — ${r.loTitle}`, qTokens)}),
+          h('small',{html: hilite(pv, qTokens)})
+        )
+      );
+    });
+    SEARCH_DD.classList.add('show');
+  }
+
   function runSearch(q,mode){const qTokens=tokenize(q);if(!qTokens.length){SEARCH_DD.classList.remove('show');return;}const results=docs.map(d=>{const pv=(chapters[d.ci].los[d.li].snippets?.[0]?.body)||(chapters[d.ci].los[d.li].preview)||'';return{...d,score:scoreDoc(qTokens,d),preview:pv};}).filter(r=>r.score>0).sort((a,b)=>b.score-a.score);if(mode==='dd'){showSearchDD(results,qTokens);return;}stopTiming();SEARCH_DD.classList.remove('show');if(MAIN)MAIN.innerHTML='';MAIN.append(h('h1',{},'Search'),h('p',{class:'lead'},`Results for “${q}”`));if(!results.length){MAIN.append(h('div',{class:'muted'},'No matches.'));return;}results.slice(0,30).forEach(r=>{MAIN.append(h('div',{class:'cardlet'},h('div',{style:'font-weight:600',html:hilite(`${r.chTitle} — ${r.loTitle}`,qTokens)}),h('p',{class:'muted',html:hilite(r.preview||'',qTokens)}),h('div',{},h('a',{href:`#ch${r.ci+1}-lo${r.li+1}`,class:'btn'},'Open'))));});}
+  
   SEARCH_BOX.addEventListener('input',e=>{const q=e.target.value.trim();if(!q){SEARCH_DD.classList.remove('show');return;}runSearch(q,'dd');});
   SEARCH_BOX.addEventListener('keydown',e=>{if(e.key==='Enter'){const q=SEARCH_BOX.value.trim();if(q){location.hash='#search:'+encodeURIComponent(q);}}else if(e.key==='Escape'){SEARCH_DD.classList.remove('show');}});
   document.addEventListener('click',(e)=>{if(!document.getElementById('search').contains(e.target)){SEARCH_DD.classList.remove('show');}});
@@ -596,4 +612,13 @@ window.addEventListener('error', (ev) => {
 </script>
 <script>
 /* ===== AO Privacy Popup & Consent (standalone) ===== */
-window.AOPrivacy={open(){ensureStyles();buildPopup();}};document.addEventListener('DOMContentLoaded',()=>{ensureStyles();const LS={banner:'ao.v2.privacyBanner',ga:'ao.v2.analytics.ga',cl:'ao.v2.analytics.clarity'};const hasGPC=()=>(typeof navigator.globalPrivacyControl!=='undefined'&&navigator.globalPrivacyControl===true);const get=(k,def=null)=>{try{const v=localStorage.getItem(k);return v===null?def:v;}catch{return def;}};const set=(k,v)=>{try{localStorage.setItem(k,v);}catch{}};if(get(LS.banner)!=='1'){if(!hasGPC()){set(LS.ga,'1');set(LS.cl,'I'm sorrry, I do not have access to the file you are referring to.
+window.AOPrivacy={open(){ensureStyles();buildPopup();}};document.addEventListener('DOMContentLoaded',()=>{ensureStyles();const LS={banner:'ao.v2.privacyBanner',ga:'ao.v2.analytics.ga',cl:'ao.v2.analytics.clarity'};const hasGPC=()=>(typeof navigator.globalPrivacyControl!=='undefined'&&navigator.globalPrivacyControl===true);const get=(k,def=null)=>{try{const v=localStorage.getItem(k);return v===null?def:v;}catch{return def;}};const set=(k,v)=>{try{localStorage.setItem(k,v);}catch{}};if(get(LS.banner)!=='1'){if(!hasGPC()){set(LS.ga,'1');set(LS.cl,'1');}buildPopup();}applyAnalyticsFromConsent();});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const allow = document.getElementById('allow-analytics');
+  if (allow) allow.addEventListener('click', () => AOAnalytics.enable());
+});
+</script>
+</body>
+</html>
