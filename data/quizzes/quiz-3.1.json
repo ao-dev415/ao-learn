@@ -3,27 +3,31 @@
   "chapter": "Chapter 3",
   "lo": "Learning Objective 3.1",
   "data": {
-    "id": "unique_quiz_id_3_1",
-    "title": "Quiz for Learning Objective 3.1",
-    "questions": [
+    "title": "Savings Basics Quiz",
+    "elements": [
       {
-        "text": "This is the first question text.",
-        "options": [
-          "This is option A.",
-          "This is the correct option B.",
-          "This is option C."
+        "name": "emergency-fund-account",
+        "type": "radiogroup",
+        "title": "Which account is generally best for an emergency fund?",
+        "choices": [
+          "Checking account",
+          "High-yield savings account",
+          "Brokerage margin account"
         ],
-        "correctIndex": 1
+        "correctAnswer": "High-yield savings account"
       },
       {
-        "text": "This is the second question text.",
-        "options": [
-          "This is the correct option A.",
-          "This is option B.",
-          "This is option C."
+        "name": "emergency-fund-target",
+        "type": "radiogroup",
+        "title": "Roughly how many months of expenses is a common emergency-fund target?",
+        "choices": [
+          "1–2 months",
+          "3–6 months",
+          "12–18 months"
         ],
-        "correctIndex": 0
+        "correctAnswer": "3–6 months"
       }
-    ]
+    ],
+    "showQuestionNumbers": "off"
   }
 }
