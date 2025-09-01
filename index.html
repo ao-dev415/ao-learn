@@ -13,9 +13,9 @@
   <link rel="preconnect" href="https://www.google-analytics.com" crossorigin>
   <link rel="preconnect" href="https://www.clarity.ms" crossorigin>
 
-  <script src="https://unpkg.com/survey-core@1.9.162/survey.core.min.js"></script>
-  <script src="https://unpkg.com/survey-knockout-ui@1.9.162/survey-knockout-ui.min.js"></script>
-  <link href="https://unpkg.com/survey-core@1.9.162/defaultV2.min.css" type="text/css" rel="stylesheet"/>
+  <link href="static/js/vendor/survey-core.min.css" rel="stylesheet"/>
+  <script src="static/js/vendor/survey.core.min.js"></script>
+  <script src="static/js/vendor/survey-js-ui.min.js"></script>
 
   <script>
   (function() {
@@ -593,7 +593,6 @@ window.addEventListener('error', (ev) => {
     const qTokens=tokenize(q);
     if(!qTokens.length){SEARCH_DD.classList.remove('show');return;}
     const results=docs.map(d => {
-      // THIS IS THE CORRECTED PART FOR THE SEARCH TYPO
       const pv=(chapters[d.ci].los[d.li].snippets?.[0]?.body)||(chapters[d.ci].los[d.li].preview)||'';
       return {...d,score:scoreDoc(qTokens,d),preview:pv};
     }).filter(r=>r.score>0).sort((a,b)=>b.score-a.score);
