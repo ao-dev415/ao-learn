@@ -21,10 +21,6 @@
   (function() {
     const GA_ID = 'G-C2E79R93CQ';
     const CLARITY_ID = 't38u1ekrco';
-    const LS_KEY = 'analytics_consent';
-    const GPC = (typeof navigator !== 'undefined' && navigator.globalPrivacyControl === true);
-    const prior = (typeof localStorage !== 'undefined') ? localStorage.getItem(LS_KEY) : null;
-    const consentOn = prior ? (prior === 'on') : !GPC;
 
     function loadGA() {
       if (!GA_ID || window.__gaLoaded) return;
@@ -53,19 +49,10 @@
     window.loadGA = loadGA;
     window.loadClarity = loadClarity;
 
-    function enable() {
-      try { localStorage.setItem(LS_KEY, 'on'); } catch(e) {}
-      loadGA(); loadClarity();
-    }
-    function disable() {
-      try { localStorage.setItem(LS_KEY, 'off'); } catch(e) {}
-    }
-
-    if (consentOn) { enable(); } else { disable(); }
-
     window.AOAnalytics = {
-      enable, disable,
-      isOn: () => (typeof localStorage !== 'undefined' && localStorage.getItem(LS_KEY) === 'on')
+      enable(){ localStorage.setItem('ao.v2.analytics.ga','1'); localStorage.setItem('ao.v2.analytics.clarity','1'); window.loadGA?.(); window.loadClarity?.(); },
+      disable(){ localStorage.setItem('ao.v2.analytics.ga','0'); localStorage.setItem('ao.v2.analytics.clarity','0'); },
+      isOn(){ return localStorage.getItem('ao.v2.analytics.ga')==='1' || localStorage.getItem('ao.v2.analytics.clarity')==='1'; }
     };
   })();
   </script>
@@ -86,7 +73,7 @@
         <a href="#about" data-route="about">About</a>
       </nav>
       <div class="search" id="search">
-        <input id="q" placeholder="Search or ask (Enter to view all)…" autocomplete="off"/>
+        <input id="q" aria-label="Search or ask" placeholder="Search or ask (Enter to view all)…" autocomplete="off"/>
         <div class="dd" id="dd"></div>
       </div>
       <button id="theme-toggle" aria-label="Toggle theme">
@@ -199,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ---------- Helpers ----------
     const h=(t,a={},...c)=>{const e=document.createElement(t);for(const[k,v]of Object.entries(a)){if(k==='class')e.className=v;else if(k==='html'&&e)e.innerHTML=v;else if(k.startsWith('on')&&typeof v==='function')e.addEventListener(k.slice(2),v);else e.setAttribute(k,v);}c.forEach(x=>{if(x!=null)e.appendChild(typeof x==='string'?document.createTextNode(x):x)});return e;};
     const num = s => s ? parseInt(s,10) : NaN;
-    const tokenize = s => (s||'').toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(Boolean);
+    const tokenize = s => (s||'').toLowerCase().replace(/[^\p{L}\p{N}\s]/gu,' ').split(/\s+/).filter(Boolean);
     const fmtDate=(iso,tz,time)=>{try{const dt=new Date(`${iso}T${time||'00:00'}:00`);const opt={dateStyle:'medium',timeStyle:time?'short':undefined};if(tz)opt.timeZone=tz;const s=new Intl.DateTimeFormat(undefined,opt).format(dt);return s+(tz?` (${(tz.split('/')[1]||tz)})`:'');}catch{return iso+(time?` ${time}`:'');}};
     const loadJSON=(k,def)=>{try{const v=JSON.parse(localStorage.getItem(k)||'');return v??def;}catch{return def;}};
     const saveJSON=(k,v)=>localStorage.setItem(k, JSON.stringify(v));
@@ -480,7 +467,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if(MAIN)MAIN.innerHTML='';
       MAIN.append(
         h('h1',{},'Privacy Policy (US/California)'),
-        h('p',{class:'lead'},'Summary: We don’t collect personal information on our servers. Your reading progress and quiz results are saved on your device only.')
+        h('p',{class:'lead'}, 'Summary: We don’t collect personal information on our servers. Your reading progress and quiz results are saved on your device only.')
       );
       MAIN.append(
         h('div',{class:'cardlet'},
@@ -490,8 +477,8 @@ document.addEventListener('DOMContentLoaded', function() {
           h('p',{},'• Forms you send us: If you email us or submit a contact form, we’ll use it to reply and support you.')
         ),
         h('div',{class:'cardlet'},
-          h('h4',{},'Optional analytics (off by default)'),
-          h('p',{},'We may offer Google Analytics and/or Microsoft Clarity to understand aggregate usage. These are disabled by default and only load if you turn them on. We also honor Global Privacy Control (GPC) signals by keeping optional analytics disabled when GPC is present.'),
+          h('h4',{},'Optional analytics'),
+          h('p',{},'To improve the user experience, we use basic, anonymous analytics from Google and Microsoft Clarity. These are enabled by default in most regions but can be disabled at any time using the button below. We honor Global Privacy Control (GPC) signals by keeping analytics disabled when GPC is present.'),
           h('div',{style:'margin-top:12px'},h('button',{class:'btn',onclick:()=>{window.AOPrivacy.open();}},'Change Privacy Choices'))
         ),
         h('div',{class:'cardlet'},
@@ -522,7 +509,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if(a.cta){socialLinksContainer.appendChild(h('a',{class:'btn btn-brand',href:a.cta.url,target:'_blank',rel:'noopener'},a.cta.text));}
       const profileCard=h('div',{class:'card profile-card'},h('img',{src:a.imageSrc||'',alt:a.name||'Profile picture'}),h('div',{},h('p',{class:'muted'},(a.socials||[]).map(s=>s.text).join(' • ')),socialLinksContainer));
       MAIN.append(h('h1',{},a.name||'Profile'),h('p',{class:'lead'},a.location||''),profileCard);
-      if(a.office&&a.office.mapUrl){MAIN.append(h('h2',{},'Office'),h('div',{class:'card office-map'},h('h3',{},a.office.location),h('iframe',{title:`${a.office.location} map`,width:'100%',height:'220',loading:'lazy',allowfullscreen:true,referrerpolicy:'no-referrer-when-downgrade',src:a.office.mapUrl||''})));}
+      if(a.office&&a.office.mapUrl){MAIN.append(h('h2',{},'Office'),h('div',{class:'card office-map'},h('h3',{},a.office.location),h('iframe',{title:`${a.office.location} map`,width:'100%',height:'220',loading:'lazy',allowfullscreen:'',referrerpolicy:'no-referrer-when-downgrade',src:a.office.mapUrl||''})));}
       const aboutCard=h('div',{class:'cardlet'},h('h4',{},'About'),h('div',{class:'alert'},a.bio||''));
       RAIL.appendChild(aboutCard);
     }
@@ -592,7 +579,7 @@ document.addEventListener('DOMContentLoaded', function() {
           const when = new Date(res.ts||Date.now()).toLocaleString();
           qtb.appendChild(h('tr',{},
             h('td',{}, id),
-            h('td',{}, `${res.score}/${res.total}`),
+            h('td',{}, `${res.score??'?'}/${res.total??'?'}`),
             h('td',{}, when),
             h('td',{}, res.key||'')
           ));
@@ -677,7 +664,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     SEARCH_BOX.addEventListener('keydown',e=>{if(e.key==='Enter'){const q=SEARCH_BOX.value.trim();if(q){location.hash='#search:'+encodeURIComponent(q);}}else if(e.key==='Escape'){SEARCH_DD.classList.remove('show');}});
-    document.addEventListener('click',(e)=>{if(!document.getElementById('search').contains(e.target)){SEARCH_DD.classList.remove('show');}});
+    document.addEventListener('click',(e)=>{ const box = document.getElementById('search'); if (!box || !box.contains(e.target)) SEARCH_DD.classList.remove('show'); });
     
     // ---------- Boot ----------
     async function loadSiteJSON(){const metaRoot=document.querySelector('meta[name="ao-root"]')?.content??'/';const base=WANT_FULL?'full/site.json':'site.json';const candidates=[];const add=(u)=>{if(!candidates.includes(u))candidates.push(u);};add((metaRoot||'')+base);add(base);add('/'+base);const errs=[];for(const u of candidates){try{const res=await fetch(u,{cache:'no-store',credentials:'same-origin'});if(res.ok){return JSON.parse(await res.text());}errs.push(`${u} -> HTTP ${res.status}`);}catch(e){errs.push(`${u} -> ${e.message||e}`);}}throw new Error(errs.join(' | '));}
