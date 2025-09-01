@@ -49,6 +49,9 @@
         y=l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t,y);
       })(window, document, 'clarity', 'script', CLARITY_ID);
     }
+    
+    window.loadGA = loadGA;
+    window.loadClarity = loadClarity;
 
     function enable() {
       try { localStorage.setItem(LS_KEY, 'on'); } catch(e) {}
@@ -156,6 +159,19 @@ document.addEventListener('DOMContentLoaded', function() {
     } catch {}
   });
 
+  window.addEventListener('unhandledrejection', (ev)=>{
+    try{
+      const n=document.getElementById('nav');
+      if(n){
+        n.innerHTML='';
+        const d=document.createElement('div');
+        d.className='muted';
+        d.textContent='Promise error: ' + (ev.reason?.message || String(ev.reason));
+        n.appendChild(d);
+      }
+    }catch{}
+  });
+
   (function(){
     // ---------- DOM ----------
     const NAV  = document.getElementById('nav');
@@ -187,6 +203,40 @@ document.addEventListener('DOMContentLoaded', function() {
     const fmtDate=(iso,tz,time)=>{try{const dt=new Date(`${iso}T${time||'00:00'}:00`);const opt={dateStyle:'medium',timeStyle:time?'short':undefined};if(tz)opt.timeZone=tz;const s=new Intl.DateTimeFormat(undefined,opt).format(dt);return s+(tz?` (${(tz.split('/')[1]||tz)})`:'');}catch{return iso+(time?` ${time}`:'');}};
     const loadJSON=(k,def)=>{try{const v=JSON.parse(localStorage.getItem(k)||'');return v??def;}catch{return def;}};
     const saveJSON=(k,v)=>localStorage.setItem(k, JSON.stringify(v));
+    
+    function csvEscape(v){ 
+      const s = String(v ?? "");
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
+    }
+    function buildCSV(){
+      const rows = [];
+      rows.push(["Chapter/LO","Seconds","Seen?"].map(csvEscape).join(","));
+      (chapters||[]).forEach((ch,ci)=>{
+        (ch.los||[]).forEach((lo,li)=>{
+          const key = `${ci+1}.${li+1}`;
+          const secs = timeMap[key] || 0;
+          const seenFlag = seen.has(key) ? "yes" : "no";
+          rows.push([`${key} ${lo.title||""}`, secs, seenFlag].map(csvEscape).join(","));
+        });
+      });
+      rows.push("", "Quiz Results", "Quiz ID,Score,Total,When,LO Key");
+      Object.entries(quizResults||{}).forEach(([id,res])=>{
+        rows.push([id, res.score??"", res.total??"", new Date(res.ts||Date.now()).toISOString(), res.key||""].map(csvEscape).join(","));
+      });
+      rows.push("", "Assessments", "Assessment ID,Score,When");
+      Object.entries(assessResults||{}).forEach(([id,res])=>{
+        rows.push([id, res.answers?.totalScore ?? "", new Date(res.ts||Date.now()).toISOString()].map(csvEscape).join(","));
+      });
+      return rows.join("\n");
+    }
+    function downloadFile(filename, content, mime){
+      const blob = new Blob([content], {type: mime || "application/octet-stream"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click();
+      setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 0);
+    }
     
     // ---------- State ----------
     const seen = new Set(loadJSON(LS_SEEN, []));
@@ -225,13 +275,19 @@ document.addEventListener('DOMContentLoaded', function() {
       if (!surveyJson) return;
       const surveyHost = h('div', { class: 'cardlet', style: 'margin-top:20px;' });
       MAIN.appendChild(surveyHost);
-      Survey.StylesManager.applyTheme('defaultV2');
+      
+      if (Survey?.Theme?.applyTheme) {
+        Survey.Theme.applyTheme(Survey.Theme.Default);
+      } else if (Survey?.StylesManager?.applyTheme) {
+        Survey.StylesManager.applyTheme('defaultV2');
+      }
+
       const survey = new Survey.Model(surveyJson);
       survey.onComplete.add(sender => {
         saveQuizResult(lo.quiz.id || `quiz_${key}`, {
           key,
-          score: sender.getCorrectAnswerCount(),
-          total: sender.getQuestionCount(),
+          score: sender.getCorrectAnswerCount?.() ?? null,
+          total: sender.getQuestionCount?.() ?? null,
           answers: sender.data,
           ts: Date.now()
         });
@@ -244,7 +300,13 @@ document.addEventListener('DOMContentLoaded', function() {
       if (!surveyJson) return;
       const surveyHost = document.getElementById('survey-container');
       if (!surveyHost) return;
-      Survey.StylesManager.applyTheme('defaultV2');
+
+      if (Survey?.Theme?.applyTheme) {
+        Survey.Theme.applyTheme(Survey.Theme.Default);
+      } else if (Survey?.StylesManager?.applyTheme) {
+        Survey.StylesManager.applyTheme('defaultV2');
+      }
+
       const survey = new Survey.Model(surveyJson);
       survey.onComplete.add(sender => {
         saveAssessResult(ch.assessment.id || `assess_ch${chIdx+1}`, {
@@ -495,7 +557,7 @@ document.addEventListener('DOMContentLoaded', function() {
         )
       );
       const table=h('table',{class:'data-table', style:'margin-top:8px'});
-      table.innerHTML=`<thead><tr><th>Chapter / LO</th><th style-align="right">Time (s)</th><th style-align="right">Status</th></tr></thead><tbody></tbody>`;
+      table.innerHTML=`<thead><tr><th>Chapter / LO</th><th style="text-align:right">Time (s)</th><th style="text-align:right">Status</th></tr></thead><tbody></tbody>`;
       const tb=table.querySelector('tbody');
       (chapters||[]).forEach((ch,ci)=>{
         const title = ch.title || `Chapter ${ci+1}`;
@@ -607,7 +669,13 @@ document.addEventListener('DOMContentLoaded', function() {
       results.slice(0,30).forEach(r=>{MAIN.append(h('div',{class:'cardlet'},h('div',{style:'font-weight:600',html:hilite(`${r.chTitle} — ${r.loTitle}`,qTokens)}),h('p',{class:'muted',html:hilite(r.preview||'',qTokens)}),h('div',{},h('a',{href:`#ch${r.ci+1}-lo${r.li+1}`,class:'btn'},'Open'))));});
     }
     
-    SEARCH_BOX.addEventListener('input',e=>{const q=e.target.value.trim();if(!q){SEARCH_DD.classList.remove('show');return;}runSearch(q,'dd');});
+    let searchDebounce;
+    SEARCH_BOX.addEventListener('input', e=>{
+      clearTimeout(searchDebounce);
+      const q=e.target.value.trim();
+      searchDebounce=setTimeout(()=>{ if(!q){SEARCH_DD.classList.remove('show');return;} runSearch(q,'dd'); }, 120);
+    });
+
     SEARCH_BOX.addEventListener('keydown',e=>{if(e.key==='Enter'){const q=SEARCH_BOX.value.trim();if(q){location.hash='#search:'+encodeURIComponent(q);}}else if(e.key==='Escape'){SEARCH_DD.classList.remove('show');}});
     document.addEventListener('click',(e)=>{if(!document.getElementById('search').contains(e.target)){SEARCH_DD.classList.remove('show');}});
     
