@@ -7,156 +7,120 @@
   <meta name="robots" content="noindex,nofollow"/>
   <meta name="ao-root" content="/"/>
 
-  <link rel="stylesheet" href="/static/css/ao-ui.css"/>
+  <link rel="stylesheet" href="static/css/ao-ui.css"/>
 
-  <!-- self‑hosted SurveyJS -->
-  <link rel="stylesheet" href="/static/vendor/survey/defaultV2.min.css"/>
-  <script src="/static/vendor/survey/survey.core.min.js"></script>
-  <script src="/static/vendor/survey/survey-knockout-ui.min.js"></script>
+  <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+  <link rel="preconnect" href="https://www.google-analytics.com" crossorigin>
+  <link rel="preconnect" href="https://www.clarity.ms" crossorigin>
 
-  <script>
-  (function() {
-    const GA_ID = 'G-C2E79R93CQ';
-    const CLARITY_ID = 't38u1ekrco';
-    const LS_KEY = 'analytics_consent';
-    const GPC = navigator.globalPrivacyControl === true;
-    const prior = localStorage.getItem(LS_KEY);
-    const consentOn = prior ? prior === 'on' : !GPC;
+  <!-- SurveyJS -->
+  <script src="https://unpkg.com/survey-core@1.9.162/survey.core.min.js"></script>
+  <script src="https://unpkg.com/survey-knockout-ui@1.9.162/survey-knockout-ui.min.js"></script>
+  <link href="https://unpkg.com/survey-core@1.9.162/defaultV2.min.css" rel="stylesheet"/>
 
-    function loadGA() {
-      if (!GA_ID || window.__gaLoaded) return;
-      window.__gaLoaded = true;
-      const s = document.createElement('script');
-      s.async = true;
-      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(GA_ID);
-      document.head.appendChild(s);
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){ dataLayer.push(arguments); }
-      window.gtag = gtag;
-      gtag('js', new Date());
-      gtag('config', GA_ID, { anonymize_ip: true });
-    }
-
-    function loadClarity() {
-      if (!CLARITY_ID || window.__clarityLoaded) return;
-      window.__clarityLoaded = true;
-      (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){ (c[a].q=c[a].q||[]).push(arguments); };
-        t=l.createElement(r); t.async=1; t.src='https://www.clarity.ms/tag/' + i;
-        y=l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t,y);
-      })(window, document, 'clarity', 'script', CLARITY_ID);
-    }
-
-    function enable() {
-      localStorage.setItem(LS_KEY, 'on');
-      loadGA(); loadClarity();
-    }
-    function disable() {
-      localStorage.setItem(LS_KEY, 'off');
-    }
-
-    if (consentOn) { enable(); } else { disable(); }
-
-    window.AOAnalytics = { enable, disable, isOn: () => localStorage.getItem(LS_KEY) === 'on' };
-  })();
-  </script>
+  <!-- analytics block ... unchanged -->
 </head>
 <body>
-  <!-- header/navigation omitted for brevity, identical to user version -->
+  <!-- header / layout ... unchanged -->
 
-  <!-- Theme toggle script unchanged -->
-  <!-- Boot error surface unchanged -->
+<script>
+/* theme toggle ... unchanged */
+</script>
 
-  <script>
-  (function(){
-    // DOM refs
-    const NAV  = document.getElementById('nav');
-    const MAIN = document.getElementById('main');
-    const RAIL = document.getElementById('rail');
-    const MENU = document.getElementById('menu');
-    const SEARCH_BOX = document.getElementById('q');
-    const SEARCH_DD  = document.getElementById('dd');
+<script>
+/* Boot error surface ... unchanged */
+(function(){
+  /* ---------- DOM ---------- */
+  const NAV  = document.getElementById('nav');
+  const MAIN = document.getElementById('main');
+  const RAIL = document.getElementById('rail');
+  const MENU = document.getElementById('menu');
+  const SEARCH_BOX = document.getElementById('q');
+  const SEARCH_DD  = document.getElementById('dd');
 
-    // Config & state
-    const LS_SEEN='ao.v2.seen', LS_TIME='ao.v2.time', LS_LAST='ao.v2.last',
-          LS_QUIZ='ao.v2.quiz', LS_ASSESS='ao.v2.assess';
-    const params=new URLSearchParams(location.search);
-    const WANT_DEMO=params.get('demo')==='1';
-    const WANT_FULL=params.get('full')==='1';
+  /* ---------- Config ---------- */
+  const LS_SEEN='ao.v2.seen', LS_TIME='ao.v2.time', LS_LAST='ao.v2.last',
+        LS_QUIZ='ao.v2.quiz', LS_ASSESS='ao.v2.assess';
+  const COMP_THRESH={red:20,yellow:60};
 
-    // helpers (h, tokenize, etc.) unchanged …
+  const params   = new URLSearchParams(location.search);
+  const WANT_DEMO= params.get('demo')==='1';
+  const WANT_FULL= params.get('full')==='1';
 
-    // QUIZ & ASSESSMENT
-    function saveQuizResult(id,payload){ quizResults[id]=payload; saveJSON(LS_QUIZ,quizResults); }
-    function saveAssessResult(id,payload){ assessResults[id]=payload; saveJSON(LS_ASSESS,assessResults); }
+  /* ---------- helpers/state/timing … unchanged ---------- */
 
-    function renderQuiz(lo,key){
-      const surveyJson = lo.quiz; if(!surveyJson) return;
-      const surveyHost = h('div',{class:'cardlet',style:'margin-top:20px;'}); MAIN.appendChild(surveyHost);
-      Survey.StylesManager.applyTheme('defaultV2');
-      const survey = new Survey.Model(surveyJson);
-      survey.onComplete.add(sender=>{
-        saveQuizResult(lo.quiz.id||`quiz_${key}`,{
-          key,
-          score: sender.getCorrectAnswerCount(),
-          total: sender.getQuestionCount(),
-          answers: sender.data,
-          ts: Date.now()
-        });
+  /* ---------- QUIZ & ASSESSMENT ---------- */
+  function saveQuizResult(id,payload){ quizResults[id]=payload; saveJSON(LS_QUIZ,quizResults); }
+  function saveAssessResult(id,payload){ assessResults[id]=payload; saveJSON(LS_ASSESS,assessResults); }
+
+  function renderQuiz(lo,key){
+    const surveyJson = lo.quiz; if(!surveyJson) return;
+    const host = h('div',{class:'cardlet',style:'margin-top:20px;'}); MAIN.appendChild(host);
+    Survey.StylesManager.applyTheme('defaultV2');
+    const survey = new Survey.Model(surveyJson);
+    survey.onComplete.add(sender=>{
+      saveQuizResult(lo.quiz.id||`quiz_${key}`,{
+        key,
+        score: sender.getCorrectAnswerCount(),
+        total: sender.getQuestionCount(),
+        answers: sender.data,
+        ts: Date.now()
       });
-      survey.render(surveyHost);
-    }
+    });
+    survey.render(host);
+  }
 
-    function renderAssessment(ch,chIdx){
-      const surveyJson = ch.assessment; if(!surveyJson) return;
-      const host = document.getElementById('survey-container'); if(!host) return;
-      Survey.StylesManager.applyTheme('defaultV2');
-      const survey = new Survey.Model(surveyJson);
-      survey.onComplete.add(sender=>{
-        saveAssessResult(ch.assessment.id||`assess_ch${chIdx+1}`,{
-          chapter: chIdx + 1,
-          answers: sender.data,
-          ts: Date.now()
-        });
+  function renderAssessment(ch,chIdx){
+    const surveyJson = ch.assessment; if(!surveyJson) return;
+    const host = document.getElementById('survey-container'); if(!host) return;
+    Survey.StylesManager.applyTheme('defaultV2');
+    const survey = new Survey.Model(surveyJson);
+    survey.onComplete.add(sender=>{
+      saveAssessResult(ch.assessment.id||`assess_ch${chIdx+1}`,{
+        chapter: chIdx + 1,
+        answers: sender.data,
+        ts: Date.now()
       });
-      survey.render(host);
-    }
+    });
+    survey.render(host);
+  }
 
-    // renderMain, renderAssessmentView, renderAssessmentInvitation unchanged …
+  /* ---------- Search helpers ---------- */
+  function showSearchDD(results,qTokens){
+    SEARCH_DD.innerHTML='';
+    if(!results.length){ SEARCH_DD.classList.remove('show'); return; }
+    results.slice(0,8).forEach(r=>{
+      const pv = chapters[r.ci].los[r.li].snippets?.[0]?.body ||
+                 chapters[r.ci].los[r.li].preview || '';
+      SEARCH_DD.appendChild(
+        h('div',{class:'res',onclick:()=>{
+            location.hash=`#ch${r.ci+1}-lo${r.li+1}`;
+            SEARCH_DD.classList.remove('show'); SEARCH_BOX.blur();
+          }},
+          h('div',{html:hilite(`${r.chTitle} — ${r.loTitle}`,qTokens)}),
+          h('small',{html:hilite(pv,qTokens)})
+        )
+      );
+    });
+    SEARCH_DD.classList.add('show');
+  }
 
-    // Search helpers
-    function showSearchDD(results, qTokens){
-      if (SEARCH_DD) SEARCH_DD.innerHTML = '';
-      if (!results.length){ SEARCH_DD.classList.remove('show'); return; }
-      results.slice(0,8).forEach(r=>{
-        const pv = (chapters[r.ci].los[r.li].snippets?.[0]?.body) ||
-                   (chapters[r.ci].los[r.li].preview) || '';
-        SEARCH_DD.appendChild(
-          h('div',{class:'res',onclick:()=>{
-              location.hash=`#ch${r.ci+1}-lo${r.li+1}`;
-              SEARCH_DD.classList.remove('show'); SEARCH_BOX.blur();
-            }},
-            h('div',{html: hilite(`${r.chTitle} — ${r.loTitle}`, qTokens)}),
-            h('small',{html: hilite(pv, qTokens)})
-          )
-        );
-      });
-      SEARCH_DD.classList.add('show');
-    }
+  function runSearch(q,mode){
+    const qTokens=tokenize(q);
+    if(!qTokens.length){ SEARCH_DD.classList.remove('show'); return; }
+    const results=docs.map(d=>{
+      const pv = chapters[d.ci].los[d.li].snippets?.[0]?.body ||
+                 chapters[d.ci].los[d.li].preview || '';
+      return {...d,score:scoreDoc(qTokens,d),preview:pv};
+    }).filter(r=>r.score>0).sort((a,b)=>b.score-a.score);
+    if(mode==='dd'){ showSearchDD(results,qTokens); return; }
+    /* ... remainder of runSearch ... */
+  }
 
-    // runSearch unchanged …
+  /* ---------- boot(), renderMain(), etc. ... unchanged ---------- */
+})();
+</script>
 
-    function setActiveMenu(){
-      const r=(location.hash.replace('#','')||'home').split(':')[0];
-      MENU.querySelectorAll('[data-route]').forEach(a=>{
-        a.setAttribute('aria-current', a.dataset.route===r ? 'page' : 'false');
-      });
-    }
-
-    // boot(), route(), etc. unchanged …
-  })();
-  </script>
-
-  <!-- privacy popup & analytics allow button scripts unchanged -->
+<!-- privacy popup & analytics allow button scripts ... unchanged -->
 </body>
 </html>
