@@ -2,7 +2,7 @@
 
 /* ---------- Design tokens ---------- */
 :root{
-  --brand: #00d0b6;
+  --brand: #00B2C0;
   --brand-600: #00b8a1;
   --brand-700: #009b87;
 
@@ -99,6 +99,31 @@ a:hover{text-decoration:underline}
 .dd .res{padding:10px;border-radius:8px;cursor:pointer}
 .dd .res:hover{background:var(--bg-elev-2)}
 .dd .res small{display:block;color:var(--fg-muted);margin-top:2px}
+
+/* ---------- Theme Toggle Icon ---------- */
+#theme-toggle{
+  background:transparent;
+  border:none;
+  cursor:pointer;
+  padding:0;
+  margin:0;
+}
+
+/* By default (dark mode), show the moon icon and hide the sun icon */
+#theme-toggle .icon-light {
+  display: none;
+}
+#theme-toggle .icon-dark {
+  display: block;
+}
+
+/* When in light mode, hide the moon icon and show the sun icon */
+.light #theme-toggle .icon-light {
+  display: block;
+}
+.light #theme-toggle .icon-dark {
+  display: none;
+}
 
 /* Wrap columns */
 .wrap{
