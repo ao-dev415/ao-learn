@@ -9,6 +9,11 @@
 
   <link rel="stylesheet" href="static/css/ao-ui.css"/>
 
+  <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+  <link rel="preconnect" href="https://www.google-analytics.com" crossorigin>
+  <link rel="preconnect" href="https://www.clarity.ms" crossorigin>
+
+  <!-- SurveyJS -->
   <script src="https://unpkg.com/survey-core@1.9.162/survey.core.min.js"></script>
   <script src="https://unpkg.com/survey-knockout-ui@1.9.162/survey-knockout-ui.min.js"></script>
   <link href="https://unpkg.com/survey-core@1.9.162/defaultV2.min.css" rel="stylesheet"/>
@@ -16,7 +21,7 @@
   <!-- analytics block unchanged -->
 </head>
 <body>
-  <!-- header, navigation, theme toggle … unchanged -->
+  <!-- header / layout unchanged -->
 
 <script>
 /* Surface any boot errors in the left nav */
@@ -32,8 +37,9 @@ window.addEventListener('error', (ev) => {
     }
   } catch {}
 });
+
 (function(){
-  /* ---------- DOM ---------- */
+  // ---------- DOM ----------
   const NAV  = document.getElementById('nav');
   const MAIN = document.getElementById('main');
   const RAIL = document.getElementById('rail');
@@ -41,7 +47,7 @@ window.addEventListener('error', (ev) => {
   const SEARCH_BOX = document.getElementById('q');
   const SEARCH_DD  = document.getElementById('dd');
 
-  /* ---------- Config ---------- */
+  // ---------- Config ----------
   const LS_SEEN  = 'ao.v2.seen';
   const LS_TIME  = 'ao.v2.time';
   const LS_LAST  = 'ao.v2.last';
@@ -49,13 +55,13 @@ window.addEventListener('error', (ev) => {
   const LS_ASSESS= 'ao.v2.assess';
   const COMP_THRESH = { red:20, yellow:60 };
 
-  const params   = new URLSearchParams(location.search);
+  const params    = new URLSearchParams(location.search);
   const WANT_DEMO = params.get('demo') === '1';
-  const WANT_FULL = params.get('full') === '1';   // ← fixed
+  const WANT_FULL = params.get('full') === '1';    // ← fixed
 
-  /* ---------- Helpers, state, timing … unchanged ---------- */
+  // ... helpers, state, timing (unchanged) ...
 
-  /* ---------- QUIZ & ASSESSMENT ---------- */
+  // ---------- QUIZ & ASSESSMENT ----------
   function saveQuizResult(id, payload){ quizResults[id] = payload; saveJSON(LS_QUIZ, quizResults); }
   function saveAssessResult(id, payload){ assessResults[id] = payload; saveJSON(LS_ASSESS, assessResults); }
 
@@ -64,7 +70,7 @@ window.addEventListener('error', (ev) => {
     const surveyHost = h('div', { class: 'cardlet', style: 'margin-top:20px;' });
     MAIN.appendChild(surveyHost);
 
-    Survey.StylesManager.applyTheme("defaultV2");
+    Survey.StylesManager.applyTheme('defaultV2');
     const survey = new Survey.Model(surveyJson);
     survey.onComplete.add(sender => {
       saveQuizResult(lo.quiz.id || `quiz_${key}`, {
@@ -82,7 +88,7 @@ window.addEventListener('error', (ev) => {
     const surveyJson = ch.assessment; if (!surveyJson) return;
     const surveyHost = document.getElementById('survey-container'); if (!surveyHost) return;
 
-    Survey.StylesManager.applyTheme("defaultV2");
+    Survey.StylesManager.applyTheme('defaultV2');
     const survey = new Survey.Model(surveyJson);
     survey.onComplete.add(sender => {
       saveAssessResult(ch.assessment.id || `assess_ch${chIdx+1}`, {
@@ -94,9 +100,9 @@ window.addEventListener('error', (ev) => {
     survey.render(surveyHost);
   }
 
-  /* ---------- Reader, My Data, etc. unchanged ---------- */
+  // ... renderMain, renderMyData, etc. unchanged ...
 
-  /* ---------- Search ---------- */
+  // ---------- Search ----------
   function showSearchDD(results, qTokens){
     if (SEARCH_DD) SEARCH_DD.innerHTML = '';
     if (!results.length){ SEARCH_DD.classList.remove('show'); return; }
@@ -106,8 +112,7 @@ window.addEventListener('error', (ev) => {
       SEARCH_DD.appendChild(
         h('div',{class:'res',onclick:()=>{
             location.hash=`#ch${r.ci+1}-lo${r.li+1}`;
-            SEARCH_DD.classList.remove('show');
-            SEARCH_BOX.blur();
+            SEARCH_DD.classList.remove('show'); SEARCH_BOX.blur();
           }},
           h('div',{html: hilite(`${r.chTitle} — ${r.loTitle}`, qTokens)}),
           h('small',{html: hilite(pv, qTokens)})
@@ -118,20 +123,18 @@ window.addEventListener('error', (ev) => {
   }
 
   function runSearch(q, mode){
-    const qTokens = tokenize(q);
+    const qTokens=tokenize(q);
     if(!qTokens.length){ SEARCH_DD.classList.remove('show'); return; }
-    const results = docs.map(d => {
-      const pv = (chapters[d.ci].los[d.li].snippets?.[0]?.body) ||
-                 (chapters[d.ci].los[d.li].preview) || '';
-      return {...d, score: scoreDoc(qTokens, d), preview: pv};
-    }).filter(r => r.score>0).sort((a,b)=>b.score-a.score);
-    if(mode==='dd'){ showSearchDD(results,qTokens); return; }
-    // … remainder of runSearch unchanged …
+    const results=docs.map(d=>{
+      const pv=(chapters[d.ci].los[d.li].snippets?.[0]?.body)||
+                (chapters[d.ci].los[d.li].preview)||'';
+      return {...d, score:scoreDoc(qTokens,d), preview:pv};
+    }).filter(r=>r.score>0).sort((a,b)=>b.score-a.score);
+    if(mode==='dd'){ showSearchDD(results, qTokens); return; }
+    // ... remainder unchanged ...
   }
 
-  /* ---------- Boot, route, etc. unchanged ---------- */
-  async function boot(){ /* ... existing logic ... */ }
-  boot();
+  // ... boot & routing (unchanged) ...
 })();
 </script>
 <!-- privacy popup + analytics allow button scripts unchanged -->
