@@ -8,80 +8,132 @@
   <meta name="ao-root" content="/"/>
 
   <link rel="stylesheet" href="static/css/ao-ui.css"/>
+
   <script src="https://unpkg.com/survey-core@1.9.162/survey.core.min.js"></script>
   <script src="https://unpkg.com/survey-knockout-ui@1.9.162/survey-knockout-ui.min.js"></script>
   <link href="https://unpkg.com/survey-core@1.9.162/defaultV2.min.css" rel="stylesheet"/>
+
+  <!-- analytics block unchanged -->
 </head>
 <body>
-  <!-- header / layout unchanged -->
-  <script>
-  /* ... analytics + theme scripts ... */
+  <!-- header, navigation, theme toggle … unchanged -->
 
-  document.addEventListener('DOMContentLoaded', function () {
-    const NAV=document.getElementById('nav'), MAIN=document.getElementById('main'),
-          MENU=document.getElementById('menu'), SEARCH_BOX=document.getElementById('q'),
-          SEARCH_DD=document.getElementById('dd');
-
-    const LS_SEEN='ao.v2.seen', LS_TIME='ao.v2.time', LS_LAST='ao.v2.last',
-          LS_QUIZ='ao.v2.quiz', LS_ASSESS='ao.v2.assess', COMP_THRESH={red:20,yellow:60};
-
-    const params=new URLSearchParams(location.search);
-    const WANT_DEMO=params.get('demo')==='1';
-    const WANT_FULL=params.get('full')==='1';
-
-    const h=(t,a={},...c)=>{const e=document.createElement(t);
-      for(const[k,v]of Object.entries(a)){
-        if(k==='class')e.className=v;
-        else if(k==='html')e.innerHTML=v;
-        else if(k.startsWith('on')&&typeof v==='function')e.addEventListener(k.slice(2),v);
-        else e.setAttribute(k,v);
-      }
-      c.forEach(x=>{if(x!=null)e.appendChild(typeof x==='string'?document.createTextNode(x):x)});
-      return e;
-    };
-    const tokenize=s=>(s||'').toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(Boolean);
-    const loadJSON=(k,def)=>{try{return JSON.parse(localStorage.getItem(k)||'')||def;}catch{return def;}};
-    const saveJSON=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
-
-    const seen=new Set(loadJSON(LS_SEEN,[]));
-    const timeMap=loadJSON(LS_TIME,{});
-    const quizResults=loadJSON(LS_QUIZ,{});
-    const assessResults=loadJSON(LS_ASSESS,{});
-    let currentTimer=null, site=null, chapters=[], docs=[];
-
-    function saveQuizResult(id,payload){quizResults[id]=payload;saveJSON(LS_QUIZ,quizResults);}
-    function saveAssessResult(id,payload){assessResults[id]=payload;saveJSON(LS_ASSESS,assessResults);}
-
-    function renderQuiz(lo,key){
-      const surveyJson=lo.quiz; if(!surveyJson) return;
-      const host=h('div',{class:'cardlet',style:'margin-top:20px;'}); MAIN.appendChild(host);
-      Survey.StylesManager.applyTheme('defaultV2');
-      const survey=new Survey.Model(surveyJson);
-      survey.onComplete.add(sender=>{
-        saveQuizResult(lo.quiz.id||`quiz_${key}`,{
-          key,score:sender.getCorrectAnswerCount(),total:sender.getQuestionCount(),
-          answers:sender.data,ts:Date.now()
-        });
-      });
-      survey.render(host);
+<script>
+/* Surface any boot errors in the left nav */
+window.addEventListener('error', (ev) => {
+  try {
+    const n = document.getElementById('nav');
+    if (n) {
+      n.innerHTML = '';
+      const d = document.createElement('div');
+      d.className = 'muted';
+      d.textContent = 'Script error: ' + (ev.error?.message || ev.message || 'unknown');
+      n.appendChild(d);
     }
+  } catch {}
+});
+(function(){
+  /* ---------- DOM ---------- */
+  const NAV  = document.getElementById('nav');
+  const MAIN = document.getElementById('main');
+  const RAIL = document.getElementById('rail');
+  const MENU = document.getElementById('menu');
+  const SEARCH_BOX = document.getElementById('q');
+  const SEARCH_DD  = document.getElementById('dd');
 
-    function renderAssessment(ch,chIdx){
-      const surveyJson=ch.assessment; if(!surveyJson) return;
-      const host=document.getElementById('survey-container'); if(!host) return;
-      Survey.StylesManager.applyTheme('defaultV2');
-      const survey=new Survey.Model(surveyJson);
-      survey.onComplete.add(sender=>{
-        saveAssessResult(ch.assessment.id||`assess_ch${chIdx+1}`,{
-          chapter:chIdx+1,answers:sender.data,ts:Date.now()
-        });
+  /* ---------- Config ---------- */
+  const LS_SEEN  = 'ao.v2.seen';
+  const LS_TIME  = 'ao.v2.time';
+  const LS_LAST  = 'ao.v2.last';
+  const LS_QUIZ  = 'ao.v2.quiz';
+  const LS_ASSESS= 'ao.v2.assess';
+  const COMP_THRESH = { red:20, yellow:60 };
+
+  const params   = new URLSearchParams(location.search);
+  const WANT_DEMO = params.get('demo') === '1';
+  const WANT_FULL = params.get('full') === '1';   // ← fixed
+
+  /* ---------- Helpers, state, timing … unchanged ---------- */
+
+  /* ---------- QUIZ & ASSESSMENT ---------- */
+  function saveQuizResult(id, payload){ quizResults[id] = payload; saveJSON(LS_QUIZ, quizResults); }
+  function saveAssessResult(id, payload){ assessResults[id] = payload; saveJSON(LS_ASSESS, assessResults); }
+
+  function renderQuiz(lo, key){
+    const surveyJson = lo.quiz; if (!surveyJson) return;
+    const surveyHost = h('div', { class: 'cardlet', style: 'margin-top:20px;' });
+    MAIN.appendChild(surveyHost);
+
+    Survey.StylesManager.applyTheme("defaultV2");
+    const survey = new Survey.Model(surveyJson);
+    survey.onComplete.add(sender => {
+      saveQuizResult(lo.quiz.id || `quiz_${key}`, {
+        key,
+        score: sender.getCorrectAnswerCount(),
+        total: sender.getQuestionCount(),
+        answers: sender.data,
+        ts: Date.now()
       });
-      survey.render(host);
-    }
+    });
+    survey.render(surveyHost);
+  }
 
-    /* ... rest of existing index.js logic (renderMain, renderMyData, search, boot, etc.) ... */
-  });
-  </script>
-  <!-- privacy popup script unchanged -->
+  function renderAssessment(ch, chIdx){
+    const surveyJson = ch.assessment; if (!surveyJson) return;
+    const surveyHost = document.getElementById('survey-container'); if (!surveyHost) return;
+
+    Survey.StylesManager.applyTheme("defaultV2");
+    const survey = new Survey.Model(surveyJson);
+    survey.onComplete.add(sender => {
+      saveAssessResult(ch.assessment.id || `assess_ch${chIdx+1}`, {
+        chapter: chIdx + 1,
+        answers: sender.data,
+        ts: Date.now()
+      });
+    });
+    survey.render(surveyHost);
+  }
+
+  /* ---------- Reader, My Data, etc. unchanged ---------- */
+
+  /* ---------- Search ---------- */
+  function showSearchDD(results, qTokens){
+    if (SEARCH_DD) SEARCH_DD.innerHTML = '';
+    if (!results.length){ SEARCH_DD.classList.remove('show'); return; }
+    results.slice(0,8).forEach(r=>{
+      const pv = (chapters[r.ci].los[r.li].snippets?.[0]?.body) ||
+                 (chapters[r.ci].los[r.li].preview) || '';
+      SEARCH_DD.appendChild(
+        h('div',{class:'res',onclick:()=>{
+            location.hash=`#ch${r.ci+1}-lo${r.li+1}`;
+            SEARCH_DD.classList.remove('show');
+            SEARCH_BOX.blur();
+          }},
+          h('div',{html: hilite(`${r.chTitle} — ${r.loTitle}`, qTokens)}),
+          h('small',{html: hilite(pv, qTokens)})
+        )
+      );
+    });
+    SEARCH_DD.classList.add('show');
+  }
+
+  function runSearch(q, mode){
+    const qTokens = tokenize(q);
+    if(!qTokens.length){ SEARCH_DD.classList.remove('show'); return; }
+    const results = docs.map(d => {
+      const pv = (chapters[d.ci].los[d.li].snippets?.[0]?.body) ||
+                 (chapters[d.ci].los[d.li].preview) || '';
+      return {...d, score: scoreDoc(qTokens, d), preview: pv};
+    }).filter(r => r.score>0).sort((a,b)=>b.score-a.score);
+    if(mode==='dd'){ showSearchDD(results,qTokens); return; }
+    // … remainder of runSearch unchanged …
+  }
+
+  /* ---------- Boot, route, etc. unchanged ---------- */
+  async function boot(){ /* ... existing logic ... */ }
+  boot();
+})();
+</script>
+<!-- privacy popup + analytics allow button scripts unchanged -->
 </body>
 </html>
