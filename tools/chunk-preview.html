@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chunk Preview — RAG/SEO</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+  :root{
+    --bg:#0b0d10;--panel:#12151a;--muted:#8ea1b2;--fg:#e8eef3;--brand:#00d0b6;
+    --border:#1e242c;--hover:#171c24;--danger:#ff5d5d;--ok:#25d18a
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
+  a{color:var(--brand);text-decoration:none}
+  header{position:sticky;top:0;z-index:10;background:#0c1015;border-bottom:1px solid var(--border);padding:10px 12px}
+  .wrap{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 52px)}
+  aside{border-right:1px solid var(--border);padding:12px;background:#0c1015}
+  main{padding:16px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  input[type="text"], input[type="url"], select{background:#0d131a;color:var(--fg);border:1px solid #233041;border-radius:8px;padding:8px 10px}
+  input[type="file"]{color:#cfe0ee}
+  button{background:#0e2723;color:#e8eef3;border:1px solid #11433b;border-radius:8px;padding:8px 10px;cursor:pointer}
+  button:hover{filter:brightness(1.08)}
+  .muted{color:var(--muted)}
+  .hint{font-size:12px;color:#9ab0c3}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px;margin:0 0 12px}
+  .chunk{border:1px solid #1f2630;border-radius:10px;padding:10px;margin:0 0 10px;background:#0e1218}
+  .meta{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:#9ab0c3;margin-bottom:6px}
+  .pill{display:inline-block;border:1px solid #2a3340;border-radius:999px;padding:2px 8px;font-size:12px;color:#c7d7e6;background:#0d1117}
+  .id{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;color:#a6b6c6}
+  mark{background:transparent;color:#e6fff7;border-bottom:1px dashed #2f4b59}
+  .grid{display:grid;grid-template-columns:1fr;gap:10px}
+  .controls .row{margin:6px 0}
+  .count{font-weight:600}
+  details pre{white-space:pre-wrap;background:#0b0f14;border:1px solid #223042;border-radius:8px;padding:8px;color:#dfe9f2;max-height:40vh;overflow:auto}
+  .copy{font-size:12px;padding:4px 8px}
+  @media (max-width:1000px){ .wrap{grid-template-columns:1fr} aside{border-right:0;border-bottom:1px solid var(--border)} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="row" style="justify-content:space-between">
+    <div class="row">
+      <strong>Chunk Preview</strong>
+      <span class="muted">· RAG / SEO / content sanity check</span>
+    </div>
+    <div class="row">
+      <a href="#" id="quickHelp" class="hint">help</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <aside class="controls">
+    <div class="card">
+      <div class="row"><strong>Load chunks</strong></div>
+      <div class="row">
+        <input id="src" type="url" placeholder="/main.static/rag/chunks.json" style="width:100%">
+      </div>
+      <div class="row">
+        <button id="loadUrl">Fetch URL</button>
+        <input id="file" type="file" accept=".json,.jsonl,application/json">
+      </div>
+      <div class="hint" style="margin-top:6px">
+        Tip: file input works under <code>file://</code>. URL fetch needs HTTPS/CORS.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row"><strong>Search & Filter</strong></div>
+      <div class="row">
+        <input id="q" type="text" placeholder="Search text (Enter)" style="width:100%">
+      </div>
+      <div class="row">
+        <select id="chapter"><option value="">All chapters</option></select>
+        <select id="lo"><option value="">All LOs</option></select>
+      </div>
+      <div class="row">
+        <label class="hint"><input type="checkbox" id="previewMode" checked> show 200-word preview</label>
+      </div>
+      <div class="row">
+        <button id="apply">Apply</button>
+        <button id="clear">Clear</button>
+        <button id="export">Export CSV</button>
+      </div>
+      <div class="hint" id="stats" style="margin-top:6px">—</div>
+    </div>
+
+    <div class="card">
+      <div class="row"><strong>Link params</strong></div>
+      <div class="hint">
+        You can bookmark with <code>?src=/path/to/chunks.json&q=term&chapter=Expenses&lo=2.2%20My%20Expenses</code>
+      </div>
+    </div>
+  </aside>
+
+  <main id="results">
+    <div class="card muted">Load a chunks file to begin.</div>
+  </main>
+</div>
+
+<script>
+(function(){
+  const SRC   = document.getElementById('src');
+  const FILE  = document.getElementById('file');
+  const LOAD  = document.getElementById('loadUrl');
+  const Q     = document.getElementById('q');
+  const CH    = document.getElementById('chapter');
+  const LO    = document.getElementById('lo');
+  const APPLY = document.getElementById('apply');
+  const CLEAR = document.getElementById('clear');
+  const RES   = document.getElementById('results');
+  const STATS = document.getElementById('stats');
+  const PREV  = document.getElementById('previewMode');
+  const EXP   = document.getElementById('export');
+
+  let CHUNKS = [];      // all chunks loaded
+  let FILTERED = [];    // current filtered view
+
+  // --- utils ---
+  const esc = s => String(s??'').replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]||m));
+  const tokenize = (s) => (String(s||'').toLowerCase().match(/[a-z0-9]+/g) || []);
+  const unique = (arr) => [...new Set(arr)];
+  const get = (obj, keys, def='') => {
+    for (const k of keys) { if (obj && obj[k]!=null) return obj[k]; }
+    return def;
+  };
+  function parseQuery(){
+    const u = new URL(location.href);
+    return Object.fromEntries(u.searchParams.entries());
+  }
+  function setQuery(k,v){
+    const u = new URL(location.href);
+    if (v==null || v==='') u.searchParams.delete(k); else u.searchParams.set(k,v);
+    history.replaceState(null,'',u.toString());
+  }
+
+  // --- loader ---
+  async function loadFromUrl(url){
+    try{
+      STATS.textContent = 'Fetching…';
+      const res = await fetch(url,{cache:'no-store'});
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const txt = await res.text();
+      CHUNKS = parseMaybeJsonl(txt);
+      afterLoad(url);
+    }catch(e){
+      STATS.textContent = '';
+      RES.innerHTML = `<div class="card" style="border-color:#4a1e23;background:#140e11">
+        <div><strong style="color:#ff9aa2">Fetch failed:</strong> ${esc(e.message||e)}</div>
+        <div class="hint" style="margin-top:6px">If loading from local files, use the file input instead.</div>
+      </div>`;
+    }
+  }
+  function loadFromFile(file){
+    const r = new FileReader();
+    r.onload = () => {
+      try{
+        CHUNKS = parseMaybeJsonl(String(r.result||''));
+        afterLoad(file.name);
+      }catch(e){
+        RES.innerHTML = `<div class="card">Parse error: ${esc(e.message||e)}</div>`;
+      }
+    };
+    r.readAsText(file);
+  }
+  function parseMaybeJsonl(text){
+    const trimmed = text.trim();
+    if(!trimmed) return [];
+    // If it looks like an array, parse JSON
+    if (trimmed[0]==='[') {
+      const arr = JSON.parse(trimmed);
+      if(!Array.isArray(arr)) throw new Error('Expected JSON array');
+      return arr;
+    }
+    // Otherwise assume JSON Lines
+    const lines = trimmed.split(/\r?\n/).filter(Boolean);
+    return lines.map((ln,i)=>{
+      try{return JSON.parse(ln);}
+      catch(e){ throw new Error(`JSONL parse error on line ${i+1}: ${e.message}`); }
+    });
+  }
+
+  // --- after load: populate filters & render ---
+  function afterLoad(sourceLabel){
+    const chOpts = unique(CHUNKS.map(c => get(c, ['chapter','h1'], ''))).filter(Boolean).sort();
+    const loOpts = unique(CHUNKS.map(c => get(c, ['lo','h2'], ''))).filter(Boolean).sort();
+
+    CH.innerHTML = `<option value="">All chapters</option>` + chOpts.map(v=>`<option>${esc(v)}</option>`).join('');
+    LO.innerHTML = `<option value="">All LOs</option>` + loOpts.map(v=>`<option>${esc(v)}</option>`).join('');
+
+    STATS.textContent = `${CHUNKS.length.toLocaleString()} chunks loaded from ${sourceLabel}`;
+    applyFilters();
+  }
+
+  // --- filtering + scoring ---
+  function scoreChunk(qTokens, c){
+    if(!qTokens.length) return 1;
+    const hay = [
+      get(c, ['text','content','body'], ''),
+      get(c, ['chapter','h1'], ''),
+      get(c, ['lo','h2'], ''),
+      get(c, ['subhead','section','h3'], '')
+    ].join(' ').toLowerCase();
+    let s = 0;
+    for(const qt of qTokens){ const hits = hay.split(qt).length - 1; if(hits>0) s += hits*2; }
+    return s;
+  }
+  function applyFilters(){
+    const q = Q.value.trim();
+    const ch = CH.value.trim();
+    const lo = LO.value.trim();
+    setQuery('q', q); setQuery('chapter', ch); setQuery('lo', lo);
+
+    const qTokens = tokenize(q);
+    FILTERED = CHUNKS.map(c => ({ c, s: scoreChunk(qTokens, c) }))
+      .filter(x => x.s > 0)
+      .filter(x => !ch || get(x.c, ['chapter','h1'],'') === ch)
+      .filter(x => !lo || get(x.c, ['lo','h2'],'') === lo)
+      .sort((a,b)=> b.s - a.s)
+      .map(x => x.c);
+
+    render(qTokens);
+  }
+
+  function hilite(text, qTokens){
+    if(!qTokens.length) return esc(text);
+    let out = esc(text);
+    qTokens.forEach(q=>{
+      const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'ig');
+      out = out.replace(re, '<mark>$1</mark>');
+    });
+    return out;
+  }
+
+  function render(qTokens){
+    if(!FILTERED.length){
+      RES.innerHTML = `<div class="card muted">No matches.</div>`;
+      return;
+    }
+    const count = FILTERED.length.toLocaleString();
+    const all = CHUNKS.length.toLocaleString();
+    const ratio = Math.round((FILTERED.length/Math.max(1,CHUNKS.length))*100);
+    STATS.innerHTML = `<span class="count">${count}</span> shown of ${all} (${ratio}%)`;
+
+    const wantPreview = PREV.checked;
+    const frag = document.createDocumentFragment();
+
+    FILTERED.slice(0,1000).forEach(ch=>{
+      const id = ch.id || ch._id || '';
+      const h1 = get(ch, ['chapter','h1'],'');
+      const h2 = get(ch, ['lo','h2'],'');
+      const h3 = get(ch, ['subhead','section','h3'],'');
+      const text = get(ch, ['text','content','body'],'');
+      const imgs = Array.isArray(ch.images)? ch.images.length : 0;
+      const vids = Array.isArray(ch.videos)? ch.videos.length : 0;
+      const tlen = (String(text).match(/\S+/g)||[]).length;
+
+      const card = document.createElement('div');
+      card.className = 'chunk';
+      card.innerHTML = `
+        <div class="meta">
+          ${h1? `<span class="pill">${esc(h1)}</span>`:''}
+          ${h2? `<span class="pill">${esc(h2)}</span>`:''}
+          ${h3? `<span class="pill">${esc(h3)}</span>`:''}
+          ${imgs? `<span class="pill">images:${imgs}</span>`:''}
+          ${vids? `<span class="pill">videos:${vids}</span>`:''}
+          <span class="pill">words:${tlen}</span>
+          ${id? `<span class="id">#${esc(id)}</span>`:''}
+          <button class="copy" data-kind="id" title="Copy chunk id">copy id</button>
+          <button class="copy" data-kind="json" title="Copy JSON">copy json</button>
+        </div>
+        <div class="grid">
+          <div class="text">${ wantPreview ? previewHtml(text, qTokens, 200) : hilite(text, qTokens) }</div>
+          <details>
+            <summary>Details</summary>
+            <pre>${esc(JSON.stringify(ch, null, 2))}</pre>
+          </details>
+        </div>
+      `;
+      frag.appendChild(card);
+    });
+
+    RES.innerHTML = '';
+    RES.appendChild(frag);
+
+    RES.querySelectorAll('button.copy').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const card = b.closest('.chunk');
+        const idx = Array.prototype.indexOf.call(RES.children, card);
+        const c = FILTERED[idx];
+        if(b.dataset.kind==='id'){
+          navigator.clipboard.writeText(String(c.id||c._id||'')).catch(()=>{});
+          b.textContent = 'copied'; setTimeout(()=>b.textContent='copy id',1000);
+        }else{
+          navigator.clipboard.writeText(JSON.stringify(c,null,2)).catch(()=>{});
+          b.textContent = 'copied'; setTimeout(()=>b.textContent='copy json',1000);
+        }
+      });
+    });
+  }
+
+  function previewHtml(text, qTokens, words=200){
+    const tokens = String(text||'').split(/\s+/);
+    const clip = tokens.slice(0, words).join(' ');
+    const more = tokens.length > words ? '…' : '';
+    return `<div>${hilite(clip, qTokens)}${more}</div>`;
+  }
+
+  // --- export CSV of current view ---
+  function exportCsv(){
+    if(!FILTERED.length){ alert('Nothing to export'); return; }
+    const escCsv = s => `"${String(s??'').replace(/"/g,'""')}"`;
+    const rows = [['id','chapter','lo','subhead','words','preview']];
+    FILTERED.forEach(c=>{
+      const t = get(c,['text','content','body'],'');
+      const pv = t.split(/\s+/).slice(0,60).join(' ');
+      rows.push([
+        c.id||c._id||'',
+        get(c,['chapter','h1'],''),
+        get(c,['lo','h2'],''),
+        get(c,['subhead','section','h3'],''),
+        (t.match(/\S+/g)||[]).length,
+        pv
+      ]);
+    });
+    const blob = new Blob([rows.map(r=>r.map(escCsv).join(',')).join('\n')], {type:'text/csv'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'chunks-preview.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 400);
+  }
+
+  // --- events ---
+  LOAD.addEventListener('click', ()=>{ const u=SRC.value.trim()||'/main.static/rag/chunks.json'; setQuery('src',u); loadFromUrl(u); });
+  FILE.addEventListener('change', (e)=>{ if(e.target.files?.[0]) loadFromFile(e.target.files[0]); });
+  APPLY.addEventListener('click', applyFilters);
+  CLEAR.addEventListener('click', ()=>{ Q.value=''; CH.value=''; LO.value=''; applyFilters(); });
+  Q.addEventListener('keydown', e=>{ if(e.key==='Enter') applyFilters(); });
+  PREV.addEventListener('change', ()=> render(tokenize(Q.value)));
+  EXP.addEventListener('click', exportCsv);
+
+  // drag & drop
+  document.addEventListener('dragover', e=>{ e.preventDefault(); });
+  document.addEventListener('drop', e=>{
+    e.preventDefault();
+    const f = e.dataTransfer?.files?.[0];
+    if(f) loadFromFile(f);
+  });
+
+  // quick help
+  document.getElementById('quickHelp').addEventListener('click', (e)=>{
+    e.preventDefault();
+    alert([
+      'How to use:',
+      '1) Click “Fetch URL” to load /main.static/rag/chunks.json, or choose a local file.',
+      '2) Search text and/or filter by Chapter / LO.',
+      '3) Toggle preview/full, copy a chunk id/JSON, or export CSV.',
+      '',
+      'Tip: You can deep-link with ?src=...&q=...&chapter=...&lo=...'
+    ].join('\n'));
+  });
+
+  // boot with URL params
+  (function boot(){
+    const p = parseQuery();
+    if(p.src){ SRC.value = p.src; }
+    if(p.q){ Q.value = p.q; }
+    if(p.chapter){ /* will set after load */ }
+    const auto = SRC.value.trim() || p.src || '/main.static/rag/chunks.json';
+    // Only auto-fetch if protocol is http(s). Under file://, rely on file input.
+    if(location.protocol.startsWith('http')){
+      SRC.value = auto;
+      loadFromUrl(auto).then(()=>{
+        if(p.chapter) CH.value = p.chapter;
+        if(p.lo) LO.value = p.lo;
+        applyFilters();
+      });
+    }
+  })();
+
+})();
+</script>
+</body>
+</html>
