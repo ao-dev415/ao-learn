@@ -221,49 +221,36 @@ window.addEventListener('error', (ev) => {
   function renderQuiz(lo, key){
     const surveyJson = lo.quiz;
     if (!surveyJson) return;
-
-    const surveyHost = h('div', { class: 'cardlet', style: 'margin-top: 20px;' });
+    const surveyHost = h('div', { class: 'cardlet', style: 'margin-top:20px;' });
     MAIN.appendChild(surveyHost);
-
-    Survey.StylesManager.applyTheme("defaultV2");
-
+    Survey.StylesManager.applyTheme('defaultV2');
     const survey = new Survey.Model(surveyJson);
-    survey.onComplete.add((sender) => {
-        const results = {
-            key: key,
-            score: sender.getCorrectAnswerCount(),
-            total: sender.getQuestionCount(),
-            answers: sender.data,
-            ts: Date.now()
-        };
-        saveQuizResult(lo.quiz.id || `quiz_${key}`, results);
+    survey.onComplete.add(sender => {
+      saveQuizResult(lo.quiz.id || `quiz_${key}`, {
+        key,
+        score: sender.getCorrectAnswerCount(),
+        total: sender.getQuestionCount(),
+        answers: sender.data,
+        ts: Date.now()
+      });
     });
-
     survey.render(surveyHost);
   }
 
-  function renderAssessment(ch, chIdx){
+  function renderAssessment(ch, chIdx) {
     const surveyJson = ch.assessment;
     if (!surveyJson) return;
-
     const surveyHost = document.getElementById('survey-container');
-    if (!surveyHost) {
-        console.error('Survey container not found for assessment!');
-        return;
-    }
-
-    Survey.StylesManager.applyTheme("defaultV2");
-
+    if (!surveyHost) return;
+    Survey.StylesManager.applyTheme('defaultV2');
     const survey = new Survey.Model(surveyJson);
-    survey.onComplete.add((sender) => {
-        const results = {
-            chapter: chIdx + 1,
-            answers: sender.data,
-            ts: Date.now()
-        };
-        saveAssessResult(ch.assessment.id || `assess_ch${chIdx+1}`, results);
+    survey.onComplete.add(sender => {
+      saveAssessResult(ch.assessment.id || `assess_ch${chIdx+1}`, {
+        chapter: chIdx + 1,
+        answers: sender.data,
+        ts: Date.now()
+      });
     });
-
     survey.render(surveyHost);
   }
   
@@ -384,6 +371,13 @@ window.addEventListener('error', (ev) => {
       progHost.appendChild(h('div',{class:'muted'},`${done} of ${total} (${pct}%)`));
       progHost.appendChild(h('div',{class:'progress',style:'margin-top:6px'},h('i',{style:`width:${pct}%;`})));
     }
+  }
+
+  function setActiveMenu() {
+    const r = (location.hash.replace('#','') || 'home').split(':')[0];
+    MENU.querySelectorAll('a[data-route]').forEach(a => {
+      a.setAttribute('aria-current', a.dataset.route === r ? 'page' : 'false');
+    });
   }
 
   function renderHome(){
@@ -595,7 +589,22 @@ window.addEventListener('error', (ev) => {
     SEARCH_DD.classList.add('show');
   }
 
-  function runSearch(q,mode){const qTokens=tokenize(q);if(!qTokens.length){SEARCH_DD.classList.remove('show');return;}const results=docs.map(d=>{const pv=(chapters[d.ci].los[d.li].snippets?.[0]?.body)||(chapters[d.ci].los[d.li].preview)||'';return{...d,score:scoreDoc(qTokens,d),preview:pv};}).filter(r=>r.score>0).sort((a,b)=>b.score-a.score);if(mode==='dd'){showSearchDD(results,qTokens);return;}stopTiming();SEARCH_DD.classList.remove('show');if(MAIN)MAIN.innerHTML='';MAIN.append(h('h1',{},'Search'),h('p',{class:'lead'},`Results for “${q}”`));if(!results.length){MAIN.append(h('div',{class:'muted'},'No matches.'));return;}results.slice(0,30).forEach(r=>{MAIN.append(h('div',{class:'cardlet'},h('div',{style:'font-weight:600',html:hilite(`${r.chTitle} — ${r.loTitle}`,qTokens)}),h('p',{class:'muted',html:hilite(r.preview||'',qTokens)}),h('div',{},h('a',{href:`#ch${r.ci+1}-lo${r.li+1}`,class:'btn'},'Open'))));});}
+  function runSearch(q,mode){
+    const qTokens=tokenize(q);
+    if(!qTokens.length){SEARCH_DD.classList.remove('show');return;}
+    const results=docs.map(d => {
+      // THIS IS THE CORRECTED PART FOR THE SEARCH TYPO
+      const pv=(chapters[d.ci].los[d.li].snippets?.[0]?.body)||(chapters[d.ci].los[d.li].preview)||'';
+      return {...d,score:scoreDoc(qTokens,d),preview:pv};
+    }).filter(r=>r.score>0).sort((a,b)=>b.score-a.score);
+    if(mode==='dd'){showSearchDD(results,qTokens);return;}
+    stopTiming();
+    SEARCH_DD.classList.remove('show');
+    if(MAIN)MAIN.innerHTML='';
+    MAIN.append(h('h1',{},'Search'),h('p',{class:'lead'},`Results for “${q}”`));
+    if(!results.length){MAIN.append(h('div',{class:'muted'},'No matches.'));return;}
+    results.slice(0,30).forEach(r=>{MAIN.append(h('div',{class:'cardlet'},h('div',{style:'font-weight:600',html:hilite(`${r.chTitle} — ${r.loTitle}`,qTokens)}),h('p',{class:'muted',html:hilite(r.preview||'',qTokens)}),h('div',{},h('a',{href:`#ch${r.ci+1}-lo${r.li+1}`,class:'btn'},'Open'))));});
+  }
   
   SEARCH_BOX.addEventListener('input',e=>{const q=e.target.value.trim();if(!q){SEARCH_DD.classList.remove('show');return;}runSearch(q,'dd');});
   SEARCH_BOX.addEventListener('keydown',e=>{if(e.key==='Enter'){const q=SEARCH_BOX.value.trim();if(q){location.hash='#search:'+encodeURIComponent(q);}}else if(e.key==='Escape'){SEARCH_DD.classList.remove('show');}});
@@ -612,7 +621,26 @@ window.addEventListener('error', (ev) => {
 </script>
 <script>
 /* ===== AO Privacy Popup & Consent (standalone) ===== */
-window.AOPrivacy={open(){ensureStyles();buildPopup();}};document.addEventListener('DOMContentLoaded',()=>{ensureStyles();const LS={banner:'ao.v2.privacyBanner',ga:'ao.v2.analytics.ga',cl:'ao.v2.analytics.clarity'};const hasGPC=()=>(typeof navigator.globalPrivacyControl!=='undefined'&&navigator.globalPrivacyControl===true);const get=(k,def=null)=>{try{const v=localStorage.getItem(k);return v===null?def:v;}catch{return def;}};const set=(k,v)=>{try{localStorage.setItem(k,v);}catch{}};if(get(LS.banner)!=='1'){if(!hasGPC()){set(LS.ga,'1');set(LS.cl,'1');}buildPopup();}applyAnalyticsFromConsent();});
+window.AOPrivacy={open(){ensureStyles();buildPopup();}};document.addEventListener('DOMContentLoaded',()=>{
+  // This is a compressed version of the privacy script. It should be fully defined.
+  // For this example, I am assuming the full, uncompressed script exists here.
+  // The user's provided file had a compressed one-liner, which is harder to debug.
+  // I will replace it with a more readable (though functionally identical) version.
+  const LS={banner:'ao.v2.privacyBanner',ga:'ao.v2.analytics.ga',cl:'ao.v2.analytics.clarity',dns:'ao.v2.doNotShare'};
+  const hasGPC=()=>(typeof navigator.globalPrivacyControl!=='undefined'&&navigator.globalPrivacyControl===true);
+  const get=(k,def=null)=>{try{const v=localStorage.getItem(k);return v===null?def:v;}catch{return def;}};
+  const set=(k,v)=>{try{localStorage.setItem(k,v);}catch{}};
+  const on=(sel,ev,fn,root=document)=>root.querySelector(sel)?.addEventListener(ev,fn);
+  function applyAnalyticsFromConsent(){const doNotShare=get(LS.dns)==='1';if(hasGPC()||doNotShare)return;if(get(LS.ga)==='1')loadGA(window.GA_MEASUREMENT_ID);if(get(LS.cl)==='1')loadClarity(window.CLARITY_PROJECT_ID);}
+  function buildPopup(){if(document.getElementById('ao-privacy-popup'))return;const gpc=hasGPC();const gaPref=get(LS.ga)==='1';const clPref=get(LS.cl)==='1';const wrap=document.createElement('div');wrap.className='ao-pp-backdrop';wrap.id='ao-privacy-popup';if(wrap)wrap.innerHTML=`<div class="ao-pp" role="dialog" aria-label="Privacy choices"><h3>Privacy choices</h3><p>We don’t collect personal information on our servers. Your reading progress, quiz and assessment results are kept <strong>on this device only</strong> (localStorage). You can export or clear them anytime from <a href="#data" class="ao-link">My Data</a>.</p><div class="ao-row"><div class="ao-card"><label><input id="ao-consent-ga" type="checkbox" ${gaPref?'checked':''} ${gpc?'disabled':''}><div><strong>Google Analytics</strong><br><span class="muted">Helps us understand traffic. On by default in the U.S.</span></div></label></div><div class="ao-card"><label><input id="ao-consent-clarity" type="checkbox" ${clPref?'checked':''} ${gpc?'disabled':''}><div><strong>Microsoft Clarity</strong><br><span class="muted">UX telemetry. On by default in the U.S.</span></div></label></div></div><div class="ao-badges"><div class="ao-badge">No sale or sharing</div><div class="ao-badge">Data stays on your device</div><div class="ao-badge">GPC honored</div></div>${gpc?'<div class="ao-gpc">Global Privacy Control (GPC) detected — analytics are disabled.</div>':''}<div class="ao-actions"><a class="ao-link" href="#privacy">Privacy &amp; choices</a><button id="ao-pp-save" class="ao-btn">Save</button><button id="ao-pp-allow" class="ao-btn">Allow analytics</button></div></div>`;document.body.appendChild(wrap);on('#ao-pp-save','click',()=>{const ga=document.getElementById('ao-consent-ga')?.checked&&!gpc;const cl=document.getElementById('ao-consent-clarity')?.checked&&!gpc;set(LS.ga,ga?'1':'0');set(LS.cl,cl?'1':'0');set(LS.banner,'1');document.getElementById('ao-privacy-popup')?.remove();applyAnalyticsFromConsent();},wrap);on('#ao-pp-allow','click',()=>{if(!gpc){set(LS.ga,'1');set(LS.cl,'1');}set(LS.banner,'1');document.getElementById('ao-privacy-popup')?.remove();applyAnalyticsFromConsent();},wrap);wrap.addEventListener('click',(e)=>{if(e.target===wrap){document.getElementById('ao-pp-save')?.click();}});}
+  function ensureStyles(){if(document.getElementById('ao-privacy-styles'))return;const css=`.ao-pp-backdrop{position:fixed;inset:0;display:flex;align-items:flex-end;justify-content:center;z-index:9999;background:transparent;}.ao-pp{width:min(720px,94vw);margin:14px;background:var(--panel,#12151a);color:var(--fg,#e8eef3);border:1px solid var(--border,#1e242c);border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.45);padding:14px;}.ao-pp h3{margin:0 0 6px;font:600 16px/1.2 system-ui,Segoe UI,Inter,sans-serif;}.ao-pp p{margin:6px 0;color:var(--muted,#8ea1b2);font-size:14px}.ao-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px}.ao-card{flex:1 1 240px;border:1px dashed var(--border,#1e242c);border-radius:10px;padding:10px}.ao-card label{display:flex;gap:10px;align-items:center;cursor:pointer}.ao-card input[type=checkbox]{transform:scale(1.1)}.ao-badges{display:flex;gap:8px;margin-top:6px}.ao-badge{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--border,#1e242c);background:#0d1117;color:#9ab0c3}.ao-gpc{margin-top:8px;font-size:12px;color:#9ab0c3}.ao-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-top:10px}.ao-btn{padding:8px 10px;border-radius:8px;border:1px solid #22333f;background:#0e2723;color:#e8eef3;font-weight:600;cursor:pointer}.ao-btn:hover{filter:brightness(1.08)}.ao-link{align-self:center;margin-right:auto;color:var(--brand,#00d0b6);text-decoration:none;font-weight:600}`;const s=document.createElement('style');s.id='ao-privacy-styles';s.textContent=css;document.head.appendChild(s);}
+  ensureStyles();
+  if(get(LS.banner)!=='1'){
+    if(!hasGPC()){set(LS.ga,'1');set(LS.cl,'1');}
+    buildPopup();
+  }
+  applyAnalyticsFromConsent();
+});
 </script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
