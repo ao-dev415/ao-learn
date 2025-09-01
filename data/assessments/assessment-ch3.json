@@ -4,6 +4,8 @@
   "data": {
     "title": "Risk Tolerance Questionnaire",
     "description": "For each question, choose the answer that best reflects your feelings and preferences.",
+    "questionsOnPageMode": "questionPerPage",
+    "widthMode": "responsive",
     "completedHtml": "<h3>Your Assessment is Complete</h3><h4>Your total score is: {totalScore}</h4>",
     "completedHtmlOnCondition": [
       {

@@ -177,3 +177,7 @@ html.light .data-table th{color:#344151}
 .office-map iframe {
   border:0;
 }
+
+.sv-title {
+  color: var(--brand); /* Uses the --brand color variable from your existing stylesheet */
+}
