@@ -160,7 +160,7 @@ async function main() {
     chapters
   };
 
-  // --- NEW SCRIPT LOGIC TO READ FROM DATA SUBFOLDERS ---
+  // --- LOGIC TO MERGE QUIZZES/ASSESSMENTS ---
   const DATA_DIR = path.resolve(path.dirname(SRC_DOCX), '../data');
   const allItems = [];
 
@@ -187,6 +187,12 @@ async function main() {
       const chapter = out.chapters.find(c => c.title === item.chapter);
       if (!chapter) continue;
 
+      // This makes the assessment available to the chapter for the nav link.
+      if (item.id.startsWith("assess-")) {
+        chapter.assessment = item.data;
+      }
+
+      // This logic handles placing the quiz/assessment inline.
       for (const lo of chapter.los || []) {
         const idx = (lo.snippets || []).findIndex(s => s && s.id === item.id);
         if (idx === -1) continue;
@@ -199,7 +205,7 @@ async function main() {
     }
     console.log(`Merged ${allItems.length} quiz/assessment items from the data/ folder.`);
   }
-  // --- END OF NEW SCRIPT LOGIC ---
+  // --- END OF MERGE LOGIC ---
 
   fs.writeFileSync(OUT_JSON, JSON.stringify(out, null, 2), "utf8");
   console.log(`Wrote ${OUT_JSON} from ${SRC_DOCX} (${chapters.length} chapters).`);
