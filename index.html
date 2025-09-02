@@ -438,14 +438,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }, 'Privacy')));
   NAV.appendChild(foot);
 }
-      });
-      NAV.append(list, h('a',{href:'#data',class:'meta-link'},'→ Open My Data'));
-      const year = new Date().getFullYear();
-      const foot = h('div',{class:'foot',id:'foot'});
-      foot.appendChild(h('div',{html:`©${year} Hall Financial Services, Inc. d/b/a ADVICE ONLY.`}));
-      foot.appendChild(h('div',{}, h('a',{href:'https://adviceonly.info/important-disclosures-and-privacy/',target:'_blank',rel:'noopener'}, 'Privacy')));
-      NAV.appendChild(foot);
-    }
 
     function setActiveLO(btn){NAV.querySelectorAll('button[aria-current="true"]').forEach(b=>b.setAttribute('aria-current','false'));btn?.setAttribute('aria-current','true');btn?.scrollIntoView({block:'nearest',inline:'nearest'});}
 
