@@ -83,7 +83,22 @@ function buildFromHtml(html) {
     if (!curSnippet) curSnippet = { title: "Body", parts: [] };
 
     if (tag === "P") {
-      const txt = normalizeText(el);
+      let txt = normalizeText(el);
+      const re = /\[\[(quiz|assess):([^\]]+)\]\]/i;
+      const m = txt.match(re);
+      if (m) {
+        const before = txt.replace(re, "").trim();
+        if (before) {
+          curSnippet.parts.push(before);
+          pushSnippet(curLo, curSnippet);
+        } else {
+          pushSnippet(curLo, curSnippet);
+        }
+        curSnippet = null;
+        const type = m[1].toLowerCase() === "quiz" ? "quiz" : "assessment";
+        curLo.snippets.push({ type, id: m[2] });
+        continue;
+      }
       if (txt) curSnippet.parts.push(txt);
       continue;
     }
@@ -124,7 +139,7 @@ async function main() {
   const { value: html } = await mammoth.convertToHtml({ path: SRC_DOCX }, { styleMap: [] });
   const chapters = buildFromHtml(html);
 
-const existing = loadExisting();
+  const existing = loadExisting();
   const ABOUT_FILE = path.resolve(path.dirname(SRC_DOCX), '../data/about.json');
   
   let aboutData = {
@@ -145,45 +160,46 @@ const existing = loadExisting();
     chapters
   };
 
-// --- NEW SCRIPT LOGIC TO READ FROM DATA SUBFOLDERS ---
-const DATA_DIR = path.resolve(path.dirname(SRC_DOCX), '../data');
-const allItems = [];
+  // --- NEW SCRIPT LOGIC TO READ FROM DATA SUBFOLDERS ---
+  const DATA_DIR = path.resolve(path.dirname(SRC_DOCX), '../data');
+  const allItems = [];
 
-const readDataFromDir = (dirPath) => {
-  const fullPath = path.join(DATA_DIR, dirPath);
-  if (!fs.existsSync(fullPath)) return;
+  const readDataFromDir = (dirPath) => {
+    const fullPath = path.join(DATA_DIR, dirPath);
+    if (!fs.existsSync(fullPath)) return;
 
-  const files = fs.readdirSync(fullPath).filter(f => f.endsWith('.json'));
-  for (const file of files) {
-    try {
-      const content = fs.readFileSync(path.join(fullPath, file), 'utf8');
-      allItems.push(JSON.parse(content));
-    } catch (e) {
-      console.error(`Error parsing ${file}:`, e);
-    }
-  }
-};
-
-readDataFromDir('quizzes');
-readDataFromDir('assessments');
-
-if (allItems.length > 0) {
-  for (const item of allItems) {
-    const chapter = out.chapters.find(c => c.title === item.chapter);
-    if (!chapter) continue;
-
-    if (item.id.startsWith("assess-")) {
-      chapter.assessment = item.data;
-    } else if (item.id.startsWith("quiz-")) {
-      const lo = chapter.los.find(l => l.title === item.lo);
-      if (lo) {
-        lo.quiz = item.data;
+    const files = fs.readdirSync(fullPath).filter(f => f.endsWith('.json'));
+    for (const file of files) {
+      try {
+        const content = fs.readFileSync(path.join(fullPath, file), 'utf8');
+        allItems.push(JSON.parse(content));
+      } catch (e) {
+        console.error(`Error parsing ${file}:`, e);
       }
     }
+  };
+
+  readDataFromDir('quizzes');
+  readDataFromDir('assessments');
+
+  if (allItems.length > 0) {
+    for (const item of allItems) {
+      const chapter = out.chapters.find(c => c.title === item.chapter);
+      if (!chapter) continue;
+
+      for (const lo of chapter.los || []) {
+        const idx = (lo.snippets || []).findIndex(s => s && s.id === item.id);
+        if (idx === -1) continue;
+        if (item.id.startsWith("assess-")) {
+          lo.snippets[idx] = { type: 'assessment', id: item.id, assessment: item.data };
+        } else if (item.id.startsWith("quiz-")) {
+          lo.snippets[idx] = { type: 'quiz', id: item.id, quiz: item.data };
+        }
+      }
+    }
+    console.log(`Merged ${allItems.length} quiz/assessment items from the data/ folder.`);
   }
-  console.log(`Merged ${allItems.length} quiz/assessment items from the data/ folder.`);
-}
-// --- END OF NEW SCRIPT LOGIC ---
+  // --- END OF NEW SCRIPT LOGIC ---
 
   fs.writeFileSync(OUT_JSON, JSON.stringify(out, null, 2), "utf8");
   console.log(`Wrote ${OUT_JSON} from ${SRC_DOCX} (${chapters.length} chapters).`);

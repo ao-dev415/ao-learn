@@ -257,12 +257,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function saveQuizResult(id, payload){ quizResults[id] = payload; saveJSON(LS_QUIZ, quizResults); }
     function saveAssessResult(id, payload){ assessResults[id] = payload; saveJSON(LS_ASSESS, assessResults); }
 
-    function renderQuiz(lo, key){
-      const surveyJson = lo.quiz;
+    function renderQuiz(quiz, key){
+      const surveyJson = quiz;
       if (!surveyJson) return;
       const surveyHost = h('div', { class: 'cardlet', style: 'margin-top:20px;' });
       MAIN.appendChild(surveyHost);
-      
+
       if (Survey?.Theme?.applyTheme) {
         Survey.Theme.applyTheme(Survey.Theme.Default);
       } else if (Survey?.StylesManager?.applyTheme) {
@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
       const survey = new Survey.Model(surveyJson);
       survey.onComplete.add(sender => {
-        saveQuizResult(lo.quiz.id || `quiz_${key}`, {
+        saveQuizResult(quiz.id || `quiz_${key}`, {
           key,
           score: sender.getCorrectAnswerCount?.() ?? null,
           total: sender.getQuestionCount?.() ?? null,
@@ -282,11 +282,11 @@ document.addEventListener('DOMContentLoaded', function() {
       survey.render(surveyHost);
     }
 
-    function renderAssessment(ch, chIdx) {
-      const surveyJson = ch.assessment;
+    function renderAssessment(assessment, key, host) {
+      const surveyJson = assessment;
       if (!surveyJson) return;
-      const surveyHost = document.getElementById('survey-container');
-      if (!surveyHost) return;
+      const surveyHost = host || h('div', { class: 'cardlet', style: 'margin-top:20px;' });
+      if (!host) MAIN.appendChild(surveyHost);
 
       if (Survey?.Theme?.applyTheme) {
         Survey.Theme.applyTheme(Survey.Theme.Default);
@@ -296,8 +296,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
       const survey = new Survey.Model(surveyJson);
       survey.onComplete.add(sender => {
-        saveAssessResult(ch.assessment.id || `assess_ch${chIdx+1}`, {
-          chapter: chIdx + 1,
+        const chapter = parseInt((key || '').split('.')[0], 10) || null;
+        saveAssessResult(assessment.id || `assess_${key}`, {
+          chapter,
           answers: sender.data,
           ts: Date.now()
         });
@@ -321,19 +322,6 @@ document.addEventListener('DOMContentLoaded', function() {
       const pool = [...normalizeMedia(lo.images), ...normalizeMedia(lo.image||lo.img)];
       (lo.snippets||[]).forEach(s=>{ pool.push(...normalizeMedia(s.images), ...normalizeMedia(s.image||s.img)); });
 
-      (lo.snippets || []).forEach(s => {
-        if (!s) return;
-        if (s.title) MAIN.append(h('h3', {}, s.title));
-        if (s.body) {
-          const strippedBody = s.body.replace(/\[\[(img|vid):\d+\]\]/gi, '').trim();
-          if (strippedBody) MAIN.append(h('p', {}, strippedBody));
-        }
-      });
-
-      const allBodyText = (lo.snippets||[]).map(s => s.body || '').join(' ');
-      const imgTokens = extractTokenIndices(allBodyText,'img').filter(i=>pool[i] && pool[i].kind==='image');
-      const vidTokens = extractTokenIndices(allBodyText,'vid').filter(i=>pool[i] && pool[i].kind==='video');
-
       const addFigure = (item)=>{
         const fig=h('figure');
         if(item.kind==='image'){const im=h('img',{src:item.src,alt:item.alt||''});im.addEventListener('dblclick',()=>openZoom(im));fig.appendChild(im);}
@@ -342,24 +330,34 @@ document.addEventListener('DOMContentLoaded', function() {
         MAIN.appendChild(fig);
       };
 
-      [...imgTokens.map(i=>({i,kind:'img'})), ...vidTokens.map(i=>({i,kind:'vid'}))].sort((a,b)=>a.i-b.i).forEach(t => addFigure(pool[t.i]));
-      if(imgTokens.length===0 && vidTokens.length===0 && pool[0]) addFigure(pool[0]);
-      
-      if (lo.quiz) {
-          renderQuiz(lo, key);
-      } else if (ch.assessment && loIdx === (ch.los.length - 1)) {
-          renderAssessmentInvitation(ch, chIdx);
-      }
+      let hasMediaToken = false;
+      (lo.snippets || []).forEach(s => {
+        if (!s) return;
+        if (s.type === 'quiz' && s.quiz) { renderQuiz(s.quiz, key); return; }
+        if (s.type === 'assessment' && s.assessment) { renderAssessment(s.assessment, key); return; }
+        if (s.title) MAIN.append(h('h3', {}, s.title));
+        if (s.body) {
+          const strippedBody = s.body.replace(/\[\[(img|vid):\d+\]\]/gi, '').trim();
+          if (strippedBody) MAIN.append(h('p', {}, strippedBody));
+          const imgTokens = extractTokenIndices(s.body,'img').filter(i=>pool[i] && pool[i].kind==='image');
+          const vidTokens = extractTokenIndices(s.body,'vid').filter(i=>pool[i] && pool[i].kind==='video');
+          if(imgTokens.length || vidTokens.length) hasMediaToken = true;
+          [...imgTokens.map(i=>({i,kind:'img'})), ...vidTokens.map(i=>({i,kind:'vid'}))].sort((a,b)=>a.i-b.i).forEach(t => addFigure(pool[t.i]));
+        }
+      });
+
+      if(!hasMediaToken && pool[0]) addFigure(pool[0]);
     }
 
     function renderAssessmentView(ch, chIdx) {
       stopTiming();
       if (MAIN) MAIN.innerHTML = '';
+      const container = h('div', { id: 'survey-container' });
       MAIN.append(
         h('h1', {}, `${ch.title || 'Chapter'} — Assessment`),
-        h('div', { id: 'survey-container' })
+        container
       );
-      renderAssessment(ch, chIdx);
+      renderAssessment(ch.assessment, `${chIdx+1}`, container);
     }
     
     function renderAssessmentInvitation(ch, chIdx) {
@@ -705,3 +703,5 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 </body>
 </html>
+}
+ok, can you place the code into the prospective files and give them back the code to paste in? here is fixed book as well
