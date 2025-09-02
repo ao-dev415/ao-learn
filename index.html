@@ -371,72 +371,54 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function buildLeftNav() {
-  if (NAV) NAV.innerHTML = '';
-  const list = h('ul');
-  chapters.forEach((ch, chIdx) => {
-    list.append(h('h3', {}, ch.title || `Chapter ${chIdx+1}`));
-    (ch.los || []).forEach((lo, loIdx) => {
-      const btn = h('button', {
-        class: 'lo',
-        onclick: () => {
-          renderMain(ch, lo, chIdx, loIdx);
-          location.hash = `#ch${chIdx+1}-lo${loIdx+1}`;
-          setActiveLO(btn);
-          refreshRail();
-        }
-      }, loLabel(lo));
-      list.append(h('li', {}, btn));
-    });
+      if (NAV) NAV.innerHTML = '';
+      const list = h('ul');
+      chapters.forEach((ch, chIdx) => {
+        list.append(h('h3', {}, ch.title || `Chapter ${chIdx+1}`));
+        (ch.los || []).forEach((lo, loIdx) => {
+          const btn = h('button', {
+            class: 'lo',
+            onclick: () => {
+              renderMain(ch, lo, chIdx, loIdx);
+              location.hash = `#ch${chIdx+1}-lo${loIdx+1}`;
+              setActiveLO(btn);
+              refreshRail();
+            }
+          }, loLabel(lo));
+          list.append(h('li', {}, btn));
+        });
 
-    if (ch.assessment) {
-      const assessmentBtn = h('button', {
-        class: 'assessment-link',
-        onclick: () => {
-          renderAssessmentView(ch, chIdx);
-          location.hash = `#ch${chIdx+1}-assessment`;
-          setActiveLO(assessmentBtn);
+        if (ch.assessment) {
+          const assessmentBtn = h('button', {
+            class: 'assessment-link',
+            onclick: () => {
+              renderAssessmentView(ch, chIdx);
+              location.hash = `#ch${chIdx+1}-assessment`;
+              setActiveLO(assessmentBtn);
+            }
+          }, ch.assessment.title || 'Chapter Assessment');
+          list.append(h('li', {}, assessmentBtn));
         }
-      }, ch.assessment.title || 'Chapter Assessment');
-      list.append(h('li', {}, assessmentBtn));
+      });
+      NAV.append(list, h('a', {
+        href: '#data',
+        class: 'meta-link'
+      }, '→ Open My Data'));
+      const year = new Date().getFullYear();
+      const foot = h('div', {
+        class: 'foot',
+        id: 'foot'
+      });
+      foot.appendChild(h('div', {
+        html: `©${year} Hall Financial Services, Inc. d/b/a ADVICE ONLY.`
+      }));
+      foot.appendChild(h('div', {}, h('a', {
+        href: 'https://adviceonly.info/important-disclosures-and-privacy/',
+        target: '_blank',
+        rel: 'noopener'
+      }, 'Privacy')));
+      NAV.appendChild(foot);
     }
-  NAV.append(list, h('a', {
-    href: '#data',
-    class: 'meta-link'
-  }, '→ Open My Data'));
-  const year = new Date().getFullYear();
-  const foot = h('div', {
-    class: 'foot',
-    id: 'foot'
-  });
-  foot.appendChild(h('div', {
-    html: `©${year} Hall Financial Services, Inc. d/b/a ADVICE ONLY.`
-  }));
-  foot.appendChild(h('div', {}, h('a', {
-    href: 'https://adviceonly.info/important-disclosures-and-privacy/',
-    target: '_blank',
-    rel: 'noopener'
-  }, 'Privacy')));
-  NAV.appendChild(foot);
-}
-  NAV.append(list, h('a', {
-    href: '#data',
-    class: 'meta-link'
-  }, '→ Open My Data'));
-  const year = new Date().getFullYear();
-  const foot = h('div', {
-    class: 'foot',
-    id: 'foot'
-  });
-  foot.appendChild(h('div', {
-    html: `©${year} Hall Financial Services, Inc. d/b/a ADVICE ONLY.`
-  }));
-  foot.appendChild(h('div', {}, h('a', {
-    href: 'https://adviceonly.info/important-disclosures-and-privacy/',
-    target: '_blank',
-    rel: 'noopener'
-  }, 'Privacy')));
-  NAV.appendChild(foot);
-}
 
     function setActiveLO(btn){NAV.querySelectorAll('button[aria-current="true"]').forEach(b=>b.setAttribute('aria-current','false'));btn?.setAttribute('aria-current','true');btn?.scrollIntoView({block:'nearest',inline:'nearest'});}
 
