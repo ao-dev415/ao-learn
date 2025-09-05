@@ -1,0 +1,58 @@
+{
+  "id": "assess-c5",
+  "chapter": "Chapter 5",
+  "data": {
+    "title": "Chapter 5 Knowledge Check",
+    "description": "This assessment demonstrates different question types.",
+    "elements": [
+      {
+        "name": "text-question",
+        "type": "text",
+        "title": "What is the primary topic of this chapter? (Text Input)"
+      },
+      {
+        "name": "dropdown-question",
+        "type": "dropdown",
+        "title": "Which concept was most interesting? (Dropdown)",
+        "choices": [
+          "Concept A",
+          "Concept B",
+          "Concept C"
+        ]
+      },
+      {
+        "name": "likert-scale-question",
+        "type": "matrix",
+        "title": "Please rate your understanding of the following topics (Likert Scale):",
+        "columns": [
+          {
+            "value": 1,
+            "text": "Not at all"
+          },
+          {
+            "value": 2,
+            "text": "A little"
+          },
+          {
+            "value": 3,
+            "text": "Moderately"
+          },
+          {
+            "value": 4,
+            "text": "Very well"
+          }
+        ],
+        "rows": [
+          {
+            "value": "topic1",
+            "text": "Topic 1"
+          },
+          {
+            "value": "topic2",
+            "text": "Topic 2"
+          }
+        ]
+      }
+    ]
+  }
+}
