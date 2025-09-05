@@ -1,758 +1,666 @@
 {
-  "title": "Advice-Only® Learning Management System",
-  "about": {
-    "name": "Quincy Hall, CFP®",
-    "location": "Advice Only — Corte Madera, CA",
-    "imageSrc": "static/brand/Quincy-Hall-CFP-profile.webp",
-    "socials": [
-      {
-        "text": "YouTube",
-        "url": "https://www.youtube.com/@adviceonly"
-      },
-      {
-        "text": "LinkedIn",
-        "url": "https://www.linkedin.com/in/quincyhall/"
-      },
-      {
-        "text": "Instagram",
-        "url": "https://www.instagram.com/adviceonlyadvisor"
-      }
-    ],
-    "cta": {
-      "text": "Contact",
-      "url": "https://adviceonly.info/contact-us"
-    },
-    "office": {
-      "location": "Corte Madera, CA",
-      "mapUrl": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3147.2087400888195!2d-122.52514918832557!3d37.92555367183081!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80859b6b23b9d1cd%3A0xf2017c8ee78ff8c3!2sAdvice%20Only%E2%84%A2%20Financial%20Advisors%20CA!5e0!3m2!1sen!2sus!4v1756609374047!5m2!1sen!2sus"
-    },
-    "bio": "Advice-only planning. No commissions. This is the longer descriptive text that appears in the right sidebar rail when viewing the About page."
-  },
-  "events": [],
+  "book": "Advice Only™ Methodology (2024)",
   "chapters": [
     {
-      "title": "Chapter 1",
+      "title": "Chapter 1: My Perfect Plan",
       "los": [
         {
-          "title": "Learning Objective 1.1",
-          "preview": "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+          "title": "Learning Objective 1.1 — Overview",
+          "preview": "Big-picture review of retirement planning and how the pieces fit together.",
           "snippets": [
             {
               "title": "Body",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "body": "Big-picture review of retirement planning and how the pieces fit together."
             },
             {
-              "title": "What is Lorem Ipsum1?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "title": "Goal setting",
+              "body": "Details: Goal setting. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             },
             {
-              "title": "What is Lorem Ipsum2?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "title": "Coordinating income sources",
+              "body": "Details: Coordinating income sources. Placeholder content derived from the chapter text to test\nparsing.\n\nAdditional supporting explanation and examples."
             },
             {
-              "title": "What is Lorem Ipsum3?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-            }
-          ],
-          "images": [
-            {
-              "src": "media/ch01/lo1-1/ch01-lo01-bumper-01.jpg"
+              "title": "Risk preferences",
+              "body": "Details: Risk preferences. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             }
           ]
         },
         {
-          "title": "Learning Objective 1.2",
-          "preview": "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+          "title": "Learning Objective 1.2 — Planning Process",
+          "preview": "High-level process flow from data gathering → analysis → implementation → monitoring.",
           "snippets": [
             {
               "title": "Body",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "body": "High-level process flow from data gathering → analysis → implementation → monitoring."
             },
             {
-              "title": "What is Lorem Ipsum4?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "title": "Inputs & assumptions",
+              "body": "Details: Inputs & assumptions. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             },
             {
-              "title": "What is Lorem Ipsum5?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "title": "Stress testing",
+              "body": "Details: Stress testing. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             },
             {
-              "title": "What is Lorem Ipsum6?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-            }
-          ],
-          "images": [
-            {
-              "src": "media/ch01/lo1-2/ch01-lo02-bumper-03.png"
-            },
-            {
-              "src": "media/ch01/lo1-2/ch01-lo02-coffee-02.jpg"
-            },
-            {
-              "src": "media/ch01/lo1-2/ch01-lo02-rational-01.png"
+              "title": "Action plan & review cadence",
+              "body": "Details: Action plan & review cadence. Placeholder content derived from the chapter text to test\nparsing.\n\nAdditional supporting explanation and examples."
             }
           ]
         },
         {
-          "title": "Learning Objective 1.3",
-          "preview": "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+          "title": "Learning Objective 1.3 — Readiness Checklist",
+          "preview": "Identify missing documents and decisions before proceeding to detailed chapters.",
           "snippets": [
             {
               "title": "Body",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "body": "Identify missing documents and decisions before proceeding to detailed chapters."
             },
             {
-              "title": "What is Lorem Ipsum7?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "title": "Key documents",
+              "body": "Details: Key documents. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             },
             {
-              "title": "What is Lorem Ipsum8?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "title": "Decision inventory",
+              "body": "Details: Decision inventory. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             },
             {
-              "title": "What is Lorem Ipsum9?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-            }
-          ],
-          "images": [
-            {
-              "src": "media/ch01/lo1-3/ch01-lo03-mural-01.jpg"
+              "title": "Next-step ownership",
+              "body": "Details: Next-step ownership. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             }
           ]
         }
       ]
     },
     {
-      "title": "Chapter 2",
+      "title": "Chapter 2: Expenses",
       "los": [
         {
-          "title": "Learning Objective 2.1",
-          "preview": "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+          "title": "Learning Objective 2.1 — Being Real",
+          "preview": "Set realistic retirement expectations; align partners; avoid plans with failure baked in.",
           "snippets": [
             {
               "title": "Body",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "body": "Set realistic retirement expectations; align partners; avoid plans with failure baked in."
             },
             {
-              "title": "What is Lorem Ipsum1?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "title": "Top reasons for early retirement",
+              "body": "Details: Top reasons for early retirement. Placeholder content derived from the chapter text to test\nparsing.\n\nAdditional supporting explanation and examples."
             },
             {
-              "title": "What is Lorem Ipsum2?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "title": "Behavioral gaps vs. intentions",
+              "body": "Details: Behavioral gaps vs. intentions. Placeholder content derived from the chapter text to test\nparsing.\n\nAdditional supporting explanation and examples."
             },
             {
-              "title": "What is Lorem Ipsum3?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-            }
-          ],
-          "images": [
-            {
-              "src": "media/ch02/lo2-1/ch02-lo01-expected-retirement-01.png"
+              "title": "Realistic timelines",
+              "body": "Details: Realistic timelines. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             }
           ]
         },
         {
-          "title": "Learning Objective 2.2",
-          "preview": "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+          "title": "Learning Objective 2.2 — My Expenses",
+          "preview": "Build a simple, durable budgeting system that separates essential vs. discretionary spend.",
           "snippets": [
             {
               "title": "Body",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "body": "Build a simple, durable budgeting system that separates essential vs. discretionary spend."
             },
             {
-              "title": "What is Lorem Ipsum4?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "title": "Data download & cleanup",
+              "body": "Details: Data download & cleanup. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             },
             {
-              "title": "What is Lorem Ipsum5?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "title": "Categorization",
+              "body": "Details: Categorization. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             },
             {
-              "title": "What is Lorem Ipsum6?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-            }
-          ],
-          "images": [
-            {
-              "src": "media/ch02/lo2-2/ch02-lo02-budget-01.png"
-            },
-            {
-              "src": "media/ch02/lo2-2/ch02-lo02-budget-video-03.png"
-            },
-            {
-              "src": "media/ch02/lo2-2/ch02-lo02-calc-02.png"
+              "title": "Review cadence & adjustments",
+              "body": "Details: Review cadence & adjustments. Placeholder content derived from the chapter text to test\nparsing.\n\nAdditional supporting explanation and examples."
             }
           ]
         },
         {
-          "title": "Learning Objective 2.3",
-          "preview": "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+          "title": "Learning Objective 2.3 — Understanding Inflation",
+          "preview": "Use CPI as a baseline; personalize an inflation assumption; revisit over time.",
           "snippets": [
             {
               "title": "Body",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "body": "Use CPI as a baseline; personalize an inflation assumption; revisit over time."
             },
             {
-              "title": "What is Lorem Ipsum7?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "title": "CPI basics",
+              "body": "Details: CPI basics. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             },
             {
-              "title": "What is Lorem Ipsum8?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "title": "Personal vs. headline inflation",
+              "body": "Details: Personal vs. headline inflation. Placeholder content derived from the chapter text to test\nparsing.\n\nAdditional supporting explanation and examples."
             },
             {
-              "title": "What is Lorem Ipsum9?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-            },
-            {
-              "type": "assessment",
-              "id": "assess-c2",
-              "assessment": {
-                "title": "Chapter 2 Knowledge Check",
-                "description": "This assessment demonstrates different question types.",
-                "elements": [
-                  {
-                    "name": "text-question",
-                    "type": "text",
-                    "title": "What is the primary topic of this chapter? (Text Input)"
-                  },
-                  {
-                    "name": "dropdown-question",
-                    "type": "dropdown",
-                    "title": "Which concept was most interesting? (Dropdown)",
-                    "choices": [
-                      "Concept A",
-                      "Concept B",
-                      "Concept C"
-                    ]
-                  },
-                  {
-                    "name": "likert-scale-question",
-                    "type": "matrix",
-                    "title": "Please rate your understanding of the following topics (Likert Scale):",
-                    "columns": [
-                      {
-                        "value": 1,
-                        "text": "Not at all"
-                      },
-                      {
-                        "value": 2,
-                        "text": "A little"
-                      },
-                      {
-                        "value": 3,
-                        "text": "Moderately"
-                      },
-                      {
-                        "value": 4,
-                        "text": "Very well"
-                      }
-                    ],
-                    "rows": [
-                      {
-                        "value": "topic1",
-                        "text": "Topic 1"
-                      },
-                      {
-                        "value": "topic2",
-                        "text": "Topic 2"
-                      }
-                    ]
-                  }
-                ]
-              }
-            }
-          ],
-          "images": [
-            {
-              "src": "media/ch02/lo2-3/ch02-lo03-calc-01.png"
+              "title": "Impacts on plan success",
+              "body": "Details: Impacts on plan success. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             }
           ]
         }
-      ],
-      "assessment": {
-        "title": "Chapter 2 Knowledge Check",
-        "description": "This assessment demonstrates different question types.",
-        "elements": [
-          {
-            "name": "text-question",
-            "type": "text",
-            "title": "What is the primary topic of this chapter? (Text Input)"
-          },
-          {
-            "name": "dropdown-question",
-            "type": "dropdown",
-            "title": "Which concept was most interesting? (Dropdown)",
-            "choices": [
-              "Concept A",
-              "Concept B",
-              "Concept C"
-            ]
-          },
-          {
-            "name": "likert-scale-question",
-            "type": "matrix",
-            "title": "Please rate your understanding of the following topics (Likert Scale):",
-            "columns": [
-              {
-                "value": 1,
-                "text": "Not at all"
-              },
-              {
-                "value": 2,
-                "text": "A little"
-              },
-              {
-                "value": 3,
-                "text": "Moderately"
-              },
-              {
-                "value": 4,
-                "text": "Very well"
-              }
-            ],
-            "rows": [
-              {
-                "value": "topic1",
-                "text": "Topic 1"
-              },
-              {
-                "value": "topic2",
-                "text": "Topic 2"
-              }
-            ]
-          }
-        ]
-      }
+      ]
     },
     {
-      "title": "Chapter 3",
+      "title": "Chapter 3: Cashflow & Net Worth",
       "los": [
         {
-          "title": "Learning Objective 3.1",
-          "preview": "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+          "title": "Learning Objective 3.1 — Key Planning Documents",
+          "preview": "Build and maintain a Net Worth Statement and Cash Flow Statement.",
           "snippets": [
             {
               "title": "Body",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "body": "Build and maintain a Net Worth Statement and Cash Flow Statement."
             },
             {
-              "title": "What is Lorem Ipsum1?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "title": "Net worth snapshot",
+              "body": "Details: Net worth snapshot. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             },
             {
-              "title": "What is Lorem Ipsum2?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "title": "Cash inflows/outflows",
+              "body": "Details: Cash inflows/outflows. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             },
             {
-              "type": "quiz",
-              "id": "quiz-c3-1",
-              "quiz": {
-                "title": "Quiz for Learning Objective 3.1",
-                "elements": [
-                  {
-                    "type": "radiogroup",
-                    "name": "q1",
-                    "title": "This is the first question text.",
-                    "choices": [
-                      "This is option A.",
-                      "This is the correct option B.",
-                      "This is option C."
-                    ],
-                    "correctAnswer": "This is the correct option B."
-                  },
-                  {
-                    "type": "radiogroup",
-                    "name": "q2",
-                    "title": "This is the second question text.",
-                    "choices": [
-                      "This is the correct option A.",
-                      "This is option B.",
-                      "This is option C."
-                    ],
-                    "correctAnswer": "This is the correct option A."
-                  }
-                ]
-              }
-            },
-            {
-              "title": "Body",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-            },
-            {
-              "title": "What is Lorem Ipsum3?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-            }
-          ],
-          "images": [
-            {
-              "src": "media/ch03/lo3-1/ch03-lo01-savings-01.png"
+              "title": "Using statements in planning",
+              "body": "Details: Using statements in planning. Placeholder content derived from the chapter text to test\nparsing.\n\nAdditional supporting explanation and examples."
             }
           ]
         },
         {
-          "title": "Learning Objective 3.2",
-          "preview": "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+          "title": "Learning Objective 3.2 — Positive Cash Flow",
+          "preview": "Identify new savings ‘firepower’ and redeploy toward goals.",
           "snippets": [
             {
               "title": "Body",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "body": "Identify new savings ‘firepower’ and redeploy toward goals."
             },
             {
-              "title": "What is Lorem Ipsum4?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "title": "Improving cash flow",
+              "body": "Details: Improving cash flow. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             },
             {
-              "title": "What is Lorem Ipsum5?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "title": "Where to save",
+              "body": "Details: Where to save. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             },
             {
-              "title": "What is Lorem Ipsum6?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-            }
-          ],
-          "images": [
-            {
-              "src": "media/ch03/lo3-2/ch03-lo02-battle-plan-01.png"
-            },
-            {
-              "src": "media/ch03/lo3-2/ch03-lo02-spiritual-02.jpg"
+              "title": "Savings rate vs. gross income",
+              "body": "Details: Savings rate vs. gross income. Placeholder content derived from the chapter text to test\nparsing.\n\nAdditional supporting explanation and examples."
             }
           ]
         },
         {
-          "title": "Learning Objective 3.3",
-          "preview": "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+          "title": "Learning Objective 3.3 — Compounding Interest",
+          "preview": "Leverage compounding; understand TVM caveats; align with risk and time horizon.",
           "snippets": [
             {
               "title": "Body",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "body": "Leverage compounding; understand TVM caveats; align with risk and time horizon."
             },
             {
-              "title": "What is Lorem Ipsum7?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "title": "Inflation offset",
+              "body": "Details: Inflation offset. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             },
             {
-              "title": "What is Lorem Ipsum8?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+              "title": "Risk, returns, and variability",
+              "body": "Details: Risk, returns, and variability. Placeholder content derived from the chapter text to test\nparsing.\n\nAdditional supporting explanation and examples."
             },
             {
-              "title": "What is Lorem Ipsum9?",
-              "body": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-            },
-            {
-              "type": "assessment",
-              "id": "assess-c3",
-              "assessment": {
-                "title": "Risk Tolerance Questionnaire",
-                "description": "For each question, choose the answer that best reflects your feelings and preferences.",
-                "questionsOnPageMode": "questionPerPage",
-                "widthMode": "responsive",
-                "completedHtml": "<h3>Your Assessment is Complete</h3><h4>Your total score is: {totalScore}</h4>",
-                "completedHtmlOnCondition": [
-                  {
-                    "expression": "{totalScore} >= 0 and {totalScore} <= 4",
-                    "html": "<h3>Result: Conservative Investor</h3><p>You prioritize the safety and stability of your investments over potential high returns. You may prefer investments like bonds, CDs, or high-quality dividend-paying stocks.</p>"
-                  },
-                  {
-                    "expression": "{totalScore} >= 5 and {totalScore} <= 8",
-                    "html": "<h3>Result: Balanced Investor</h3><p>You seek a balance between risk and return. Your portfolio may include a mix of stocks and bonds, with a moderate allocation to growth-oriented assets.</p>"
-                  },
-                  {
-                    "expression": "{totalScore} >= 9 and {totalScore} <= 12",
-                    "html": "<h3>Result: Aggressive Investor</h3><p>You are comfortable with higher levels of risk and are willing to tolerate market volatility in pursuit of potentially higher returns. Your portfolio may be heavily weighted towards stocks and other growth investments.</p>"
-                  }
-                ],
-                "elements": [
-                  {
-                    "name": "investment-drop-reaction",
-                    "type": "radiogroup",
-                    "title": "Imagine you have $100,000 invested. If the value of this investment dropped to $70,000 overnight, how would you react?",
-                    "choices": [
-                      {
-                        "value": 0,
-                        "text": "You would panic and sell all of your investments."
-                      },
-                      {
-                        "value": 1,
-                        "text": "You would be concerned but would wait to see if the investment recovers."
-                      },
-                      {
-                        "value": 2,
-                        "text": "You would view it as a buying opportunity and invest more money."
-                      }
-                    ],
-                    "isRequired": true
-                  },
-                  {
-                    "name": "investment-comfort",
-                    "type": "radiogroup",
-                    "title": "Which of the following investments would you be most comfortable with?",
-                    "choices": [
-                      {
-                        "value": 2,
-                        "text": "A single stock with the potential for high returns but also high risk."
-                      },
-                      {
-                        "value": 1,
-                        "text": "A diversified portfolio of stocks and bonds with moderate risk and return potential."
-                      },
-                      {
-                        "value": 0,
-                        "text": "A savings account or government bond with low risk and low return potential."
-                      }
-                    ],
-                    "isRequired": true
-                  },
-                  {
-                    "name": "investment-philosophy",
-                    "type": "radiogroup",
-                    "title": "You are considering an investment with the potential to earn high returns over the next few years. However, there's also a chance that you could lose some or all of your initial investment. What would you do?",
-                    "choices": [
-                      {
-                        "value": 0,
-                        "text": "You would not invest, as the risk is too high."
-                      },
-                      {
-                        "value": 1,
-                        "text": "You would invest a small amount of money that you can afford to lose."
-                      },
-                      {
-                        "value": 2,
-                        "text": "You would invest a significant portion of your savings, hoping for high returns."
-                      }
-                    ],
-                    "isRequired": true
-                  },
-                  {
-                    "name": "investment-horizon",
-                    "type": "radiogroup",
-                    "title": "How long do you plan to invest your money?",
-                    "choices": [
-                      {
-                        "value": 0,
-                        "text": "Less than 5 years."
-                      },
-                      {
-                        "value": 1,
-                        "text": "5-10 years."
-                      },
-                      {
-                        "value": 2,
-                        "text": "More than 10 years."
-                      }
-                    ],
-                    "isRequired": true
-                  },
-                  {
-                    "name": "financial-situation",
-                    "type": "radiogroup",
-                    "title": "What is your current financial situation?",
-                    "choices": [
-                      {
-                        "value": 0,
-                        "text": "You have significant debt and limited savings."
-                      },
-                      {
-                        "value": 1,
-                        "text": "You have some debt but also have a decent amount of savings."
-                      },
-                      {
-                        "value": 2,
-                        "text": "You have little to no debt and a substantial amount of savings."
-                      }
-                    ],
-                    "isRequired": true
-                  },
-                  {
-                    "name": "risk-feeling",
-                    "type": "radiogroup",
-                    "title": "In general, how would you describe your feelings about taking risks with your money?",
-                    "choices": [
-                      {
-                        "value": 0,
-                        "text": "You prefer to avoid risks and prioritize the safety of your investments."
-                      },
-                      {
-                        "value": 1,
-                        "text": "You are comfortable with some risk, as long as the potential rewards are reasonable."
-                      },
-                      {
-                        "value": 2,
-                        "text": "You are willing to take substantial risks in pursuit of high returns."
-                      }
-                    ],
-                    "isRequired": true
-                  }
-                ],
-                "calculatedValues": [
-                  {
-                    "name": "totalScore",
-                    "expression": "{investment-drop-reaction} + {investment-comfort} + {investment-philosophy} + {investment-horizon} + {financial-situation} + {risk-feeling}",
-                    "includeIntoResult": true
-                  }
-                ]
-              }
-            }
-          ],
-          "images": [
-            {
-              "src": "media/ch03/lo3-3/ch03-lo03-balance-sheet-01.png"
+              "title": "Illustrative calculators",
+              "body": "Details: Illustrative calculators. Placeholder content derived from the chapter text to test\nparsing.\n\nAdditional supporting explanation and examples."
             }
           ]
         }
-      ],
-      "assessment": {
-        "title": "Risk Tolerance Questionnaire",
-        "description": "For each question, choose the answer that best reflects your feelings and preferences.",
-        "questionsOnPageMode": "questionPerPage",
-        "widthMode": "responsive",
-        "completedHtml": "<h3>Your Assessment is Complete</h3><h4>Your total score is: {totalScore}</h4>",
-        "completedHtmlOnCondition": [
-          {
-            "expression": "{totalScore} >= 0 and {totalScore} <= 4",
-            "html": "<h3>Result: Conservative Investor</h3><p>You prioritize the safety and stability of your investments over potential high returns. You may prefer investments like bonds, CDs, or high-quality dividend-paying stocks.</p>"
-          },
-          {
-            "expression": "{totalScore} >= 5 and {totalScore} <= 8",
-            "html": "<h3>Result: Balanced Investor</h3><p>You seek a balance between risk and return. Your portfolio may include a mix of stocks and bonds, with a moderate allocation to growth-oriented assets.</p>"
-          },
-          {
-            "expression": "{totalScore} >= 9 and {totalScore} <= 12",
-            "html": "<h3>Result: Aggressive Investor</h3><p>You are comfortable with higher levels of risk and are willing to tolerate market volatility in pursuit of potentially higher returns. Your portfolio may be heavily weighted towards stocks and other growth investments.</p>"
-          }
-        ],
-        "elements": [
-          {
-            "name": "investment-drop-reaction",
-            "type": "radiogroup",
-            "title": "Imagine you have $100,000 invested. If the value of this investment dropped to $70,000 overnight, how would you react?",
-            "choices": [
-              {
-                "value": 0,
-                "text": "You would panic and sell all of your investments."
-              },
-              {
-                "value": 1,
-                "text": "You would be concerned but would wait to see if the investment recovers."
-              },
-              {
-                "value": 2,
-                "text": "You would view it as a buying opportunity and invest more money."
-              }
-            ],
-            "isRequired": true
-          },
-          {
-            "name": "investment-comfort",
-            "type": "radiogroup",
-            "title": "Which of the following investments would you be most comfortable with?",
-            "choices": [
-              {
-                "value": 2,
-                "text": "A single stock with the potential for high returns but also high risk."
-              },
-              {
-                "value": 1,
-                "text": "A diversified portfolio of stocks and bonds with moderate risk and return potential."
-              },
-              {
-                "value": 0,
-                "text": "A savings account or government bond with low risk and low return potential."
-              }
-            ],
-            "isRequired": true
-          },
-          {
-            "name": "investment-philosophy",
-            "type": "radiogroup",
-            "title": "You are considering an investment with the potential to earn high returns over the next few years. However, there's also a chance that you could lose some or all of your initial investment. What would you do?",
-            "choices": [
-              {
-                "value": 0,
-                "text": "You would not invest, as the risk is too high."
-              },
-              {
-                "value": 1,
-                "text": "You would invest a small amount of money that you can afford to lose."
-              },
-              {
-                "value": 2,
-                "text": "You would invest a significant portion of your savings, hoping for high returns."
-              }
-            ],
-            "isRequired": true
-          },
-          {
-            "name": "investment-horizon",
-            "type": "radiogroup",
-            "title": "How long do you plan to invest your money?",
-            "choices": [
-              {
-                "value": 0,
-                "text": "Less than 5 years."
-              },
-              {
-                "value": 1,
-                "text": "5-10 years."
-              },
-              {
-                "value": 2,
-                "text": "More than 10 years."
-              }
-            ],
-            "isRequired": true
-          },
-          {
-            "name": "financial-situation",
-            "type": "radiogroup",
-            "title": "What is your current financial situation?",
-            "choices": [
-              {
-                "value": 0,
-                "text": "You have significant debt and limited savings."
-              },
-              {
-                "value": 1,
-                "text": "You have some debt but also have a decent amount of savings."
-              },
-              {
-                "value": 2,
-                "text": "You have little to no debt and a substantial amount of savings."
-              }
-            ],
-            "isRequired": true
-          },
-          {
-            "name": "risk-feeling",
-            "type": "radiogroup",
-            "title": "In general, how would you describe your feelings about taking risks with your money?",
-            "choices": [
-              {
-                "value": 0,
-                "text": "You prefer to avoid risks and prioritize the safety of your investments."
-              },
-              {
-                "value": 1,
-                "text": "You are comfortable with some risk, as long as the potential rewards are reasonable."
-              },
-              {
-                "value": 2,
-                "text": "You are willing to take substantial risks in pursuit of high returns."
-              }
-            ],
-            "isRequired": true
-          }
-        ],
-        "calculatedValues": [
-          {
-            "name": "totalScore",
-            "expression": "{investment-drop-reaction} + {investment-comfort} + {investment-philosophy} + {investment-horizon} + {financial-situation} + {risk-feeling}",
-            "includeIntoResult": true
-          }
-        ]
-      }
+      ]
+    },
+    {
+      "title": "Chapter 4: Types of Accounts",
+      "los": [
+        {
+          "title": "Learning Objective 4.1 — Individual Retirement Accounts",
+          "preview": "Differentiate Traditional vs. Roth IRAs; when to use and why.",
+          "snippets": [
+            {
+              "title": "Body",
+              "body": "Differentiate Traditional vs. Roth IRAs; when to use and why."
+            },
+            {
+              "title": "Traditional IRA characteristics",
+              "body": "Details: Traditional IRA characteristics. Placeholder content derived from the chapter text to test\nparsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Use cases",
+              "body": "Details: Use cases. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Rollovers & inheritance basics",
+              "body": "Details: Rollovers & inheritance basics. Placeholder content derived from the chapter text to test\nparsing.\n\nAdditional supporting explanation and examples."
+            }
+          ]
+        },
+        {
+          "title": "Learning Objective 4.2 — IRA Tax-Deductibility",
+          "preview": "Understand deductibility rules with/without employer plan access.",
+          "snippets": [
+            {
+              "title": "Body",
+              "body": "Understand deductibility rules with/without employer plan access."
+            },
+            {
+              "title": "MAGI thresholds",
+              "body": "Details: MAGI thresholds. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Spousal IRA rules",
+              "body": "Details: Spousal IRA rules. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Recordkeeping for basis",
+              "body": "Details: Recordkeeping for basis. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            }
+          ]
+        },
+        {
+          "title": "Learning Objective 4.3 — Roth IRAs",
+          "preview": "Tax-free growth mechanics; 5-year clock; RMD advantages.",
+          "snippets": [
+            {
+              "title": "Body",
+              "body": "Tax-free growth mechanics; 5-year clock; RMD advantages."
+            },
+            {
+              "title": "Contribution limits",
+              "body": "Details: Contribution limits. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Conversions",
+              "body": "Details: Conversions. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "When Roth fits the plan",
+              "body": "Details: When Roth fits the plan. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Chapter 5: Guarantees",
+      "los": [
+        {
+          "title": "Learning Objective 5.1 — Social Security Basics",
+          "preview": "AIME/PIA framework; statements; benefit calculation tiers.",
+          "snippets": [
+            {
+              "title": "Body",
+              "body": "AIME/PIA framework; statements; benefit calculation tiers."
+            },
+            {
+              "title": "Creating SSA account",
+              "body": "Details: Creating SSA account. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Reading the statement",
+              "body": "Details: Reading the statement. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Coordinating with plan",
+              "body": "Details: Coordinating with plan. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            }
+          ]
+        },
+        {
+          "title": "Learning Objective 5.2 — Taking Social Security",
+          "preview": "Timing tradeoffs (62, FRA, 70); survivor/Spousal; COLA impacts.",
+          "snippets": [
+            {
+              "title": "Body",
+              "body": "Timing tradeoffs (62, FRA, 70); survivor/Spousal; COLA impacts."
+            },
+            {
+              "title": "Claiming windows",
+              "body": "Details: Claiming windows. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Delayed credits",
+              "body": "Details: Delayed credits. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Cash flow integration",
+              "body": "Details: Cash flow integration. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            }
+          ]
+        },
+        {
+          "title": "Learning Objective 5.3 — Beneficiaries & Coordination",
+          "preview": "Keep beneficiaries current; coordinate with other guarantees.",
+          "snippets": [
+            {
+              "title": "Body",
+              "body": "Keep beneficiaries current; coordinate with other guarantees."
+            },
+            {
+              "title": "Designations",
+              "body": "Details: Designations. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Coordination with annuities/pensions",
+              "body": "Details: Coordination with annuities/pensions. Placeholder content derived from the chapter text to\ntest parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Estate considerations",
+              "body": "Details: Estate considerations. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Chapter 6: Distributions",
+      "los": [
+        {
+          "title": "Learning Objective 6.1 — What’s Better?",
+          "preview": "Compare DBP vs. DCP distribution choices; lump sum vs. annuity.",
+          "snippets": [
+            {
+              "title": "Body",
+              "body": "Compare DBP vs. DCP distribution choices; lump sum vs. annuity."
+            },
+            {
+              "title": "DBP traits",
+              "body": "Details: DBP traits. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "DCP traits",
+              "body": "Details: DCP traits. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Guarantee vs. growth tradeoffs",
+              "body": "Details: Guarantee vs. growth tradeoffs. Placeholder content derived from the chapter text to test\nparsing.\n\nAdditional supporting explanation and examples."
+            }
+          ]
+        },
+        {
+          "title": "Learning Objective 6.2 — DC Plan Distributions",
+          "preview": "Options on departure/retirement: leave, transfer, rollover, withdraw, annuitize.",
+          "snippets": [
+            {
+              "title": "Body",
+              "body": "Options on departure/retirement: leave, transfer, rollover, withdraw, annuitize."
+            },
+            {
+              "title": "Leave in plan",
+              "body": "Details: Leave in plan. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "To new plan",
+              "body": "Details: To new plan. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "To IRA / Roth options",
+              "body": "Details: To IRA / Roth options. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            }
+          ]
+        },
+        {
+          "title": "Learning Objective 6.3 — Moving My Money",
+          "preview": "Direct vs. indirect rollovers; timing; tax traps; paperwork.",
+          "snippets": [
+            {
+              "title": "Body",
+              "body": "Direct vs. indirect rollovers; timing; tax traps; paperwork."
+            },
+            {
+              "title": "Rollover vs. transfer",
+              "body": "Details: Rollover vs. transfer. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Withholding pitfalls",
+              "body": "Details: Withholding pitfalls. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Creditor protection",
+              "body": "Details: Creditor protection. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Chapter 7: Investments",
+      "los": [
+        {
+          "title": "Learning Objective 7.1 — An Investment’s Objective",
+          "preview": "Tie objective to use-case, time horizon, and global portfolio context.",
+          "snippets": [
+            {
+              "title": "Body",
+              "body": "Tie objective to use-case, time horizon, and global portfolio context."
+            },
+            {
+              "title": "Time horizon & risk",
+              "body": "Details: Time horizon & risk. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Liquidity reserves",
+              "body": "Details: Liquidity reserves. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Portfolio inventory",
+              "body": "Details: Portfolio inventory. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            }
+          ]
+        },
+        {
+          "title": "Learning Objective 7.2 — Loaning vs. Owning",
+          "preview": "Understand credit (bonds/cash) vs. equity (stocks/real assets).",
+          "snippets": [
+            {
+              "title": "Body",
+              "body": "Understand credit (bonds/cash) vs. equity (stocks/real assets)."
+            },
+            {
+              "title": "Lending forms",
+              "body": "Details: Lending forms. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Equity forms",
+              "body": "Details: Equity forms. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Risk/return profiles",
+              "body": "Details: Risk/return profiles. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            }
+          ]
+        },
+        {
+          "title": "Learning Objective 7.3 — Cash & Money Markets",
+          "preview": "Cash vehicles, liquidity, FDIC vs. funds; role in plan.",
+          "snippets": [
+            {
+              "title": "Body",
+              "body": "Cash vehicles, liquidity, FDIC vs. funds; role in plan."
+            },
+            {
+              "title": "Savings/MMAs/MMFs",
+              "body": "Details: Savings/MMAs/MMFs. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "CDs",
+              "body": "Details: CDs. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "When/where to hold cash",
+              "body": "Details: When/where to hold cash. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            }
+          ]
+        },
+        {
+          "title": "Learning Objective 7.4 — Bonds: Intro & Yield",
+          "preview": "How bonds work; coupon vs. yield; term; pricing with rates.",
+          "snippets": [
+            {
+              "title": "Body",
+              "body": "How bonds work; coupon vs. yield; term; pricing with rates."
+            },
+            {
+              "title": "Bond terms",
+              "body": "Details: Bond terms. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Yield mechanics",
+              "body": "Details: Yield mechanics. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Interest-rate sensitivity",
+              "body": "Details: Interest-rate sensitivity. Placeholder content derived from the chapter text to test\nparsing.\n\nAdditional supporting explanation and examples."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Chapter 8: Insurance",
+      "los": [
+        {
+          "title": "Learning Objective 8.1 — Car, Home, & Umbrella",
+          "preview": "Review/adjust P&C coverages approaching retirement; asset protection.",
+          "snippets": [
+            {
+              "title": "Body",
+              "body": "Review/adjust P&C coverages approaching retirement; asset protection."
+            },
+            {
+              "title": "Vehicle coverage",
+              "body": "Details: Vehicle coverage. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Home/Renters",
+              "body": "Details: Home/Renters. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Umbrella considerations",
+              "body": "Details: Umbrella considerations. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            }
+          ]
+        },
+        {
+          "title": "Learning Objective 8.2 — Disability Insurance",
+          "preview": "Short vs. long-term; group vs. personal; COLA; own-any occupation.",
+          "snippets": [
+            {
+              "title": "Body",
+              "body": "Short vs. long-term; group vs. personal; COLA; own-any occupation."
+            },
+            {
+              "title": "Coverage scope",
+              "body": "Details: Coverage scope. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Elimination/benefit periods",
+              "body": "Details: Elimination/benefit periods. Placeholder content derived from the chapter text to test\nparsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Coordination with SSDI/SDI",
+              "body": "Details: Coordination with SSDI/SDI. Placeholder content derived from the chapter text to test\nparsing.\n\nAdditional supporting explanation and examples."
+            }
+          ]
+        },
+        {
+          "title": "Learning Objective 8.3 — Health/Medicare & LTC (placeholder)",
+          "preview": "Coordinate Medicare choices and custodial care risk.",
+          "snippets": [
+            {
+              "title": "Body",
+              "body": "Coordinate Medicare choices and custodial care risk."
+            },
+            {
+              "title": "Medicare parts",
+              "body": "Details: Medicare parts. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "LTC policy basics",
+              "body": "Details: LTC policy basics. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Self-insure thresholds",
+              "body": "Details: Self-insure thresholds. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Chapter 9: Estate Planning",
+      "los": [
+        {
+          "title": "Learning Objective 9.1 — Estate Planning Basics",
+          "preview": "Plan early; document preferences; appoint agents; avoid common pitfalls.",
+          "snippets": [
+            {
+              "title": "Body",
+              "body": "Plan early; document preferences; appoint agents; avoid common pitfalls."
+            },
+            {
+              "title": "Goals",
+              "body": "Details: Goals. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Effective plan components",
+              "body": "Details: Effective plan components. Placeholder content derived from the chapter text to test\nparsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Avoiding missteps",
+              "body": "Details: Avoiding missteps. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            }
+          ]
+        },
+        {
+          "title": "Learning Objective 9.2 — Appreciated Assets (Step-Up)",
+          "preview": "Step-up in basis; which assets qualify; exceptions (IRAs, etc.).",
+          "snippets": [
+            {
+              "title": "Body",
+              "body": "Step-up in basis; which assets qualify; exceptions (IRAs, etc.)."
+            },
+            {
+              "title": "Qualifying assets",
+              "body": "Details: Qualifying assets. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Non-qualifying assets",
+              "body": "Details: Non-qualifying assets. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Tax timing",
+              "body": "Details: Tax timing. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            }
+          ]
+        },
+        {
+          "title": "Learning Objective 9.3 — Incapacity Planning",
+          "preview": "Durable POA, AHCD/Living Will, healthcare proxy; executor readiness.",
+          "snippets": [
+            {
+              "title": "Body",
+              "body": "Durable POA, AHCD/Living Will, healthcare proxy; executor readiness."
+            },
+            {
+              "title": "Scope of powers",
+              "body": "Details: Scope of powers. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Medical directives",
+              "body": "Details: Medical directives. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            },
+            {
+              "title": "Anatomical gifts",
+              "body": "Details: Anatomical gifts. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
+            }
+          ]
+        }
+      ]
     }
   ]
 }
