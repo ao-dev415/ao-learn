@@ -70,6 +70,19 @@
             }
           ]
         }
+      ],
+      "assessment": {
+        "id": "assess-c1",
+        "title": "Chapter 1 Knowledge Check",
+        "href": "/assess/ch1",
+        "src": "/data/assessments/assessment-ch1.json"
+      },
+      "items": [
+        {
+          "type": "assessment",
+          "title": "Chapter 1 Knowledge Check",
+          "href": "/assess/ch1"
+        }
       ]
     },
     {
@@ -140,6 +153,19 @@
               "body": "Details: Impacts on plan success. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             }
           ]
+        }
+      ],
+      "assessment": {
+        "id": "assess-c2",
+        "title": "Chapter 2 Knowledge Check",
+        "href": "/assess/ch2",
+        "src": "/data/assessments/assessment-ch2.json"
+      },
+      "items": [
+        {
+          "type": "assessment",
+          "title": "Chapter 2 Knowledge Check",
+          "href": "/assess/ch2"
         }
       ]
     },
@@ -212,6 +238,19 @@
             }
           ]
         }
+      ],
+      "assessment": {
+        "id": "assess-c3",
+        "title": "Risk Tolerance Questionnaire",
+        "href": "/assess/ch3",
+        "src": "/data/assessments/assessment-ch3.json"
+      },
+      "items": [
+        {
+          "type": "assessment",
+          "title": "Risk Tolerance Questionnaire",
+          "href": "/assess/ch3"
+        }
       ]
     },
     {
@@ -282,6 +321,19 @@
               "body": "Details: When Roth fits the plan. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             }
           ]
+        }
+      ],
+      "assessment": {
+        "id": "assess-c4",
+        "title": "Chapter 4 Knowledge Check",
+        "href": "/assess/ch4",
+        "src": "/data/assessments/assessment-ch4.json"
+      },
+      "items": [
+        {
+          "type": "assessment",
+          "title": "Chapter 4 Knowledge Check",
+          "href": "/assess/ch4"
         }
       ]
     },
@@ -354,6 +406,19 @@
             }
           ]
         }
+      ],
+      "assessment": {
+        "id": "assess-c5",
+        "title": "Chapter 5 Knowledge Check",
+        "href": "/assess/ch5",
+        "src": "/data/assessments/assessment-ch5.json"
+      },
+      "items": [
+        {
+          "type": "assessment",
+          "title": "Chapter 5 Knowledge Check",
+          "href": "/assess/ch5"
+        }
       ]
     },
     {
@@ -424,6 +489,19 @@
               "body": "Details: Creditor protection. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             }
           ]
+        }
+      ],
+      "assessment": {
+        "id": "assess-c6",
+        "title": "Chapter 6 Knowledge Check",
+        "href": "/assess/ch6",
+        "src": "/data/assessments/assessment-ch6.json"
+      },
+      "items": [
+        {
+          "type": "assessment",
+          "title": "Chapter 6 Knowledge Check",
+          "href": "/assess/ch6"
         }
       ]
     },
@@ -518,6 +596,19 @@
             }
           ]
         }
+      ],
+      "assessment": {
+        "id": "assess-c7",
+        "title": "Chapter 7 Knowledge Check",
+        "href": "/assess/ch7",
+        "src": "/data/assessments/assessment-ch7.json"
+      },
+      "items": [
+        {
+          "type": "assessment",
+          "title": "Chapter 7 Knowledge Check",
+          "href": "/assess/ch7"
+        }
       ]
     },
     {
@@ -589,6 +680,19 @@
             }
           ]
         }
+      ],
+      "assessment": {
+        "id": "assess-c8",
+        "title": "Chapter 8 Knowledge Check",
+        "href": "/assess/ch8",
+        "src": "/data/assessments/assessment-ch8.json"
+      },
+      "items": [
+        {
+          "type": "assessment",
+          "title": "Chapter 8 Knowledge Check",
+          "href": "/assess/ch8"
+        }
       ]
     },
     {
@@ -659,6 +763,19 @@
               "body": "Details: Anatomical gifts. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             }
           ]
+        }
+      ],
+      "assessment": {
+        "id": "assess-c9",
+        "title": "Chapter 9 Knowledge Check",
+        "href": "/assess/ch9",
+        "src": "/data/assessments/assessment-ch9.json"
+      },
+      "items": [
+        {
+          "type": "assessment",
+          "title": "Chapter 9 Knowledge Check",
+          "href": "/assess/ch9"
         }
       ]
     }
