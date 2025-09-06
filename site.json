@@ -23,13 +23,6 @@
             {
               "title": "Risk preferences",
               "body": "Details: Risk preferences. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
-            },
-            {
-              "type": "quiz",
-              "title": "Demo Quiz",
-              "quiz": {
-                "src": "/data/quizzes/quiz-demo.json"
-              }
             }
           ]
         },
