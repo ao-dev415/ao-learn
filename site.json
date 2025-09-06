@@ -74,8 +74,68 @@
       "assessment": {
         "id": "assess-c1",
         "title": "Chapter 1 Knowledge Check",
+        "href": "/assess-c1",
         "src": "/data/assessments/assessment-ch1.json",
-        "href": "/assess-c1"
+        "data": {
+          "title": "Chapter 1 Knowledge Check",
+          "description": "This assessment demonstrates different question types.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "name": "text-question",
+                  "type": "text",
+                  "title": "What is the primary topic of this chapter? (Text Input)"
+                },
+                {
+                  "name": "dropdown-question",
+                  "type": "dropdown",
+                  "title": "Which concept was most interesting? (Dropdown)",
+                  "choices": [
+                    "Concept A",
+                    "Concept B",
+                    "Concept C"
+                  ]
+                },
+                {
+                  "name": "likert-scale-question",
+                  "type": "matrix",
+                  "title": "Please rate your understanding of the following topics (Likert Scale):",
+                  "columns": [
+                    {
+                      "value": 1,
+                      "text": "Not at all"
+                    },
+                    {
+                      "value": 2,
+                      "text": "A little"
+                    },
+                    {
+                      "value": 3,
+                      "text": "Moderately"
+                    },
+                    {
+                      "value": 4,
+                      "text": "Very well"
+                    }
+                  ],
+                  "rows": [
+                    {
+                      "value": "topic1",
+                      "text": "Topic 1"
+                    },
+                    {
+                      "value": "topic2",
+                      "text": "Topic 2"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        }
       },
       "items": [
         {
@@ -158,8 +218,68 @@
       "assessment": {
         "id": "assess-c2",
         "title": "Chapter 2 Knowledge Check",
+        "href": "/assess-c2",
         "src": "/data/assessments/assessment-ch2.json",
-        "href": "/assess-c2"
+        "data": {
+          "title": "Chapter 2 Knowledge Check",
+          "description": "This assessment demonstrates different question types.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "name": "text-question",
+                  "type": "text",
+                  "title": "What is the primary topic of this chapter? (Text Input)"
+                },
+                {
+                  "name": "dropdown-question",
+                  "type": "dropdown",
+                  "title": "Which concept was most interesting? (Dropdown)",
+                  "choices": [
+                    "Concept A",
+                    "Concept B",
+                    "Concept C"
+                  ]
+                },
+                {
+                  "name": "likert-scale-question",
+                  "type": "matrix",
+                  "title": "Please rate your understanding of the following topics (Likert Scale):",
+                  "columns": [
+                    {
+                      "value": 1,
+                      "text": "Not at all"
+                    },
+                    {
+                      "value": 2,
+                      "text": "A little"
+                    },
+                    {
+                      "value": 3,
+                      "text": "Moderately"
+                    },
+                    {
+                      "value": 4,
+                      "text": "Very well"
+                    }
+                  ],
+                  "rows": [
+                    {
+                      "value": "topic1",
+                      "text": "Topic 1"
+                    },
+                    {
+                      "value": "topic2",
+                      "text": "Topic 2"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        }
       },
       "items": [
         {
@@ -242,8 +362,140 @@
       "assessment": {
         "id": "assess-c3",
         "title": "Chapter 3 Knowledge Check",
+        "href": "/assess-c3",
         "src": "/data/assessments/assessment-ch3.json",
-        "href": "/assess-c3"
+        "data": {
+          "title": "Risk Tolerance Questionnaire",
+          "description": "For each question, choose the answer that best reflects your feelings and preferences.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "name": "investment-drop-reaction",
+                  "type": "radiogroup",
+                  "title": "Imagine you have $100,000 invested. If the value of this investment dropped to $70,000 overnight, how would you react?",
+                  "choices": [
+                    {
+                      "value": 0,
+                      "text": "You would panic and sell all of your investments."
+                    },
+                    {
+                      "value": 1,
+                      "text": "You would be concerned but would wait to see if the investment recovers."
+                    },
+                    {
+                      "value": 2,
+                      "text": "You would view it as a buying opportunity and invest more money."
+                    }
+                  ],
+                  "isRequired": true
+                },
+                {
+                  "name": "investment-comfort",
+                  "type": "radiogroup",
+                  "title": "Which of the following investments would you be most comfortable with?",
+                  "choices": [
+                    {
+                      "value": 2,
+                      "text": "A single stock with the potential for high returns but also high risk."
+                    },
+                    {
+                      "value": 1,
+                      "text": "A diversified portfolio of stocks and bonds with moderate risk and return potential."
+                    },
+                    {
+                      "value": 0,
+                      "text": "A savings account or government bond with low risk and low return potential."
+                    }
+                  ],
+                  "isRequired": true
+                },
+                {
+                  "name": "investment-philosophy",
+                  "type": "radiogroup",
+                  "title": "You are considering an investment with the potential to earn high returns over the next few years. However, there's also a chance that you could lose some or all of your initial investment. What would you do?",
+                  "choices": [
+                    {
+                      "value": 0,
+                      "text": "You would not invest, as the risk is too high."
+                    },
+                    {
+                      "value": 1,
+                      "text": "You would invest a small amount of money that you can afford to lose."
+                    },
+                    {
+                      "value": 2,
+                      "text": "You would invest a significant portion of your savings, hoping for high returns."
+                    }
+                  ],
+                  "isRequired": true
+                },
+                {
+                  "name": "investment-horizon",
+                  "type": "radiogroup",
+                  "title": "How long do you plan to invest your money?",
+                  "choices": [
+                    {
+                      "value": 0,
+                      "text": "Less than 5 years."
+                    },
+                    {
+                      "value": 1,
+                      "text": "5-10 years."
+                    },
+                    {
+                      "value": 2,
+                      "text": "More than 10 years."
+                    }
+                  ],
+                  "isRequired": true
+                },
+                {
+                  "name": "financial-situation",
+                  "type": "radiogroup",
+                  "title": "What is your current financial situation?",
+                  "choices": [
+                    {
+                      "value": 0,
+                      "text": "You have significant debt and limited savings."
+                    },
+                    {
+                      "value": 1,
+                      "text": "You have some debt but also have a decent amount of savings."
+                    },
+                    {
+                      "value": 2,
+                      "text": "You have little to no debt and a substantial amount of savings."
+                    }
+                  ],
+                  "isRequired": true
+                },
+                {
+                  "name": "risk-feeling",
+                  "type": "radiogroup",
+                  "title": "In general, how would you describe your feelings about taking risks with your money?",
+                  "choices": [
+                    {
+                      "value": 0,
+                      "text": "You prefer to avoid risks and prioritize the safety of your investments."
+                    },
+                    {
+                      "value": 1,
+                      "text": "You are comfortable with some risk, as long as the potential rewards are reasonable."
+                    },
+                    {
+                      "value": 2,
+                      "text": "You are willing to take substantial risks in pursuit of high returns."
+                    }
+                  ],
+                  "isRequired": true
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        }
       },
       "items": [
         {
@@ -326,8 +578,68 @@
       "assessment": {
         "id": "assess-c4",
         "title": "Chapter 4 Knowledge Check",
+        "href": "/assess-c4",
         "src": "/data/assessments/assessment-ch4.json",
-        "href": "/assess-c4"
+        "data": {
+          "title": "Chapter 4 Knowledge Check",
+          "description": "This assessment demonstrates different question types.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "name": "text-question",
+                  "type": "text",
+                  "title": "What is the primary topic of this chapter? (Text Input)"
+                },
+                {
+                  "name": "dropdown-question",
+                  "type": "dropdown",
+                  "title": "Which concept was most interesting? (Dropdown)",
+                  "choices": [
+                    "Concept A",
+                    "Concept B",
+                    "Concept C"
+                  ]
+                },
+                {
+                  "name": "likert-scale-question",
+                  "type": "matrix",
+                  "title": "Please rate your understanding of the following topics (Likert Scale):",
+                  "columns": [
+                    {
+                      "value": 1,
+                      "text": "Not at all"
+                    },
+                    {
+                      "value": 2,
+                      "text": "A little"
+                    },
+                    {
+                      "value": 3,
+                      "text": "Moderately"
+                    },
+                    {
+                      "value": 4,
+                      "text": "Very well"
+                    }
+                  ],
+                  "rows": [
+                    {
+                      "value": "topic1",
+                      "text": "Topic 1"
+                    },
+                    {
+                      "value": "topic2",
+                      "text": "Topic 2"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        }
       },
       "items": [
         {
@@ -410,8 +722,68 @@
       "assessment": {
         "id": "assess-c5",
         "title": "Chapter 5 Knowledge Check",
+        "href": "/assess-c5",
         "src": "/data/assessments/assessment-ch5.json",
-        "href": "/assess-c5"
+        "data": {
+          "title": "Chapter 5 Knowledge Check",
+          "description": "This assessment demonstrates different question types.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "name": "text-question",
+                  "type": "text",
+                  "title": "What is the primary topic of this chapter? (Text Input)"
+                },
+                {
+                  "name": "dropdown-question",
+                  "type": "dropdown",
+                  "title": "Which concept was most interesting? (Dropdown)",
+                  "choices": [
+                    "Concept A",
+                    "Concept B",
+                    "Concept C"
+                  ]
+                },
+                {
+                  "name": "likert-scale-question",
+                  "type": "matrix",
+                  "title": "Please rate your understanding of the following topics (Likert Scale):",
+                  "columns": [
+                    {
+                      "value": 1,
+                      "text": "Not at all"
+                    },
+                    {
+                      "value": 2,
+                      "text": "A little"
+                    },
+                    {
+                      "value": 3,
+                      "text": "Moderately"
+                    },
+                    {
+                      "value": 4,
+                      "text": "Very well"
+                    }
+                  ],
+                  "rows": [
+                    {
+                      "value": "topic1",
+                      "text": "Topic 1"
+                    },
+                    {
+                      "value": "topic2",
+                      "text": "Topic 2"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        }
       },
       "items": [
         {
@@ -494,8 +866,68 @@
       "assessment": {
         "id": "assess-c6",
         "title": "Chapter 6 Knowledge Check",
+        "href": "/assess-c6",
         "src": "/data/assessments/assessment-ch6.json",
-        "href": "/assess-c6"
+        "data": {
+          "title": "Chapter 6 Knowledge Check",
+          "description": "This assessment demonstrates different question types.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "name": "text-question",
+                  "type": "text",
+                  "title": "What is the primary topic of this chapter? (Text Input)"
+                },
+                {
+                  "name": "dropdown-question",
+                  "type": "dropdown",
+                  "title": "Which concept was most interesting? (Dropdown)",
+                  "choices": [
+                    "Concept A",
+                    "Concept B",
+                    "Concept C"
+                  ]
+                },
+                {
+                  "name": "likert-scale-question",
+                  "type": "matrix",
+                  "title": "Please rate your understanding of the following topics (Likert Scale):",
+                  "columns": [
+                    {
+                      "value": 1,
+                      "text": "Not at all"
+                    },
+                    {
+                      "value": 2,
+                      "text": "A little"
+                    },
+                    {
+                      "value": 3,
+                      "text": "Moderately"
+                    },
+                    {
+                      "value": 4,
+                      "text": "Very well"
+                    }
+                  ],
+                  "rows": [
+                    {
+                      "value": "topic1",
+                      "text": "Topic 1"
+                    },
+                    {
+                      "value": "topic2",
+                      "text": "Topic 2"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        }
       },
       "items": [
         {
@@ -600,8 +1032,68 @@
       "assessment": {
         "id": "assess-c7",
         "title": "Chapter 7 Knowledge Check",
+        "href": "/assess-c7",
         "src": "/data/assessments/assessment-ch7.json",
-        "href": "/assess-c7"
+        "data": {
+          "title": "Chapter 7 Knowledge Check",
+          "description": "This assessment demonstrates different question types.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "name": "text-question",
+                  "type": "text",
+                  "title": "What is the primary topic of this chapter? (Text Input)"
+                },
+                {
+                  "name": "dropdown-question",
+                  "type": "dropdown",
+                  "title": "Which concept was most interesting? (Dropdown)",
+                  "choices": [
+                    "Concept A",
+                    "Concept B",
+                    "Concept C"
+                  ]
+                },
+                {
+                  "name": "likert-scale-question",
+                  "type": "matrix",
+                  "title": "Please rate your understanding of the following topics (Likert Scale):",
+                  "columns": [
+                    {
+                      "value": 1,
+                      "text": "Not at all"
+                    },
+                    {
+                      "value": 2,
+                      "text": "A little"
+                    },
+                    {
+                      "value": 3,
+                      "text": "Moderately"
+                    },
+                    {
+                      "value": 4,
+                      "text": "Very well"
+                    }
+                  ],
+                  "rows": [
+                    {
+                      "value": "topic1",
+                      "text": "Topic 1"
+                    },
+                    {
+                      "value": "topic2",
+                      "text": "Topic 2"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        }
       },
       "items": [
         {
@@ -684,8 +1176,68 @@
       "assessment": {
         "id": "assess-c8",
         "title": "Chapter 8 Knowledge Check",
+        "href": "/assess-c8",
         "src": "/data/assessments/assessment-ch8.json",
-        "href": "/assess-c8"
+        "data": {
+          "title": "Chapter 8 Knowledge Check",
+          "description": "This assessment demonstrates different question types.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "name": "text-question",
+                  "type": "text",
+                  "title": "What is the primary topic of this chapter? (Text Input)"
+                },
+                {
+                  "name": "dropdown-question",
+                  "type": "dropdown",
+                  "title": "Which concept was most interesting? (Dropdown)",
+                  "choices": [
+                    "Concept A",
+                    "Concept B",
+                    "Concept C"
+                  ]
+                },
+                {
+                  "name": "likert-scale-question",
+                  "type": "matrix",
+                  "title": "Please rate your understanding of the following topics (Likert Scale):",
+                  "columns": [
+                    {
+                      "value": 1,
+                      "text": "Not at all"
+                    },
+                    {
+                      "value": 2,
+                      "text": "A little"
+                    },
+                    {
+                      "value": 3,
+                      "text": "Moderately"
+                    },
+                    {
+                      "value": 4,
+                      "text": "Very well"
+                    }
+                  ],
+                  "rows": [
+                    {
+                      "value": "topic1",
+                      "text": "Topic 1"
+                    },
+                    {
+                      "value": "topic2",
+                      "text": "Topic 2"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        }
       },
       "items": [
         {
@@ -768,8 +1320,68 @@
       "assessment": {
         "id": "assess-c9",
         "title": "Chapter 9 Knowledge Check",
+        "href": "/assess-c9",
         "src": "/data/assessments/assessment-ch9.json",
-        "href": "/assess-c9"
+        "data": {
+          "title": "Chapter 9 Knowledge Check",
+          "description": "This assessment demonstrates different question types.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "name": "text-question",
+                  "type": "text",
+                  "title": "What is the primary topic of this chapter? (Text Input)"
+                },
+                {
+                  "name": "dropdown-question",
+                  "type": "dropdown",
+                  "title": "Which concept was most interesting? (Dropdown)",
+                  "choices": [
+                    "Concept A",
+                    "Concept B",
+                    "Concept C"
+                  ]
+                },
+                {
+                  "name": "likert-scale-question",
+                  "type": "matrix",
+                  "title": "Please rate your understanding of the following topics (Likert Scale):",
+                  "columns": [
+                    {
+                      "value": 1,
+                      "text": "Not at all"
+                    },
+                    {
+                      "value": 2,
+                      "text": "A little"
+                    },
+                    {
+                      "value": 3,
+                      "text": "Moderately"
+                    },
+                    {
+                      "value": 4,
+                      "text": "Very well"
+                    }
+                  ],
+                  "rows": [
+                    {
+                      "value": "topic1",
+                      "text": "Topic 1"
+                    },
+                    {
+                      "value": "topic2",
+                      "text": "Topic 2"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        }
       },
       "items": [
         {
