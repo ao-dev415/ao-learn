@@ -729,6 +729,125 @@ document.addEventListener('DOMContentLoaded', function () {
   if (allow) allow.addEventListener('click', () => AOAnalytics.enable());
 });
 </script>
+<!-- --- Assessment loader + safe override (drop-in) --- -->
+<script id="assessment-loader-patch">
+(function () {
+  // prevent double install
+  if (window.__assessmentLoaderPatched) return;
+  window.__assessmentLoaderPatched = true;
+
+  // ---- helpers -------------------------------------------------------------
+
+  async function loadAssessment(meta) {
+    // meta can be a full Survey JSON object OR a tiny object like { src, href, url }
+    if (!meta) return null;
+
+    // already a survey object?
+    if (meta.pages || meta.elements || meta.data) {
+      return normalizeSurvey(meta);
+    }
+
+    const url = meta.src || meta.href || meta.url;
+    if (!url) return null;
+
+    const res = await fetch(url, {
+      cache: "no-store",           // branch previews avoid stale JSON
+      credentials: "same-origin"
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${url}`);
+    const raw = await res.json();
+    return normalizeSurvey(raw);
+  }
+
+  function normalizeSurvey(src) {
+    // Accept a few shapes and return a canonical SurveyJS object with "pages"
+    if (!src || typeof src !== "object") return null;
+
+    // Survey Creator style wrapper: { data: { pages|elements, title?, description? } }
+    if (src.data && typeof src.data === "object") {
+      const d = src.data;
+      if (Array.isArray(d.pages)) {
+        return {
+          title: src.title || d.title || "",
+          description: src.description || d.description || "",
+          pages: d.pages
+        };
+      }
+      if (Array.isArray(d.elements)) {
+        return {
+          title: src.title || d.title || "",
+          description: src.description || d.description || "",
+          pages: [{ name: "page1", elements: d.elements }]
+        };
+      }
+    }
+
+    // Flat shapes
+    if (Array.isArray(src.pages)) return src;
+    if (Array.isArray(src.elements)) {
+      return {
+        title: src.title || "",
+        description: src.description || "",
+        pages: [{ name: "page1", elements: src.elements }]
+      };
+    }
+
+    return src; // let SurveyJS cope if it’s already proper
+  }
+
+  // ---- safe override of renderAssessmentView -------------------------------
+
+  // Keep references to globals your app already exposes
+  const h    = window.h;
+  const MAIN = window.MAIN;
+  const stopTiming = window.stopTiming || function(){};
+  const renderAssessment = window.renderAssessment; // existing renderer that expects full survey JSON
+
+  // If your app didn’t export renderAssessment, bail gracefully
+  if (typeof renderAssessment !== "function" || typeof h !== "function" || !MAIN) {
+    console.warn("[assess] Patch could not find required globals (renderAssessment / h / MAIN).");
+    return;
+  }
+
+  // Replace the view function with an async version that loads JSON by src
+  window.renderAssessmentView = async function renderAssessmentViewPatched(ch, chIdx) {
+    stopTiming();
+    if (MAIN) MAIN.innerHTML = "";
+
+    const container = h("div", { id: "survey-container" });
+    const titleText = (ch && ch.title ? ch.title : ("Chapter " + (chIdx + 1))) + " — Assessment";
+    MAIN.append(
+      h("h1", {}, titleText),
+      container
+    );
+
+    try {
+      const surveyJson = await loadAssessment(ch && ch.assessment ? ch.assessment : null);
+
+      // Nothing or empty pages? Show a gentle message instead of blank UI
+      const empty = !surveyJson
+        || !Array.isArray(surveyJson.pages)
+        || surveyJson.pages.length === 0
+        || surveyJson.pages.every(p => !p || !Array.isArray(p.elements) || p.elements.length === 0);
+
+      if (empty) {
+        container.appendChild(h("div", { class: "muted" }, "The survey is empty or unavailable."));
+        return;
+      }
+
+      // Your existing function that renders a SurveyJS model:
+      // signature in your app: renderAssessment(surveyJson, chapterNumberString, mountNode)
+      renderAssessment(surveyJson, String(chIdx + 1), container);
+    } catch (err) {
+      console.error("[assess] Failed to load assessment:", err);
+      container.appendChild(h("div", { class: "muted" }, "Failed to load the assessment."));
+    }
+  };
+
+  console.info("[assess] Assessment loader patch installed.");
+})();
+</script>
+<!-- --- /Assessment loader + safe override --- -->
 </body>
 </html>
 }

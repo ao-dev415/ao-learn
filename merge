@@ -1,0 +1,51 @@
+[i] Building from per-chapter DOCX under content/docx/**/chNN.docx
+… parsing ch1: ch01.docx
+… parsing ch2: ch02.docx
+… parsing ch3: ch03.docx
+… parsing ch4: ch04.docx
+… parsing ch5: ch05.docx
+… parsing ch6: ch06.docx
+… parsing ch7: ch07.docx
+… parsing ch8: ch08.docx
+… parsing ch9: ch09.docx
+… new chapter: Chapter 1: My Perfect Plan
+    … LO: Learning Objective 1.1 — Overview
+    … LO: Learning Objective 1.2 — Planning Process
+    … LO: Learning Objective 1.3 — Readiness Checklist
+… new chapter: Chapter 2: Expenses
+    … LO: Learning Objective 2.1 — Being Real
+    … LO: Learning Objective 2.2 — My Expenses
+    … LO: Learning Objective 2.3 — Understanding Inflation
+… new chapter: Chapter 3: Cashflow & Net Worth
+    … LO: Learning Objective 3.1 — Key Planning Documents
+    … LO: Learning Objective 3.2 — Positive Cash Flow
+    … LO: Learning Objective 3.3 — Compounding Interest
+… new chapter: Chapter 4: Types of Accounts
+    … LO: Learning Objective 4.1 — Individual Retirement Accounts
+    … LO: Learning Objective 4.2 — IRA Tax-Deductibility
+    … LO: Learning Objective 4.3 — Roth IRAs
+… new chapter: Chapter 5: Guarantees
+    … LO: Learning Objective 5.1 — Social Security Basics
+    … LO: Learning Objective 5.2 — Taking Social Security
+    … LO: Learning Objective 5.3 — Beneficiaries & Coordination
+… new chapter: Chapter 6: Distributions
+    … LO: Learning Objective 6.1 — What’s Better?
+    … LO: Learning Objective 6.2 — DC Plan Distributions
+    … LO: Learning Objective 6.3 — Moving My Money
+… new chapter: Chapter 7: Investments
+    … LO: Learning Objective 7.1 — An Investment’s Objective
+    … LO: Learning Objective 7.2 — Loaning vs. Owning
+    … LO: Learning Objective 7.3 — Cash & Money Markets
+    … LO: Learning Objective 7.4 — Bonds: Intro & Yield
+… new chapter: Chapter 8: Insurance
+    … LO: Learning Objective 8.1 — Car, Home, & Umbrella
+    … LO: Learning Objective 8.2 — Disability Insurance
+    … LO: Learning Objective 8.3 — Health/Medicare & LTC (placeholder)
+… new chapter: Chapter 9: Estate Planning
+    … LO: Learning Objective 9.1 — Estate Planning Basics
+    … LO: Learning Objective 9.2 — Appreciated Assets (Step-Up)
+    … LO: Learning Objective 9.3 — Incapacity Planning
+[ok] Wrote site.json: 9 chapters, 28 LOs
+[ok] Wrote full/rag.json: 140 snippets
+[i] Previews in /Users/quinc/Desktop/AO-V1/tmp_html
+[ok] Wrote ./site.json and ./full/rag.json (paths unchanged)
