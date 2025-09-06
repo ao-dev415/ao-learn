@@ -74,14 +74,14 @@
       "assessment": {
         "id": "assess-c1",
         "title": "Chapter 1 Knowledge Check",
-        "href": "/assess/ch1",
-        "src": "/data/assessments/assessment-ch1.json"
+        "src": "data/assessments/assessment-ch1.json",
+        "href": "/assess-c1"
       },
       "items": [
         {
           "type": "assessment",
           "title": "Chapter 1 Knowledge Check",
-          "href": "/assess/ch1"
+          "href": "/assess-c1"
         }
       ]
     },
@@ -158,14 +158,14 @@
       "assessment": {
         "id": "assess-c2",
         "title": "Chapter 2 Knowledge Check",
-        "href": "/assess/ch2",
-        "src": "/data/assessments/assessment-ch2.json"
+        "src": "data/assessments/assessment-ch2.json",
+        "href": "/assess-c2"
       },
       "items": [
         {
           "type": "assessment",
           "title": "Chapter 2 Knowledge Check",
-          "href": "/assess/ch2"
+          "href": "/assess-c2"
         }
       ]
     },
@@ -241,15 +241,15 @@
       ],
       "assessment": {
         "id": "assess-c3",
-        "title": "Risk Tolerance Questionnaire",
-        "href": "/assess/ch3",
-        "src": "/data/assessments/assessment-ch3.json"
+        "title": "Chapter 3 Knowledge Check",
+        "src": "data/assessments/assessment-ch3.json",
+        "href": "/assess-c3"
       },
       "items": [
         {
           "type": "assessment",
-          "title": "Risk Tolerance Questionnaire",
-          "href": "/assess/ch3"
+          "title": "Chapter 3 Knowledge Check",
+          "href": "/assess-c3"
         }
       ]
     },
@@ -326,14 +326,14 @@
       "assessment": {
         "id": "assess-c4",
         "title": "Chapter 4 Knowledge Check",
-        "href": "/assess/ch4",
-        "src": "/data/assessments/assessment-ch4.json"
+        "src": "data/assessments/assessment-ch4.json",
+        "href": "/assess-c4"
       },
       "items": [
         {
           "type": "assessment",
           "title": "Chapter 4 Knowledge Check",
-          "href": "/assess/ch4"
+          "href": "/assess-c4"
         }
       ]
     },
@@ -410,14 +410,14 @@
       "assessment": {
         "id": "assess-c5",
         "title": "Chapter 5 Knowledge Check",
-        "href": "/assess/ch5",
-        "src": "/data/assessments/assessment-ch5.json"
+        "src": "data/assessments/assessment-ch5.json",
+        "href": "/assess-c5"
       },
       "items": [
         {
           "type": "assessment",
           "title": "Chapter 5 Knowledge Check",
-          "href": "/assess/ch5"
+          "href": "/assess-c5"
         }
       ]
     },
@@ -494,14 +494,14 @@
       "assessment": {
         "id": "assess-c6",
         "title": "Chapter 6 Knowledge Check",
-        "href": "/assess/ch6",
-        "src": "/data/assessments/assessment-ch6.json"
+        "src": "data/assessments/assessment-ch6.json",
+        "href": "/assess-c6"
       },
       "items": [
         {
           "type": "assessment",
           "title": "Chapter 6 Knowledge Check",
-          "href": "/assess/ch6"
+          "href": "/assess-c6"
         }
       ]
     },
@@ -600,14 +600,14 @@
       "assessment": {
         "id": "assess-c7",
         "title": "Chapter 7 Knowledge Check",
-        "href": "/assess/ch7",
-        "src": "/data/assessments/assessment-ch7.json"
+        "src": "data/assessments/assessment-ch7.json",
+        "href": "/assess-c7"
       },
       "items": [
         {
           "type": "assessment",
           "title": "Chapter 7 Knowledge Check",
-          "href": "/assess/ch7"
+          "href": "/assess-c7"
         }
       ]
     },
@@ -684,14 +684,14 @@
       "assessment": {
         "id": "assess-c8",
         "title": "Chapter 8 Knowledge Check",
-        "href": "/assess/ch8",
-        "src": "/data/assessments/assessment-ch8.json"
+        "src": "data/assessments/assessment-ch8.json",
+        "href": "/assess-c8"
       },
       "items": [
         {
           "type": "assessment",
           "title": "Chapter 8 Knowledge Check",
-          "href": "/assess/ch8"
+          "href": "/assess-c8"
         }
       ]
     },
@@ -768,14 +768,14 @@
       "assessment": {
         "id": "assess-c9",
         "title": "Chapter 9 Knowledge Check",
-        "href": "/assess/ch9",
-        "src": "/data/assessments/assessment-ch9.json"
+        "src": "data/assessments/assessment-ch9.json",
+        "href": "/assess-c9"
       },
       "items": [
         {
           "type": "assessment",
           "title": "Chapter 9 Knowledge Check",
-          "href": "/assess/ch9"
+          "href": "/assess-c9"
         }
       ]
     }
