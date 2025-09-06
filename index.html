@@ -257,53 +257,85 @@ document.addEventListener('DOMContentLoaded', function() {
     function saveQuizResult(id, payload){ quizResults[id] = payload; saveJSON(LS_QUIZ, quizResults); }
     function saveAssessResult(id, payload){ assessResults[id] = payload; saveJSON(LS_ASSESS, assessResults); }
 
-    function renderQuiz(quiz, key){
-      const surveyJson = quiz;
-      if (!surveyJson) return;
-      const surveyHost = h('div', { class: 'cardlet', style: 'margin-top:20px;' });
-      MAIN.appendChild(surveyHost);
-
-      if (Survey?.Theme?.applyTheme) {
-        Survey.Theme.applyTheme(Survey.Theme.Default);
-      } else if (Survey?.StylesManager?.applyTheme) {
-        Survey.StylesManager.applyTheme('defaultV2');
-      }
-
-      const survey = new Survey.Model(surveyJson);
-      survey.onComplete.add(sender => {
-        saveQuizResult(quiz.id || `quiz_${key}`, {
-          key,
-          score: sender.getCorrectAnswerCount?.() ?? null,
-          total: sender.getQuestionCount?.() ?? null,
-          answers: sender.data,
-          ts: Date.now()
-        });
-      });
-      survey.render(surveyHost);
+    // NEW: resolve root + robust fetch
+    function resolveRoot(u) {
+      const metaRoot = document.querySelector('meta[name="ao-root"]')?.content || '/';
+      if (!u) return u;
+      if (/^https?:\/\//i.test(u) || u.startsWith('/')) return u;
+      const base = metaRoot.endsWith('/') ? metaRoot.slice(0, -1) : metaRoot;
+      return base + '/' + u.replace(/^\/+/, '');
+    }
+    async function loadJSONMaybe(u) {
+      const url = resolveRoot(u);
+      const res = await fetch(url, { cache: 'no-store', credentials: 'same-origin' });
+      if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+      return res.json();
     }
 
-    function renderAssessment(assessment, key, host) {
-      const surveyJson = assessment;
-      if (!surveyJson) return;
-      const surveyHost = host || h('div', { class: 'cardlet', style: 'margin-top:20px;' });
-      if (!host) MAIN.appendChild(surveyHost);
+    async function renderQuiz(quiz, key){
+      try{
+        let surveyJson = quiz;
+        if (!surveyJson?.pages && typeof quiz?.src === 'string') {
+          surveyJson = await loadJSONMaybe(quiz.src);
+        }
+        if (!surveyJson?.pages?.length) throw new Error('Quiz JSON has no pages/elements.');
 
-      if (Survey?.Theme?.applyTheme) {
-        Survey.Theme.applyTheme(Survey.Theme.Default);
-      } else if (Survey?.StylesManager?.applyTheme) {
-        Survey.StylesManager.applyTheme('defaultV2');
-      }
+        const surveyHost = h('div', { class: 'cardlet', style: 'margin-top:20px;' });
+        MAIN.appendChild(surveyHost);
 
-      const survey = new Survey.Model(surveyJson);
-      survey.onComplete.add(sender => {
-        const chapter = parseInt((key || '').split('.')[0], 10) || null;
-        saveAssessResult(assessment.id || `assess_${key}`, {
-          chapter,
-          answers: sender.data,
-          ts: Date.now()
+        if (Survey?.Theme?.applyTheme) Survey.Theme.applyTheme(Survey.Theme.Default);
+        else if (Survey?.StylesManager?.applyTheme) Survey.StylesManager.applyTheme('defaultV2');
+
+        const survey = new Survey.Model(surveyJson);
+        survey.onComplete.add(sender => {
+          saveQuizResult(quiz.id || `quiz_${key}`, {
+            key,
+            score: sender.getCorrectAnswerCount?.() ?? null,
+            total: sender.getQuestionCount?.() ?? null,
+            answers: sender.data,
+            ts: Date.now()
+          });
         });
-      });
-      survey.render(surveyHost);
+        survey.render(surveyHost);
+      }catch(err){
+        console.error('[quiz] render failed:', err);
+        MAIN.appendChild(h('div', { class: 'cardlet' },
+          h('div', { class: 'muted' }, 'Quiz failed to load: ' + (err.message || err))
+        ));
+      }
+    }
+
+    async function renderAssessment(assessment, key, host) {
+      try{
+        let surveyJson = assessment;
+        if (!surveyJson?.pages && typeof assessment?.src === 'string') {
+          surveyJson = await loadJSONMaybe(assessment.src);
+        }
+        if (!surveyJson?.pages?.length) throw new Error('Assessment JSON has no pages/elements.');
+
+        const surveyHost = host || h('div', { class: 'cardlet', style: 'margin-top:20px;' });
+        if (!host) MAIN.appendChild(surveyHost);
+
+        if (Survey?.Theme?.applyTheme) Survey.Theme.applyTheme(Survey.Theme.Default);
+        else if (Survey?.StylesManager?.applyTheme) Survey.StylesManager.applyTheme('defaultV2');
+
+        const survey = new Survey.Model(surveyJson);
+        survey.onComplete.add(sender => {
+          const chapter = parseInt((key || '').split('.')[0], 10) || null;
+          saveAssessResult(assessment.id || `assess_${key}`, {
+            chapter,
+            answers: sender.data,
+            ts: Date.now()
+          });
+        });
+        survey.render(surveyHost);
+      }catch(err){
+        console.error('[assess] render failed:', err);
+        const holder = host || MAIN;
+        holder.appendChild(h('div', { class: 'cardlet' },
+          h('div', { class: 'muted' }, 'Assessment failed to load: ' + (err.message || err))
+        ));
+      }
     }
     
     // ---------- Reader & Page Views ----------
@@ -347,6 +379,8 @@ document.addEventListener('DOMContentLoaded', function() {
       });
 
       if(!hasMediaToken && pool[0]) addFigure(pool[0]);
+      // assessment invitation (optional, only if chapter has one)
+      if (ch.assessment) renderAssessmentInvitation(ch, chIdx);
     }
 
     function renderAssessmentView(ch, chIdx) {
@@ -468,7 +502,7 @@ document.addEventListener('DOMContentLoaded', function() {
       MAIN.append(
         h('div',{class:'cardlet'},
           h('h4',{},'At a glance'),
-          h('div',{class:'muted'},`${done} of ${total} learning objectives viewed`),
+          h('div',{class:'muted'},`${done} of ${total} viewed`),
           h('div',{class:'progress',style:'margin-top:6px'},h('i',{style:`width:${pct}%;`})),
           h('div',{style:'margin-top:10px;display:flex;gap:8px;flex-wrap:wrap'},
             h('a',{href:'#data',class:'btn'},'Open My Data'),
@@ -731,4 +765,3 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 </body>
 </html>
-}

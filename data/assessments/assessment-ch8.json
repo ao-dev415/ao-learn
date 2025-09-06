@@ -1,5 +1,5 @@
 {
-  "title": "Chapter 2 Knowledge Check (Demo)",
+  "title": "Chapter 8 Knowledge Check (Demo)",
   "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
   "pages": [
     {
@@ -8,7 +8,7 @@
         {
           "type": "text",
           "name": "topic",
-          "title": "In Chapter 2, what topic stood out most?"
+          "title": "In Chapter 8, what topic stood out most?"
         },
         {
           "type": "radiogroup",

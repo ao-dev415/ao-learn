@@ -1,100 +1,35 @@
 {
-  "id": "assess-c3",
-  "chapter": "Chapter 3",
-  "data": {
-    "title": "Risk Tolerance Questionnaire",
-    "description": "For each question, choose the answer that best reflects your feelings and preferences.",
-    "questionsOnPageMode": "questionPerPage",
-    "widthMode": "responsive",
-    "completedHtml": "<h3>Your Assessment is Complete</h3><h4>Your total score is: {totalScore}</h4>",
-    "completedHtmlOnCondition": [
-      {
-        "expression": "{totalScore} >= 0 and {totalScore} <= 4",
-        "html": "<h3>Result: Conservative Investor</h3><p>You prioritize the safety and stability of your investments over potential high returns. You may prefer investments like bonds, CDs, or high-quality dividend-paying stocks.</p>"
-      },
-      {
-        "expression": "{totalScore} >= 5 and {totalScore} <= 8",
-        "html": "<h3>Result: Balanced Investor</h3><p>You seek a balance between risk and return. Your portfolio may include a mix of stocks and bonds, with a moderate allocation to growth-oriented assets.</p>"
-      },
-      {
-        "expression": "{totalScore} >= 9 and {totalScore} <= 12",
-        "html": "<h3>Result: Aggressive Investor</h3><p>You are comfortable with higher levels of risk and are willing to tolerate market volatility in pursuit of potentially higher returns. Your portfolio may be heavily weighted towards stocks and other growth investments.</p>"
-      }
-    ],
-    "elements": [
-      {
-        "name": "investment-drop-reaction",
-        "type": "radiogroup",
-        "title": "Imagine you have $100,000 invested. If the value of this investment dropped to $70,000 overnight, how would you react?",
-        "choices": [
-          { "value": 0, "text": "You would panic and sell all of your investments." },
-          { "value": 1, "text": "You would be concerned but would wait to see if the investment recovers." },
-          { "value": 2, "text": "You would view it as a buying opportunity and invest more money." }
-        ],
-        "isRequired": true
-      },
-      {
-        "name": "investment-comfort",
-        "type": "radiogroup",
-        "title": "Which of the following investments would you be most comfortable with?",
-        "choices": [
-          { "value": 2, "text": "A single stock with the potential for high returns but also high risk." },
-          { "value": 1, "text": "A diversified portfolio of stocks and bonds with moderate risk and return potential." },
-          { "value": 0, "text": "A savings account or government bond with low risk and low return potential." }
-        ],
-        "isRequired": true
-      },
-      {
-        "name": "investment-philosophy",
-        "type": "radiogroup",
-        "title": "You are considering an investment with the potential to earn high returns over the next few years. However, there's also a chance that you could lose some or all of your initial investment. What would you do?",
-        "choices": [
-          { "value": 0, "text": "You would not invest, as the risk is too high." },
-          { "value": 1, "text": "You would invest a small amount of money that you can afford to lose." },
-          { "value": 2, "text": "You would invest a significant portion of your savings, hoping for high returns." }
-        ],
-        "isRequired": true
-      },
-      {
-        "name": "investment-horizon",
-        "type": "radiogroup",
-        "title": "How long do you plan to invest your money?",
-        "choices": [
-          { "value": 0, "text": "Less than 5 years." },
-          { "value": 1, "text": "5-10 years." },
-          { "value": 2, "text": "More than 10 years." }
-        ],
-        "isRequired": true
-      },
-      {
-        "name": "financial-situation",
-        "type": "radiogroup",
-        "title": "What is your current financial situation?",
-        "choices": [
-          { "value": 0, "text": "You have significant debt and limited savings." },
-          { "value": 1, "text": "You have some debt but also have a decent amount of savings." },
-          { "value": 2, "text": "You have little to no debt and a substantial amount of savings." }
-        ],
-        "isRequired": true
-      },
-      {
-        "name": "risk-feeling",
-        "type": "radiogroup",
-        "title": "In general, how would you describe your feelings about taking risks with your money?",
-        "choices": [
-          { "value": 0, "text": "You prefer to avoid risks and prioritize the safety of your investments." },
-          { "value": 1, "text": "You are comfortable with some risk, as long as the potential rewards are reasonable." },
-          { "value": 2, "text": "You are willing to take substantial risks in pursuit of high returns." }
-        ],
-        "isRequired": true
-      }
-    ],
-    "calculatedValues": [
-      {
-        "name": "totalScore",
-        "expression": "{investment-drop-reaction} + {investment-comfort} + {investment-philosophy} + {investment-horizon} + {financial-situation} + {risk-feeling}",
-        "includeIntoResult": true
-      }
-    ]
-  }
+  "title": "Chapter 3 Knowledge Check (Demo)",
+  "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+  "pages": [
+    {
+      "name": "page1",
+      "elements": [
+        {
+          "type": "text",
+          "name": "topic",
+          "title": "In Chapter 3, what topic stood out most?"
+        },
+        {
+          "type": "radiogroup",
+          "name": "mcq",
+          "title": "Quick check: 2 + 2 = ?",
+          "choices": [
+            "3",
+            "4",
+            "5"
+          ],
+          "correctAnswer": "4"
+        },
+        {
+          "type": "rating",
+          "name": "confidence",
+          "title": "How confident do you feel about this chapter?",
+          "rateMin": 1,
+          "rateMax": 5
+        }
+      ]
+    }
+  ],
+  "$schema": "ao/assessment@1"
 }
