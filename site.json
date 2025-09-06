@@ -79,11 +79,158 @@
         }
       ],
       "assessment": {
-        "title": "Demo Assessment",
-        "src": "/data/assessments/assessment-demo.json",
+        "id": "assess-c1",
+        "title": "Chapter 1 Knowledge Check",
         "href": "/assess-c1",
-        "id": "assess-c1"
-      }
+        "src": "/data/assessments/assessment-ch1.json",
+        "data": {
+          "title": "Chapter 1 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 1, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "json": {
+          "title": "Chapter 1 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 1, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "survey": {
+          "title": "Chapter 1 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 1, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "schema": {
+          "title": "Chapter 1 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 1, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        }
+      },
+      "items": [
+        {
+          "type": "assessment",
+          "title": "Chapter 1 Knowledge Check",
+          "href": "/assess-c1"
+        }
+      ]
     },
     {
       "title": "Chapter 2: Expenses",
@@ -153,6 +300,159 @@
               "body": "Details: Impacts on plan success. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             }
           ]
+        }
+      ],
+      "assessment": {
+        "id": "assess-c2",
+        "title": "Chapter 2 Knowledge Check",
+        "href": "/assess-c2",
+        "src": "/data/assessments/assessment-ch2.json",
+        "data": {
+          "title": "Chapter 2 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 2, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "json": {
+          "title": "Chapter 2 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 2, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "survey": {
+          "title": "Chapter 2 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 2, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "schema": {
+          "title": "Chapter 2 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 2, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        }
+      },
+      "items": [
+        {
+          "type": "assessment",
+          "title": "Chapter 2 Knowledge Check",
+          "href": "/assess-c2"
         }
       ]
     },
@@ -225,6 +525,159 @@
             }
           ]
         }
+      ],
+      "assessment": {
+        "id": "assess-c3",
+        "title": "Chapter 3 Knowledge Check",
+        "href": "/assess-c3",
+        "src": "/data/assessments/assessment-ch3.json",
+        "data": {
+          "title": "Chapter 3 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 3, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "json": {
+          "title": "Chapter 3 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 3, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "survey": {
+          "title": "Chapter 3 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 3, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "schema": {
+          "title": "Chapter 3 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 3, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        }
+      },
+      "items": [
+        {
+          "type": "assessment",
+          "title": "Chapter 3 Knowledge Check",
+          "href": "/assess-c3"
+        }
       ]
     },
     {
@@ -295,6 +748,159 @@
               "body": "Details: When Roth fits the plan. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             }
           ]
+        }
+      ],
+      "assessment": {
+        "id": "assess-c4",
+        "title": "Chapter 4 Knowledge Check",
+        "href": "/assess-c4",
+        "src": "/data/assessments/assessment-ch4.json",
+        "data": {
+          "title": "Chapter 4 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 4, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "json": {
+          "title": "Chapter 4 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 4, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "survey": {
+          "title": "Chapter 4 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 4, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "schema": {
+          "title": "Chapter 4 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 4, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        }
+      },
+      "items": [
+        {
+          "type": "assessment",
+          "title": "Chapter 4 Knowledge Check",
+          "href": "/assess-c4"
         }
       ]
     },
@@ -367,6 +973,159 @@
             }
           ]
         }
+      ],
+      "assessment": {
+        "id": "assess-c5",
+        "title": "Chapter 5 Knowledge Check",
+        "href": "/assess-c5",
+        "src": "/data/assessments/assessment-ch5.json",
+        "data": {
+          "title": "Chapter 5 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 5, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "json": {
+          "title": "Chapter 5 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 5, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "survey": {
+          "title": "Chapter 5 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 5, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "schema": {
+          "title": "Chapter 5 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 5, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        }
+      },
+      "items": [
+        {
+          "type": "assessment",
+          "title": "Chapter 5 Knowledge Check",
+          "href": "/assess-c5"
+        }
       ]
     },
     {
@@ -437,6 +1196,159 @@
               "body": "Details: Creditor protection. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             }
           ]
+        }
+      ],
+      "assessment": {
+        "id": "assess-c6",
+        "title": "Chapter 6 Knowledge Check",
+        "href": "/assess-c6",
+        "src": "/data/assessments/assessment-ch6.json",
+        "data": {
+          "title": "Chapter 6 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 6, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "json": {
+          "title": "Chapter 6 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 6, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "survey": {
+          "title": "Chapter 6 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 6, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "schema": {
+          "title": "Chapter 6 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 6, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        }
+      },
+      "items": [
+        {
+          "type": "assessment",
+          "title": "Chapter 6 Knowledge Check",
+          "href": "/assess-c6"
         }
       ]
     },
@@ -531,6 +1443,159 @@
             }
           ]
         }
+      ],
+      "assessment": {
+        "id": "assess-c7",
+        "title": "Chapter 7 Knowledge Check",
+        "href": "/assess-c7",
+        "src": "/data/assessments/assessment-ch7.json",
+        "data": {
+          "title": "Chapter 7 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 7, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "json": {
+          "title": "Chapter 7 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 7, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "survey": {
+          "title": "Chapter 7 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 7, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "schema": {
+          "title": "Chapter 7 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 7, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        }
+      },
+      "items": [
+        {
+          "type": "assessment",
+          "title": "Chapter 7 Knowledge Check",
+          "href": "/assess-c7"
+        }
       ]
     },
     {
@@ -602,6 +1667,159 @@
             }
           ]
         }
+      ],
+      "assessment": {
+        "id": "assess-c8",
+        "title": "Chapter 8 Knowledge Check",
+        "href": "/assess-c8",
+        "src": "/data/assessments/assessment-ch8.json",
+        "data": {
+          "title": "Chapter 8 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 8, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "json": {
+          "title": "Chapter 8 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 8, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "survey": {
+          "title": "Chapter 8 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 8, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "schema": {
+          "title": "Chapter 8 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 8, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        }
+      },
+      "items": [
+        {
+          "type": "assessment",
+          "title": "Chapter 8 Knowledge Check",
+          "href": "/assess-c8"
+        }
       ]
     },
     {
@@ -672,6 +1890,159 @@
               "body": "Details: Anatomical gifts. Placeholder content derived from the chapter text to test parsing.\n\nAdditional supporting explanation and examples."
             }
           ]
+        }
+      ],
+      "assessment": {
+        "id": "assess-c9",
+        "title": "Chapter 9 Knowledge Check",
+        "href": "/assess-c9",
+        "src": "/data/assessments/assessment-ch9.json",
+        "data": {
+          "title": "Chapter 9 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 9, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "json": {
+          "title": "Chapter 9 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 9, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "survey": {
+          "title": "Chapter 9 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 9, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        },
+        "schema": {
+          "title": "Chapter 9 Knowledge Check (Demo)",
+          "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
+          "pages": [
+            {
+              "name": "page1",
+              "elements": [
+                {
+                  "type": "text",
+                  "name": "topic",
+                  "title": "In Chapter 9, what topic stood out most?"
+                },
+                {
+                  "type": "radiogroup",
+                  "name": "mcq",
+                  "title": "Quick check: 2 + 2 = ?",
+                  "choices": [
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  "correctAnswer": "4"
+                },
+                {
+                  "type": "rating",
+                  "name": "confidence",
+                  "title": "How confident do you feel about this chapter?",
+                  "rateMin": 1,
+                  "rateMax": 5
+                }
+              ]
+            }
+          ],
+          "$schema": "ao/assessment@1"
+        }
+      },
+      "items": [
+        {
+          "type": "assessment",
+          "title": "Chapter 9 Knowledge Check",
+          "href": "/assess-c9"
         }
       ]
     }

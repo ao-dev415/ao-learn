@@ -1,57 +1,32 @@
 {
-  "title": "Chapter 8 Knowledge Check",
-  "description": "This assessment demonstrates different question types.",
+  "title": "Chapter 8 Knowledge Check (Demo)",
+  "description": "Demo assessment to verify wiring. Replace with real questions anytime.",
   "pages": [
     {
       "name": "page1",
       "elements": [
         {
-          "name": "text-question",
           "type": "text",
-          "title": "What is the primary topic of this chapter? (Text Input)"
+          "name": "topic",
+          "title": "In Chapter 8, what topic stood out most?"
         },
         {
-          "name": "dropdown-question",
-          "type": "dropdown",
-          "title": "Which concept was most interesting? (Dropdown)",
+          "type": "radiogroup",
+          "name": "mcq",
+          "title": "Quick check: 2 + 2 = ?",
           "choices": [
-            "Concept A",
-            "Concept B",
-            "Concept C"
-          ]
+            "3",
+            "4",
+            "5"
+          ],
+          "correctAnswer": "4"
         },
         {
-          "name": "likert-scale-question",
-          "type": "matrix",
-          "title": "Please rate your understanding of the following topics (Likert Scale):",
-          "columns": [
-            {
-              "value": 1,
-              "text": "Not at all"
-            },
-            {
-              "value": 2,
-              "text": "A little"
-            },
-            {
-              "value": 3,
-              "text": "Moderately"
-            },
-            {
-              "value": 4,
-              "text": "Very well"
-            }
-          ],
-          "rows": [
-            {
-              "value": "topic1",
-              "text": "Topic 1"
-            },
-            {
-              "value": "topic2",
-              "text": "Topic 2"
-            }
-          ]
+          "type": "rating",
+          "name": "confidence",
+          "title": "How confident do you feel about this chapter?",
+          "rateMin": 1,
+          "rateMax": 5
         }
       ]
     }
