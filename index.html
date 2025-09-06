@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   (function(){
     // ---------- DOM ----------
-    const NAV  = document.getElementById('nav');
+    const NAV   = document.getElementById('nav');
     const MAIN = document.getElementById('main');
     const RAIL = document.getElementById('rail');
     const MENU = document.getElementById('menu');
@@ -190,8 +190,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const fmtDate=(iso,tz,time)=>{try{const dt=new Date(`${iso}T${time||'00:00'}:00`);const opt={dateStyle:'medium',timeStyle:time?'short':undefined};if(tz)opt.timeZone=tz;const s=new Intl.DateTimeFormat(undefined,opt).format(dt);return s+(tz?` (${(tz.split('/')[1]||tz)})`:'');}catch{return iso+(time?` ${time}`:'');}};
     const loadJSON=(k,def)=>{try{const v=JSON.parse(localStorage.getItem(k)||'');return v??def;}catch{return def;}};
     const saveJSON=(k,v)=>localStorage.setItem(k, JSON.stringify(v));
+    const fetchJSON = async (url) => {
+      const res = await fetch(url, { cache: 'no-store', credentials: 'same-origin' });
+      if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+      return await res.json();
+    };
     
-    function csvEscape(v){ 
+    function csvEscape(v){  
       const s = String(v ?? "");
       return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
     }
@@ -253,12 +258,26 @@ document.addEventListener('DOMContentLoaded', function() {
     LB.addEventListener('click',(e)=>{if(e.target===LB)closeZoom();});
     document.addEventListener('keydown',(e)=>{if(e.key==='Escape')closeZoom();});
     
-    // ---------- QUIZ & ASSESSMENT ----------
+    // ---------- QUIZ & ASSESSMENT (with src loader) ----------
     function saveQuizResult(id, payload){ quizResults[id] = payload; saveJSON(LS_QUIZ, quizResults); }
     function saveAssessResult(id, payload){ assessResults[id] = payload; saveJSON(LS_ASSESS, assessResults); }
 
-    function renderQuiz(quiz, key){
-      const surveyJson = quiz;
+    async function loadSurveyLike(obj) {
+      // inline object already in SurveyJS shape
+      if (obj && (obj.pages || obj.questions)) return obj;
+      // object pointing at src
+      if (obj && obj.src) {
+        return await fetchJSON(obj.src);
+      }
+      // raw URL string (fallback)
+      if (typeof obj === 'string') {
+        return await fetchJSON(obj);
+      }
+      return null;
+    }
+
+    async function renderQuiz(quiz, key){
+      const surveyJson = await loadSurveyLike(quiz);
       if (!surveyJson) return;
       const surveyHost = h('div', { class: 'cardlet', style: 'margin-top:20px;' });
       MAIN.appendChild(surveyHost);
@@ -271,7 +290,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
       const survey = new Survey.Model(surveyJson);
       survey.onComplete.add(sender => {
-        saveQuizResult(quiz.id || `quiz_${key}`, {
+        saveQuizResult(surveyJson.id || `quiz_${key}`, {
           key,
           score: sender.getCorrectAnswerCount?.() ?? null,
           total: sender.getQuestionCount?.() ?? null,
@@ -282,8 +301,8 @@ document.addEventListener('DOMContentLoaded', function() {
       survey.render(surveyHost);
     }
 
-    function renderAssessment(assessment, key, host) {
-      const surveyJson = assessment;
+    async function renderAssessment(assessment, key, host) {
+      const surveyJson = await loadSurveyLike(assessment);
       if (!surveyJson) return;
       const surveyHost = host || h('div', { class: 'cardlet', style: 'margin-top:20px;' });
       if (!host) MAIN.appendChild(surveyHost);
@@ -297,7 +316,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const survey = new Survey.Model(surveyJson);
       survey.onComplete.add(sender => {
         const chapter = parseInt((key || '').split('.')[0], 10) || null;
-        saveAssessResult(assessment.id || `assess_${key}`, {
+        saveAssessResult(surveyJson.id || `assess_${key}`, {
           chapter,
           answers: sender.data,
           ts: Date.now()
@@ -307,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // ---------- Reader & Page Views ----------
-    function renderMain(ch, lo, chIdx, loIdx){
+    async function renderMain(ch, lo, chIdx, loIdx){
       const key = `${chIdx+1}.${loIdx+1}`;
       if(!seen.has(key)){ seen.add(key); saveJSON(LS_SEEN,[...seen]); }
       stopTiming(); startTiming(key);
@@ -331,10 +350,10 @@ document.addEventListener('DOMContentLoaded', function() {
       };
 
       let hasMediaToken = false;
-      (lo.snippets || []).forEach(s => {
-        if (!s) return;
-        if (s.type === 'quiz' && s.quiz) { renderQuiz(s.quiz, key); return; }
-        if (s.type === 'assessment' && s.assessment) { renderAssessment(s.assessment, key); return; }
+      for (const s of (lo.snippets || [])) {
+        if (!s) continue;
+        if (s.type === 'quiz' && s.quiz) { await renderQuiz(s.quiz, key); continue; }
+        if (s.type === 'assessment' && s.assessment) { await renderAssessment(s.assessment, key); continue; }
         if (s.title) MAIN.append(h('h3', {}, s.title));
         if (s.body) {
           const strippedBody = s.body.replace(/\[\[(img|vid):\d+\]\]/gi, '').trim();
@@ -342,14 +361,17 @@ document.addEventListener('DOMContentLoaded', function() {
           const imgTokens = extractTokenIndices(s.body,'img').filter(i=>pool[i] && pool[i].kind==='image');
           const vidTokens = extractTokenIndices(s.body,'vid').filter(i=>pool[i] && pool[i].kind==='video');
           if(imgTokens.length || vidTokens.length) hasMediaToken = true;
-          [...imgTokens.map(i=>({i,kind:'img'})), ...vidTokens.map(i=>({i,kind:'vid'}))].sort((a,b)=>a.i-b.i).forEach(t => addFigure(pool[t.i]));
+          [...]
         }
-      });
+      }
 
       if(!hasMediaToken && pool[0]) addFigure(pool[0]);
+
+      // invite to assessment at end of LO list
+      renderAssessmentInvitation(ch, chIdx);
     }
 
-    function renderAssessmentView(ch, chIdx) {
+    async function renderAssessmentView(ch, chIdx) {
       stopTiming();
       if (MAIN) MAIN.innerHTML = '';
       const container = h('div', { id: 'survey-container' });
@@ -357,7 +379,7 @@ document.addEventListener('DOMContentLoaded', function() {
         h('h1', {}, `${ch.title || 'Chapter'} — Assessment`),
         container
       );
-      renderAssessment(ch.assessment, `${chIdx+1}`, container);
+      await renderAssessment(ch.assessment, `${chIdx+1}`, container);
     }
     
     function renderAssessmentInvitation(ch, chIdx) {
@@ -378,8 +400,8 @@ document.addEventListener('DOMContentLoaded', function() {
         (ch.los || []).forEach((lo, loIdx) => {
           const btn = h('button', {
             class: 'lo',
-            onclick: () => {
-              renderMain(ch, lo, chIdx, loIdx);
+            onclick: async () => {
+              await renderMain(ch, lo, chIdx, loIdx);
               location.hash = `#ch${chIdx+1}-lo${loIdx+1}`;
               setActiveLO(btn);
               refreshRail();
@@ -391,8 +413,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (ch.assessment) {
           const assessmentBtn = h('button', {
             class: 'assessment-link',
-            onclick: () => {
-              renderAssessmentView(ch, chIdx);
+            onclick: async () => {
+              await renderAssessmentView(ch, chIdx);
               location.hash = `#ch${chIdx+1}-assessment`;
               setActiveLO(assessmentBtn);
             }
@@ -422,7 +444,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function setActiveLO(btn){NAV.querySelectorAll('button[aria-current="true"]').forEach(b=>b.setAttribute('aria-current','false'));btn?.setAttribute('aria-current','true');btn?.scrollIntoView({block:'nearest',inline:'nearest'});}
 
-    function openFromHash(){const m_lo=location.hash.match(/^#ch(\d+)-lo(\d+)$/);if(m_lo){const ch=chapters[+m_lo[1]-1];const lo=ch?.los?.[+m_lo[2]-1];if(ch&&lo){renderMain(ch,lo,+m_lo[1]-1,+m_lo[2]-1);const btns=NAV.querySelectorAll('button');let flat=0,target=-1;chapters.forEach((c,ci)=>{(c.los||[]).forEach((l,li)=>{if(c===ch&&l===lo)target=flat;flat++;});if(c.assessment)flat++;});if(target!==-1)setActiveLO(btns[target]);return true;}}const m_as=location.hash.match(/^#ch(\d+)-assessment$/);if(m_as){const ch=chapters[+m_as[1]-1];if(ch&&ch.assessment){renderAssessmentView(ch,+m_as[1]-1);const btns=NAV.querySelectorAll('button');let flat=0,target=-1;chapters.forEach((c,ci)=>{flat+=(c.los||[]).length;if(c===ch)target=flat;if(c.assessment)flat++;});if(target!==-1)setActiveLO(btns[target]);return true;}}return false;}
+    async function openFromHash(){
+      const m_lo=location.hash.match(/^#ch(\d+)-lo(\d+)$/);
+      if(m_lo){
+        const ch=chapters[+m_lo[1]-1];
+        const lo=ch?.los?.[+m_lo[2]-1];
+        if(ch&&lo){
+          await renderMain(ch,lo,+m_lo[1]-1,+m_lo[2]-1);
+          const btns=NAV.querySelectorAll('button');
+          let flat=0,target=-1;
+          chapters.forEach((c,ci)=>{(c.los||[]).forEach((l,li)=>{if(c===ch&&l===lo)target=flat;flat++;});if(c.assessment)flat++;});
+          if(target!==-1)setActiveLO(btns[target]);
+          return true;
+        }
+      }
+      const m_as=location.hash.match(/^#ch(\d+)-assessment$/);
+      if(m_as){
+        const ch=chapters[+m_as[1]-1];
+        if(ch&&ch.assessment){
+          await renderAssessmentView(ch,+m_as[1]-1);
+          const btns=NAV.querySelectorAll('button');
+          let flat=0,target=-1;
+          chapters.forEach((c,ci)=>{flat+=(c.los||[]).length;if(c===ch)target=flat;if(c.assessment)flat++;});
+          if(target!==-1)setActiveLO(btns[target]);
+          return true;
+        }
+      }
+      return false;
+    }
 
     function totals(){let total=0;(chapters||[]).forEach(ch=>total+=(ch.los?.length||0));let done=0;for(const k of seen){const[ci,li]=(k||'').split('.').map(Number);if(chapters?.[ci-1]?.los?.[li-1])done++;}return{done,total,pct:total?Math.round((done/total)*100):0};}
     
@@ -695,7 +744,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ---------- Boot ----------
     async function loadSiteJSON(){const metaRoot=document.querySelector('meta[name="ao-root"]')?.content??'/';const base=WANT_FULL?'full/site.json':'site.json';const candidates=[];const add=(u)=>{if(!candidates.includes(u))candidates.push(u);};add((metaRoot||'')+base);add(base);add('/'+base);const errs=[];for(const u of candidates){try{const res=await fetch(u,{cache:'no-store',credentials:'same-origin'});if(res.ok){return JSON.parse(await res.text());}errs.push(`${u} -> HTTP ${res.status}`);}catch(e){errs.push(`${u} -> ${e.message||e}`);}}throw new Error(errs.join(' | '));}
     async function boot(){try{site=await loadSiteJSON();}catch(e){if(!WANT_DEMO){if(NAV)NAV.innerHTML='';NAV.append(h('div',{class:'muted'},`Could not load site.json (${e.message||e}).`));site={title:'',chapters:[],events:[]};}else{site=makeDemoSite();}}chapters=(site.chapters||[]).map((ch,i)=>({ch,ord:chapterOrderIndex(ch,i)})).sort((a,b)=>a.ord-b.ord).map(x=>x.ch);buildLeftNav();buildDocs();refreshRail();route();window.addEventListener('hashchange',route);}
-    function route(){setActiveMenu();const hash=location.hash||'#home';if(/^#ch\d+-lo\d+$/.test(hash)){if(!openFromHash())renderHome();return;}if(/^#ch\d+-assessment$/.test(hash)){if(!openFromHash())renderHome();return;}if(hash.startsWith('#home')){renderHome();return;}if(hash.startsWith('#data')){renderMyData();return;}if(hash.startsWith('#events')){renderEvents();return;}if(hash.startsWith('#privacy')){renderPrivacy();return;}if(hash.startsWith('#about')){renderAbout();return;}if(hash.startsWith('#search:')){runSearch(decodeURIComponent(hash.split(':')[1]||''),'page');return;}if(chapters[0]?.los?.length){location.hash='#ch1-lo1';openFromHash();}else{renderHome();}}
+    async function route(){setActiveMenu();const hash=location.hash||'#home';if(/^#ch\d+-lo\d+$/.test(hash)){if(!await openFromHash())renderHome();return;}if(/^#ch\d+-assessment$/.test(hash)){if(!await openFromHash())renderHome();return;}if(hash.startsWith('#home')){renderHome();return;}if(hash.startsWith('#data')){renderMyData();return;}if(hash.startsWith('#events')){renderEvents();return;}if(hash.startsWith('#privacy')){renderPrivacy();return;}if(hash.startsWith('#about')){renderAbout();return;}if(hash.startsWith('#search:')){runSearch(decodeURIComponent(hash.split(':')[1]||''),'page');return;}if(chapters[0]?.los?.length){location.hash='#ch1-lo1';await openFromHash();}else{renderHome();}}
     function makeDemoSite(){return{title:"Demo Samples",alerts:["Demo is enabled via ?demo=1. Remove the query parameter to hide."],events:[{title:"Live Q&A",date:"2026-01-08",time:"13:00",tz:"America/New_York",mode:"Zoom",ctaUrl:"#",ctaLabel:"Details"}],chapters:[{title:"Demo Samples",los:[{title:"1.1 — Inline tokens",preview:"Two images and one short video, tokenized.",images:["https://picsum.photos/seed/a/1200/800","https://picsum.photos/seed/b/1200/800",{type:"video",src:"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm",caption:"Sample video"}],snippets:[{title:"Body",body:"Here’s an image [[img:1]] in-line, then a video [[vid:3]], and later another image [[img:2]]."}]}]}]};}
     
     boot();
@@ -711,8 +760,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const set=(k,v)=>{try{localStorage.setItem(k,v);}catch{}};
   const on=(sel,ev,fn,root=document)=>root.querySelector(sel)?.addEventListener(ev,fn);
   function applyAnalyticsFromConsent(){const doNotShare=get(LS.dns)==='1';if(hasGPC()||doNotShare)return;if(get(LS.ga)==='1')window.loadGA?.();if(get(LS.cl)==='1')window.loadClarity?.();}
-  function buildPopup(){if(document.getElementById('ao-privacy-popup'))return;const gpc=hasGPC();const gaPref=get(LS.ga)==='1';const clPref=get(LS.cl)==='1';const wrap=document.createElement('div');wrap.className='ao-pp-backdrop';wrap.id='ao-privacy-popup';if(wrap)wrap.innerHTML=`<div class="ao-pp" role="dialog" aria-label="Privacy choices"><h3>Privacy choices</h3><p>We don’t collect personal information on our servers. Your reading progress, quiz and assessment results are kept 
-<strong>on this device only</strong> (localStorage). You can export or clear them anytime from <a href="#data" class="ao-link">My Data</a>.</p><div class="ao-row"><div class="ao-card"><label><input id="ao-consent-ga" type="checkbox" ${gaPref?'checked':''} ${gpc?'disabled':''}><div><strong>Google Analytics</strong><br><span class="muted">Helps us understand traffic. On by default in the U.S.</span></div></label></div><div class="ao-card"><label><input id="ao-consent-clarity" type="checkbox" ${clPref?'checked':''} ${gpc?'disabled':''}><div><strong>Microsoft Clarity</strong><br><span class="muted">UX telemetry. On by default in the U.S.</span></div></label></div></div><div class="ao-badges"><div class="ao-badge">No sale or sharing</div><div class="ao-badge">Data stays on your device</div><div class="ao-badge">GPC honored</div></div>${gpc?'<div class="ao-gpc">Global Privacy Control (GPC) detected — analytics are disabled.</div>':''}<div class="ao-actions"><a class="ao-link" href="#privacy">Privacy &amp; choices</a><button id="ao-pp-save" class="ao-btn">Save</button><button id="ao-pp-allow" class="ao-btn">Allow analytics</button></div></div>`;document.body.appendChild(wrap);on('#ao-pp-save','click',()=>{const ga=document.getElementById('ao-consent-ga')?.checked&&!gpc;const cl=document.getElementById('ao-consent-clarity')?.checked&&!gpc;set(LS.ga,ga?'1':'0');set(LS.cl,cl?'1':'0');set(LS.banner,'1');document.getElementById('ao-privacy-popup')?.remove();applyAnalyticsFromConsent();},wrap);on('#ao-pp-allow','click',()=>{if(!gpc){set(LS.ga,'1');set(LS.cl,'1');}set(LS.banner,'1');document.getElementById('ao-privacy-popup')?.remove();applyAnalyticsFromConsent();},wrap);wrap.addEventListener('click',(e)=>{if(e.target===wrap){document.getElementById('ao-pp-save')?.click();}});}
+  function buildPopup(){if(document.getElementById('ao-privacy-popup'))return;const gpc=hasGPC();const gaPref=get(LS.ga)==='1';const clPref=get(LS.cl)==='1';const wrap=document.createElement('div');wrap.className='ao-pp-backdrop';wrap.id='ao-privacy-popup';if(wrap)wrap.innerHTML=`<div class="ao-pp" role="dialog" aria-label="Privacy choices"><h3>Privacy choices</h3><p>We don’t collect personal information on our servers. Your reading progress, quiz and assessment results are kept <strong>on this device only</strong> (localStorage). You can export or clear them anytime from <a href="#data" class="ao-link">My Data</a>.</p><div class="ao-row"><div class="ao-card"><label><input id="ao-consent-ga" type="checkbox" ${gaPref?'checked':''} ${gpc?'disabled':''}><div><strong>Google Analytics</strong><br><span class="muted">Helps us understand traffic. On by default in the U.S.</span></div></label></div><div class="ao-card"><label><input id="ao-consent-clarity" type="checkbox" ${clPref?'checked':''} ${gpc?'disabled':''}><div><strong>Microsoft Clarity</strong><br><span class="muted">UX telemetry. On by default in the U.S.</span></div></label></div></div><div class="ao-badges"><div class="ao-badge">No sale or sharing</div><div class="ao-badge">Data stays on your device</div><div class="ao-badge">GPC honored</div></div>${gpc?'<div class="ao-gpc">Global Privacy Control (GPC) detected — analytics are disabled.</div>':''}<div class="ao-actions"><a class="ao-link" href="#privacy">Privacy &amp; choices</a><button id="ao-pp-save" class="ao-btn">Save</button><button id="ao-pp-allow" class="ao-btn">Allow analytics</button></div></div>`;document.body.appendChild(wrap);on('#ao-pp-save','click',()=>{const ga=document.getElementById('ao-consent-ga')?.checked&&!gpc;const cl=document.getElementById('ao-consent-clarity')?.checked&&!gpc;set(LS.ga,ga?'1':'0');set(LS.cl,cl?'1':'0');set(LS.banner,'1');document.getElementById('ao-privacy-popup')?.remove();applyAnalyticsFromConsent();},wrap);on('#ao-pp-allow','click',()=>{if(!gpc){set(LS.ga,'1');set(LS.cl,'1');}set(LS.banner,'1');document.getElementById('ao-privacy-popup')?.remove();applyAnalyticsFromConsent();},wrap);wrap.addEventListener('click',(e)=>{if(e.target===wrap){document.getElementById('ao-pp-save')?.click();}});}
   function ensureStyles(){if(document.getElementById('ao-privacy-styles'))return;const css=`.ao-pp-backdrop{position:fixed;inset:0;display:flex;align-items:flex-end;justify-content:center;z-index:9999;background:transparent;}.ao-pp{width:min(720px,94vw);margin:14px;background:var(--panel,#12151a);color:var(--fg,#e8eef3);border:1px solid var(--border,#1e242c);border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.45);padding:14px;}.ao-pp h3{margin:0 0 6px;font:600 16px/1.2 system-ui,Segoe UI,Inter,sans-serif;}.ao-pp p{margin:6px 0;color:var(--muted,#8ea1b2);font-size:14px}.ao-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px}.ao-card{flex:1 1 240px;border:1px dashed var(--border,#1e242c);border-radius:10px;padding:10px}.ao-card label{display:flex;gap:10px;align-items:center;cursor:pointer}.ao-card input[type=checkbox]{transform:scale(1.1)}.ao-badges{display:flex;gap:8px;margin-top:6px}.ao-badge{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--border,#1e242c);background:#0d1117;color:#9ab0c3}.ao-gpc{margin-top:8px;font-size:12px;color:#9ab0c3}.ao-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-top:10px}.ao-btn{padding:8px 10px;border-radius:8px;border:1px solid #22333f;background:#0e2723;color:#e8eef3;font-weight:600;cursor:pointer}.ao-btn:hover{filter:brightness(1.08)}.ao-link{align-self:center;margin-right:auto;color:var(--brand,#00d0b6);text-decoration:none;font-weight:600}`;const s=document.createElement('style');s.id='ao-privacy-styles';s.textContent=css;document.head.appendChild(s);}
   window.AOPrivacy={open(){ensureStyles();buildPopup();}};
   ensureStyles();
@@ -729,20 +777,5 @@ document.addEventListener('DOMContentLoaded', function () {
   if (allow) allow.addEventListener('click', () => AOAnalytics.enable());
 });
 </script>
-
-<!-- expose important functions as globals so router and patches can access them -->
-<script>
-(function(){
-  try{
-    var g = window;
-    if (typeof renderAssessment !== 'undefined') g.renderAssessment = renderAssessment;
-    if (typeof renderAssessmentView !== 'undefined') g.renderAssessmentView = renderAssessmentView;
-    if (typeof renderQuiz !== 'undefined') g.renderQuiz = renderQuiz;
-    if (typeof h !== 'undefined') g.h = h;
-    if (typeof MAIN !== 'undefined') g.MAIN = MAIN;
-  }catch(e){ console.warn('[assess] expose globals failed:', e); }
-}());
-</script>
 </body>
 </html>
-}
