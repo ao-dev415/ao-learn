@@ -1,0 +1,17 @@
+{
+  "chapter_id": "ch-03",
+  "sections": [
+    {
+      "h2_id": "key-planning-documents",
+      "sub_objectives": [
+        {
+          "h3_id": "estimate-net-worth",
+          "title": "How can I estimate my net worth?",
+          "body_private_html": "A Net Worth statement (Balance Sheet) is designed to be simple:\n\n- **Assets:** Home, vehicles, retirement accounts, cash, and other property at realistic values.\n- **Liabilities:** Mortgage, HELOC, credit cards, student loans, 401(k) loans, etc.\n\n**Net Worth = Assets − Liabilities.**\n\nEnter approximate **gross** asset values first (before debts), then record each related liability. Update periodically to track progress and to communicate your position to family or trusted professionals.",
+          "h3_body_private_format": "markdown",
+          "chunks": []
+        }
+      ]
+    }
+  ]
+}
