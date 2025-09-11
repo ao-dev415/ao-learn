@@ -87,15 +87,20 @@ async function main(){
         const sBody = sec?.section_public_html || '';
         const sBodyFmt = sec?.section_public_format || 'markdown';
 
-        const subs = Array.isArray(sec?.sub_objectives) ? sec.sub_objectives.map((so, j) => ({
-          h3_id: so?.h3_id || slugify(so?.title || `h3-${j+1}`),
-          title: so?.title || `Sub-objective ${j+1}`,
-          visibility: so?.visibility || 'gated',
-          teaser_public: so?.teaser_public || '',
-          body_public_html: so?.body_public_html || '',
-          h3_body_public_format: so?.h3_body_public_format || (so?.body_public_html ? 'markdown' : undefined),
-          public_url: so?.public_url || undefined
-        })) : [];
+        const subs = Array.isArray(sec?.sub_objectives)
+          ? sec.sub_objectives.map((so, j) => {
+              const normalized = {
+                h3_id: so?.h3_id || slugify(so?.title || `h3-${j+1}`),
+                title: so?.title || `Sub-objective ${j+1}`,
+                visibility: so?.visibility || 'gated',
+                teaser_public: so?.teaser_public || '',
+                body_public_html: so?.body_public_html || '',
+                h3_body_public_format: so?.h3_body_public_format || (so?.body_public_html ? 'markdown' : undefined),
+                public_url: so?.public_url || undefined
+              };
+              return { ...so, ...normalized };
+            })
+          : [];
 
         return {
           h2_id: sId,
