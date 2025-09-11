@@ -16,11 +16,11 @@
       "sections": [
         {
           "h2_id": "lo-discovery-scoping",
-          "title": "Learning Objectives — Discovery & Scoping",
+          "title": "Learning Objectives \u2014 Discovery & Scoping",
           "public_url": "/ao-2024/ch-03/lo-discovery-scoping/",
           "preview_public_html": "",
           "preview_public_format": "html",
-          "section_public_html": "## Learning Objectives — Discovery & Scoping\n\n### You will be able to\n- Frame a discovery call that’s Advice-Only compliant.\n- Separate *scope* (problems) from *solutions* (products).\n- Capture constraints, risks, and success metrics in plain language.\n\n### Core ideas to watch for\n- **Outcome > Offering:** Start from the client’s desired change, not your menu.\n- **Evidence first:** Ask for artifacts (statements, docs, timelines) before opinions.\n- **Bound the work:** Who, what, when, where, how will we measure it?\n\n### Quick knowledge check\nBelow is a quick inline quiz. Answer now to check understanding.\n\n[[quiz:quiz-ch3]]\n\n### From notes to scope\n- Convert raw notes into a 1-page scope: problems → constraints → target outcomes.\n- Flag unknowns and set assumptions with owners and dates.\n\n---\n**Assessment**\nComplete the Chapter 3 assessment to confirm mastery.\n\n[[assessment:assessment-ch3]]\n",
+          "section_public_html": "## Learning Objectives \u2014 Discovery & Scoping\n\n### You will be able to\n- Frame a discovery call that\u2019s Advice-Only compliant.\n- Separate *scope* (problems) from *solutions* (products).\n- Capture constraints, risks, and success metrics in plain language.\n\n### Core ideas to watch for\n- **Outcome > Offering:** Start from the client\u2019s desired change, not your menu.\n- **Evidence first:** Ask for artifacts (statements, docs, timelines) before opinions.\n- **Bound the work:** Who, what, when, where, how will we measure it?\n\n### Quick knowledge check\nBelow is a quick inline quiz. Answer now to check understanding.\n\n[[quiz:quiz-ch3]]\n\n### From notes to scope\n- Convert raw notes into a 1-page scope: problems \u2192 constraints \u2192 target outcomes.\n- Flag unknowns and set assumptions with owners and dates.\n\n---\n**Assessment**\nComplete the Chapter 3 assessment to confirm mastery.\n\n[[assessment:assessment-ch3]]\n",
           "section_public_format": "markdown",
           "sub_objectives": [
             {
@@ -28,20 +28,30 @@
               "title": "Quick knowledge check",
               "visibility": "public_inline",
               "teaser_public": "",
-              "body_public_html": ""
+              "body_public_html": "",
+              "type": "quiz",
+              "quiz": {
+                "id": "quiz-ch3",
+                "src": "data/quizzes/quiz-ch3.json"
+              }
             },
             {
               "h3_id": "chapter-3-assessment",
               "title": "Chapter 3 Assessment",
               "visibility": "public_inline",
               "teaser_public": "",
-              "body_public_html": ""
+              "body_public_html": "",
+              "type": "assessment",
+              "assessment": {
+                "id": "assessment-ch3",
+                "src": "data/assessments/assessment-ch3.json"
+              }
             }
           ],
           "id": "lo-discovery-scoping",
           "section_id": "lo-discovery-scoping",
           "slug": "lo-discovery-scoping",
-          "public_html": "## Learning Objectives — Discovery & Scoping\n\n### You will be able to\n- Frame a discovery call that’s Advice-Only compliant.\n- Separate *scope* (problems) from *solutions* (products).\n- Capture constraints, risks, and success metrics in plain language.\n\n### Core ideas to watch for\n- **Outcome > Offering:** Start from the client’s desired change, not your menu.\n- **Evidence first:** Ask for artifacts (statements, docs, timelines) before opinions.\n- **Bound the work:** Who, what, when, where, how will we measure it?\n\n### Quick knowledge check\nBelow is a quick inline quiz. Answer now to check understanding.\n\n[[quiz:quiz-ch3]]\n\n### From notes to scope\n- Convert raw notes into a 1-page scope: problems → constraints → target outcomes.\n- Flag unknowns and set assumptions with owners and dates.\n\n---\n**Assessment**\nComplete the Chapter 3 assessment to confirm mastery.\n\n[[assessment:assessment-ch3]]\n",
+          "public_html": "## Learning Objectives \u2014 Discovery & Scoping\n\n### You will be able to\n- Frame a discovery call that\u2019s Advice-Only compliant.\n- Separate *scope* (problems) from *solutions* (products).\n- Capture constraints, risks, and success metrics in plain language.\n\n### Core ideas to watch for\n- **Outcome > Offering:** Start from the client\u2019s desired change, not your menu.\n- **Evidence first:** Ask for artifacts (statements, docs, timelines) before opinions.\n- **Bound the work:** Who, what, when, where, how will we measure it?\n\n### Quick knowledge check\nBelow is a quick inline quiz. Answer now to check understanding.\n\n[[quiz:quiz-ch3]]\n\n### From notes to scope\n- Convert raw notes into a 1-page scope: problems \u2192 constraints \u2192 target outcomes.\n- Flag unknowns and set assumptions with owners and dates.\n\n---\n**Assessment**\nComplete the Chapter 3 assessment to confirm mastery.\n\n[[assessment:assessment-ch3]]\n",
           "public_format": "markdown"
         }
       ]
