@@ -1,0 +1,106 @@
+{
+  "version": "2.0",
+  "book": {
+    "id": "rpbasics-2025",
+    "title": "Retirement Planning Basics (2025)",
+    "slug": "retirement-planning-basics-2025"
+  },
+  "chapters": [
+    {
+      "id": "ch-03",
+      "title": "Cash Flow & Net Worth",
+      "slug": "cash-flow-net-worth",
+      "public_url": "/retirement-planning-basics-2025/cash-flow-net-worth/",
+      "intro_public_html": "# Cash Flow & Net Worth (H1)\n\n*“Progress is getting nearer to where you want to be.”* — **C.S. Lewis**\n\nAN ACCURATE cash flow statement and a comprehensive Net Worth Statement are crucial when analyzing a financial plan's overall health and long-term sustainability. This is particularly vital for individuals in or nearing retirement.\n\n**My Chapter Objectives:**\n- Utilizing financial statements\n- The proper use of debt\n- Key tax terms\n- Facilitating tax flexibility\n- Real Estate for income",
+      "intro_public_format": "markdown",
+      "sections": [
+        {
+          "h2_id": "key-planning-documents",
+          "title": "3.1: Key Planning Documents",
+          "public_url": "/retirement-planning-basics-2025/cash-flow-net-worth/key-planning-documents/",
+          "preview_public_html": "Two core statements anchor your plan: a Net Worth Statement and a Cash Flow Statement.",
+          "preview_public_format": "html",
+          "section_public_html": "TO GET a basic idea of a retirement plan’s sustainability, at least two documents are required:\n\n- A **Net Worth Statement (or Balance Sheet)**\n- A **Cash Flow Statement**\n\n**Net Worth Statement:** A document that shows a global overview of an individual’s financial situation. An up-to-date net worth statement helps clarify the specific components of the financial plan to any interested parties.\n\nA Net Worth statement will:\n- Provide a basic sense of financial health  \n- Help identify the overall savings available for sustainable distribution upon retirement\n\n**Cash Flow Statement:** A document that shows annual (or monthly) inflows and outflows. A detailed cash flow statement allows for a deeper analysis beyond expenses alone. It identifies where money is coming and going and helps pinpoint possible improvements when finding new resources to improve planning outcomes.\n\nKey components include:\n- **Cash inflows (income):** Salary, investment income, rental income, business income, RMDs, and other income.  \n- **Cash outflows (expenses):** Fixed (housing, transportation, debt, utilities, insurance) and variable (food, entertainment, personal care, medical care, taxes).  \n- **Net cash flow:** Total inflows minus total outflows.\n\nHaving professional help when analyzing financial planning documents is a good idea.",
+          "section_public_format": "markdown",
+          "sub_objectives": [
+            {
+              "h3_id": "estimate-net-worth",
+              "title": "How can I estimate my net worth?",
+              "visibility": "gated",
+              "teaser_public": "List assets and liabilities, then subtract liabilities from assets to get net worth.",
+              "body_public_html": ""
+            },
+            {
+              "h3_id": "structure-cashflow-statement",
+              "title": "How should I structure a cash flow statement?",
+              "visibility": "public_inline",
+              "teaser_public": "Group income and expenses clearly; update assumptions periodically.",
+              "body_public_html": "**Steps**\n1. List **inflows** (salary, investment income, pensions, RMDs, other income).\n2. List **outflows** (fixed + variable). Tag taxes explicitly.\n3. Compute **net cash flow** (inflows − outflows).\n4. Review trends quarterly and adjust assumptions.\n\n**Tip:** Keep a short notes field for one-off items so they don’t distort your baseline.",
+              "h3_body_public_format": "markdown"
+            }
+          ]
+        },
+        {
+          "h2_id": "proper-use-of-debt",
+          "title": "3.2: The Proper Use of Debt",
+          "public_url": "/retirement-planning-basics-2025/cash-flow-net-worth/proper-use-of-debt/",
+          "preview_public_html": "When useful leverage helps (and when it hurts) in retirement planning.",
+          "preview_public_format": "html",
+          "section_public_html": "Short-term liquidity and interest-rate discipline matter more than maximizing deductions.",
+          "section_public_format": "markdown",
+          "sub_objectives": [
+            {
+              "h3_id": "prioritize-paydowns",
+              "title": "What debts should I prioritize paying down?",
+              "visibility": "public_inline",
+              "teaser_public": "Target high-rate, variable-rate, and non-deductible debt first.",
+              "body_public_html": "- Attack high APR and variable-rate balances first.\n- Consider cash buffers before aggressive prepayment in retirement.",
+              "h3_body_public_format": "markdown"
+            }
+          ]
+        },
+        {
+          "h2_id": "key-tax-terms",
+          "title": "3.3: Key Tax Terms",
+          "public_url": "/retirement-planning-basics-2025/cash-flow-net-worth/key-tax-terms/",
+          "preview_public_html": "Know the vocabulary that drives tax planning decisions.",
+          "preview_public_format": "html",
+          "section_public_html": "Basis, brackets, qualified dividends, LTCG vs STCG, NIIT — define and use consistently in planning assumptions.",
+          "section_public_format": "markdown",
+          "sub_objectives": []
+        },
+        {
+          "h2_id": "tax-flexibility",
+          "title": "3.4: Facilitating Tax Flexibility",
+          "public_url": "/retirement-planning-basics-2025/cash-flow-net-worth/tax-flexibility/",
+          "preview_public_html": "Why account location and withdrawal order matter.",
+          "preview_public_format": "html",
+          "section_public_html": "Coordinate pre-tax, Roth, and taxable accounts to shape marginal rates over time.",
+          "section_public_format": "markdown",
+          "sub_objectives": []
+        },
+        {
+          "h2_id": "real-estate-income",
+          "title": "3.5: Real Estate for Income",
+          "public_url": "/retirement-planning-basics-2025/cash-flow-net-worth/real-estate-income/",
+          "preview_public_html": "When and how rentals belong in a retirement income plan.",
+          "preview_public_format": "html",
+          "section_public_html": "Screen for cash flow after reserves, realistic capex, and vacancy. Understand illiquidity and concentration risk.",
+          "section_public_format": "markdown",
+          "sub_objectives": []
+        }
+      ]
+    }
+  ],
+  "private_lookup": {
+    "ch-03": {
+      "key-planning-documents": {
+        "estimate-net-worth": {
+          "title": "How can I estimate my net worth?",
+          "body_private_html": "A Net Worth statement (Balance Sheet) is designed to be simple:\n\n- **Assets:** Home, vehicles, retirement accounts, cash, and other property at realistic values.\n- **Liabilities:** Mortgage, HELOC, credit cards, student loans, 401(k) loans, etc.\n\n**Net Worth = Assets − Liabilities.**\n\nEnter approximate **gross** asset values first (before debts), then record each related liability. Update periodically to track progress and to communicate your position to family or trusted professionals.",
+          "h3_body_private_format": "markdown"
+        }
+      }
+    }
+  }
+}

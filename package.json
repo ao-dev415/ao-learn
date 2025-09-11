@@ -1,26 +1,8 @@
 {
-  "name": "ao-v1",
-  "version": "1.0.0",
-  "description": "How to add & place images (recommended workflow) 1) Where to put files",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ao-dev415/ao-learn.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/ao-dev415/ao-learn/issues"
-  },
-  "homepage": "https://github.com/ao-dev415/ao-learn#readme",
-  "dependencies": {
-    "chalk": "^5.6.0",
-    "jsdom": "^26.1.0",
-    "mammoth": "^1.10.0"
+    "build": "node scripts/merge_content.mjs && node scripts/merge_assessments.mjs dist/site.v2.json dist/site.v2.json && node scripts/compat_aliases.mjs dist/site.v2.json dist/site.v2.json && mkdir -p dist && cp dist/site.v2.json site.json && cp dist/site.v2.json dist/site.json",
+    "serve": "npx http-server -c-1 -p 5173 .",
+    "preview": "open http://localhost:5173 && npm run serve",
+    "publish": "npm run build && mkdir -p docs && cp index.html docs/index.html && cp site.json docs/site.json"
   }
 }

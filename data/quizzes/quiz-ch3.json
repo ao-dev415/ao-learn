@@ -1,0 +1,33 @@
+{
+  "title": "LO 3.1 Quick Check \u2014 Cashflow Concepts",
+  "showProgressBar": "off",
+  "pages": [
+    {
+      "name": "p1",
+      "elements": [
+        {
+          "type": "radiogroup",
+          "name": "q1",
+          "title": "Which statement best describes a Net Worth Statement?",
+          "choices": [
+            "A month-by-month history of income and expenses.",
+            "A snapshot of assets minus liabilities at a point in time.",
+            "A forecast of investment returns over the next year."
+          ],
+          "correctAnswer": "A snapshot of assets minus liabilities at a point in time."
+        },
+        {
+          "type": "radiogroup",
+          "name": "q2",
+          "title": "Which action most directly improves cashflow?",
+          "choices": [
+            "Rebalancing a portfolio from stocks to bonds.",
+            "Reducing recurring discretionary expenses.",
+            "Switching brokerage firms."
+          ],
+          "correctAnswer": "Reducing recurring discretionary expenses."
+        }
+      ]
+    }
+  ]
+}
