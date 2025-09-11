@@ -13,7 +13,23 @@
       "public_url": "/advice-onlytm-methodology-2024/ch-03/",
       "intro_public_html": "",
       "intro_public_format": "markdown",
-      "sections": []
+      "sections": [
+        {
+          "h2_id": "learning-objectives-discovery-scoping",
+          "title": "Learning Objectives — Discovery & Scoping",
+          "public_url": "/advice-onlytm-methodology-2024/ch-03/learning-objectives-discovery-scoping/",
+          "preview_public_html": "",
+          "preview_public_format": "html",
+          "section_public_html": "",
+          "section_public_format": "markdown",
+          "sub_objectives": [],
+          "id": "learning-objectives-discovery-scoping",
+          "section_id": "learning-objectives-discovery-scoping",
+          "slug": "learning-objectives-discovery-scoping",
+          "public_html": "",
+          "public_format": "markdown"
+        }
+      ]
     }
   ],
   "private_lookup": {
