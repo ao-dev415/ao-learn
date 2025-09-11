@@ -1,4 +1,7 @@
 {
   "chapter_id": "ch-03",
-  "notes": "Optional private metadata for chapter 3; safe to leave as-is."
+  "coach_notes": [
+    "Emphasize outcome-first framing.",
+    "If the learner jumps to products, redirect to constraints and metrics."
+  ]
 }

@@ -1,51 +1,13 @@
 {
-  "book": {
-    "id": "ao-2024",
-    "title": "Advice Only\u2122 Methodology (2024)"
-  },
-  "chapters": [
+  "book": { "id": "ao-2024" },
+  "chapter_id": "ch-03",
+  "chapter_title": "CH-03",
+  "sections": [
     {
-      "slug": "ch-03",
-      "title": "Chapter 3: Cashflow & Net Worth (v2 demo)",
-      "assessment": {
-        "id": "assess-c3",
-        "title": "Chapter 3 Knowledge Check",
-        "src": "data/assessments/assessment-ch3.json"
-      },
-      "sections": [
-        {
-          "h2_id": "3.1",
-          "title": "Learning Objective 3.1 \u2014 One long objective (demo)",
-          "preview_public_html": "Overview of cashflow statements, net worth statements, and how they connect.",
-          "section_public_html": "<p>This single objective contains multiple sub-sections and an inline quiz. It is meant to prove the v2 \u2192 legacy adapter preserves quizzes and renders assessments.</p>",
-          "sub_objectives": [
-            {
-              "title": "Net worth snapshot",
-              "visibility": "public_inline",
-              "body_public_html": "<p>Details: net worth snapshot basics and why it matters.</p>"
-            },
-            {
-              "title": "Cash inflows/outflows",
-              "visibility": "public_inline",
-              "body_public_html": "<p>Details: mapping cash inflows/outflows into a durable view.</p>"
-            },
-            {
-              "type": "quiz",
-              "title": "Quick Check \u2014 Cashflow Concepts",
-              "visibility": "public_inline",
-              "quiz": {
-                "id": "quiz-ch3",
-                "src": "data/quizzes/quiz-ch3.json"
-              }
-            },
-            {
-              "title": "Using statements in planning",
-              "visibility": "public_inline",
-              "body_public_html": "<p>Details: how these statements feed decisions, savings rate, and risk capacity.</p>"
-            }
-          ]
-        }
-      ]
+      "h2_id": "lo-discovery-scoping",
+      "title": "Learning Objectives — Discovery & Scoping",
+      "section_public_format": "markdown",
+      "section_public_html": "## Learning Objectives — Discovery & Scoping\n\n### You will be able to\n- Frame a discovery call that’s Advice-Only compliant.\n- Separate *scope* (problems) from *solutions* (products).\n- Capture constraints, risks, and success metrics in plain language.\n\n### Core ideas to watch for\n- **Outcome > Offering:** Start from the client’s desired change, not your menu.\n- **Evidence first:** Ask for artifacts (statements, docs, timelines) before opinions.\n- **Bound the work:** Who, what, when, where, how will we measure it?\n\n### Quick knowledge check\nBelow is a quick inline quiz. Answer now to check understanding.\n\n[[quiz:quiz-ch3]]\n\n### From notes to scope\n- Convert raw notes into a 1-page scope: problems → constraints → target outcomes.\n- Flag unknowns and set assumptions with owners and dates.\n\n---\n**Assessment**\nComplete the Chapter 3 assessment to confirm mastery.\n\n[[assessment:assessment-ch3]]\n"
     }
   ]
 }

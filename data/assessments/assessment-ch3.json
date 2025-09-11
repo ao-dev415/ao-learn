@@ -1,42 +1,24 @@
 {
-  "title": "Chapter 3 Knowledge Check",
-  "description": "Short assessment to validate chapter understanding.",
-  "showProgressBar": "top",
-  "pages": [
+  "id": "assessment-ch3",
+  "title": "Chapter 3 Assessment — Discovery & Scoping",
+  "passing_score": 80,
+  "items": [
     {
-      "name": "page1",
-      "elements": [
-        {
-          "type": "rating",
-          "name": "confidence",
-          "title": "How confident do you feel about building a basic cashflow and net worth view?",
-          "rateMin": 1,
-          "rateMax": 5
-        },
-        {
-          "type": "checkbox",
-          "name": "statements",
-          "title": "Which items belong on a Net Worth Statement? (Select all that apply)",
-          "choices": [
-            "Checking account balance",
-            "Credit card debt balance",
-            "Monthly restaurant spend",
-            "401(k) balance",
-            "Mortgage principal outstanding"
-          ],
-          "correctAnswer": [
-            "Checking account balance",
-            "Credit card debt balance",
-            "401(k) balance",
-            "Mortgage principal outstanding"
-          ]
-        },
-        {
-          "type": "text",
-          "name": "next_action",
-          "title": "What is one small next action you'll take after this chapter?"
-        }
-      ]
+      "id": "sa1",
+      "type": "short_answer",
+      "prompt": "In one sentence, define a valid scope boundary for a new client engagement."
+    },
+    {
+      "id": "mc1",
+      "type": "mc",
+      "prompt": "Which pair best represents a scope constraint?",
+      "options": [
+        {"id":"A","label":"‘We need a plan’ and ‘ASAP’"},
+        {"id":"B","label":"‘Max budget $8k’ and ‘decision by Oct 30’"},
+        {"id":"C","label":"‘We like modern tools’ and ‘weekly standups’"},
+        {"id":"D","label":"‘We want success’ and ‘we will try hard’"}
+      ],
+      "answer": "B"
     }
   ]
 }

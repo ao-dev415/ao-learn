@@ -1,33 +1,32 @@
 {
-  "title": "LO 3.1 Quick Check \u2014 Cashflow Concepts",
-  "showProgressBar": "off",
-  "pages": [
+  "id": "quiz-ch3",
+  "title": "Inline Check — Discovery & Scoping",
+  "questions": [
     {
-      "name": "p1",
-      "elements": [
-        {
-          "type": "radiogroup",
-          "name": "q1",
-          "title": "Which statement best describes a Net Worth Statement?",
-          "choices": [
-            "A month-by-month history of income and expenses.",
-            "A snapshot of assets minus liabilities at a point in time.",
-            "A forecast of investment returns over the next year."
-          ],
-          "correctAnswer": "A snapshot of assets minus liabilities at a point in time."
-        },
-        {
-          "type": "radiogroup",
-          "name": "q2",
-          "title": "Which action most directly improves cashflow?",
-          "choices": [
-            "Rebalancing a portfolio from stocks to bonds.",
-            "Reducing recurring discretionary expenses.",
-            "Switching brokerage firms."
-          ],
-          "correctAnswer": "Reducing recurring discretionary expenses."
-        }
-      ]
+      "id": "q1",
+      "type": "mc",
+      "prompt": "Advice-Only discovery focuses FIRST on:",
+      "options": [
+        {"id":"A","label":"Listing all services you offer"},
+        {"id":"B","label":"The client’s desired outcomes and constraints"},
+        {"id":"C","label":"Collecting fees"},
+        {"id":"D","label":"Building a proposal deck"}
+      ],
+      "answer": "B",
+      "explain": "Outcome + constraints give you the problem framing before solutions."
+    },
+    {
+      "id": "q2",
+      "type": "mc",
+      "prompt": "Which artifact is MOST useful to validate facts early?",
+      "options": [
+        {"id":"A","label":"Anecdotes from memory"},
+        {"id":"B","label":"Emails summarizing a meeting"},
+        {"id":"C","label":"Source documents (statements, contracts, timelines)"},
+        {"id":"D","label":"A future roadmap"}
+      ],
+      "answer": "C",
+      "explain": "Evidence first — primary docs reduce speculation."
     }
   ]
 }
