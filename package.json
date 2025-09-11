@@ -1,9 +1,21 @@
 {
-  "name": "ao-learn-final",
+  "name": "ao-learn",
   "private": true,
+  "version": "0.2.1",
+  "description": "Advice-Only LMS static site with v2 JSON merger",
   "type": "module",
   "scripts": {
-    "build:site": "node scripts/merge_content.mjs",
-    "build": "bash build_per_chapter.sh"
+    "merge": "node scripts/merge_content.mjs",
+    "assess": "node scripts/merge_assessments.mjs dist/site.v2.json dist/site.v2.json",
+    "build": "node scripts/merge_content.mjs && node scripts/merge_assessments.mjs dist/site.v2.json dist/site.v2.json && mkdir -p dist && cp dist/site.v2.json site.json && cp dist/site.v2.json dist/site.json",
+    "serve": "http-server -c-1 -p 5173 .",
+    "preview": "open http://localhost:5173 && npm run serve",
+    "publish": "npm run build && mkdir -p docs && cp index.html docs/index.html && cp site.json docs/site.json"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
