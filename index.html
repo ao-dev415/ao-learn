@@ -778,18 +778,32 @@ function __ao_adaptV2ToLegacy(v2){
         preview: sec.preview_public_html || "",
         snippets: []
       };
+
+      // Overview/body
       if (sec.section_public_html) {
         lo.snippets.push({
           title: "Overview",
           body: __ao_plainText(sec.section_public_html)
         });
       }
+
+      // Sub objectives (H3s + quizzes)
       (sec.sub_objectives || []).forEach(so => {
+        // NEW: Inline quiz passthrough
+        if ((so.type === 'quiz' || so.kind === 'quiz') && so.quiz) {
+          lo.snippets.push({
+            type: 'quiz',
+            title: so.title || 'Quick Check',
+            quiz: so.quiz
+          });
+          return;
+        }
+
         const vis = (so.visibility || 'gated');
         if (vis === 'public_inline') {
           lo.snippets.push({
             title: so.title || '',
-            body: __ao_plainText(so.body_public_html || "")
+            body: __ao_plainText(so.body_public_html || so.body || "")
           });
         } else if (vis === 'public_page') {
           const b = so.teaser_public
@@ -804,8 +818,10 @@ function __ao_adaptV2ToLegacy(v2){
           }
         }
       });
+
       legacyCh.los.push(lo);
     });
+
     out.chapters.push(legacyCh);
   });
 

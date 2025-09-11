@@ -1,0 +1,51 @@
+{
+  "book": {
+    "id": "ao-2024",
+    "title": "Advice Only\u2122 Methodology (2024)"
+  },
+  "chapters": [
+    {
+      "slug": "ch-03",
+      "title": "Chapter 3: Cashflow & Net Worth (v2 demo)",
+      "assessment": {
+        "id": "assess-c3",
+        "title": "Chapter 3 Knowledge Check",
+        "src": "data/assessments/assessment-ch3.json"
+      },
+      "sections": [
+        {
+          "h2_id": "3.1",
+          "title": "Learning Objective 3.1 \u2014 One long objective (demo)",
+          "preview_public_html": "Overview of cashflow statements, net worth statements, and how they connect.",
+          "section_public_html": "<p>This single objective contains multiple sub-sections and an inline quiz. It is meant to prove the v2 \u2192 legacy adapter preserves quizzes and renders assessments.</p>",
+          "sub_objectives": [
+            {
+              "title": "Net worth snapshot",
+              "visibility": "public_inline",
+              "body_public_html": "<p>Details: net worth snapshot basics and why it matters.</p>"
+            },
+            {
+              "title": "Cash inflows/outflows",
+              "visibility": "public_inline",
+              "body_public_html": "<p>Details: mapping cash inflows/outflows into a durable view.</p>"
+            },
+            {
+              "type": "quiz",
+              "title": "Quick Check \u2014 Cashflow Concepts",
+              "visibility": "public_inline",
+              "quiz": {
+                "id": "quiz-ch3",
+                "src": "data/quizzes/quiz-ch3.json"
+              }
+            },
+            {
+              "title": "Using statements in planning",
+              "visibility": "public_inline",
+              "body_public_html": "<p>Details: how these statements feed decisions, savings rate, and risk capacity.</p>"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
