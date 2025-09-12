@@ -36,7 +36,7 @@
           "type": "quiz",
           "quiz": {
             "id": "quiz-demo",
-            "src": "quiz-demo.json"
+            "src": "data/quizzes/quiz-demo.json"
           }
         }
       ]
@@ -79,7 +79,7 @@
           "type": "quiz",
           "quiz": {
             "id": "quiz-demo",
-            "src": "quiz-demo.json"
+            "src": "data/quizzes/quiz-demo.json"
           }
         },
         {
@@ -89,7 +89,7 @@
           "type": "assessment",
           "assessment": {
             "id": "assessment-ch5",
-            "src": "assessment-ch5.json"
+            "src": "data/assessments/assessment-ch5.json"
           }
         }
       ]

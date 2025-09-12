@@ -1,0 +1,28 @@
+{
+  "id": "quiz-demo",
+  "title": "Demo Quiz",
+  "showProgressBar": "top",
+  "showCorrectAnswers": true,
+  "checkErrorsMode": "onValueChanged",
+  "pages": [
+    {
+      "name": "p1",
+      "elements": [
+        {
+          "type": "radiogroup",
+          "name": "q1",
+          "title": "Which one is typically an ownership asset?",
+          "choices": ["Bond", "Stock", "Certificate of Deposit"],
+          "correctAnswer": "Stock"
+        },
+        {
+          "type": "text",
+          "inputType": "number",
+          "name": "q2",
+          "title": "What is 2 + 2?",
+          "correctAnswer": "4"
+        }
+      ]
+    }
+  ]
+}

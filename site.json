@@ -231,7 +231,7 @@
               "type": "quiz",
               "quiz": {
                 "id": "quiz-demo",
-                "src": "quiz-demo.json"
+                "src": "data/quizzes/quiz-demo.json"
               },
               "teaser_public": "",
               "body_public_html": ""
@@ -296,7 +296,7 @@
               "type": "quiz",
               "quiz": {
                 "id": "quiz-demo",
-                "src": "quiz-demo.json"
+                "src": "data/quizzes/quiz-demo.json"
               },
               "teaser_public": "",
               "body_public_html": ""
@@ -308,7 +308,7 @@
               "type": "assessment",
               "assessment": {
                 "id": "assessment-ch5",
-                "src": "assessment-ch5.json"
+                "src": "data/assessments/assessment-ch5.json"
               },
               "teaser_public": "",
               "body_public_html": ""

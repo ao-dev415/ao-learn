@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "node scripts/merge_content.mjs && node scripts/merge_assessments.mjs dist/site.v2.json dist/site.v2.json && node scripts/compat_aliases.mjs dist/site.v2.json dist/site.v2.json && mkdir -p dist && cp dist/site.v2.json site.json && cp dist/site.v2.json dist/site.json",
+    "build": "node scripts/merge_content.mjs && node scripts/merge_assessments.mjs dist/site.v2.json dist/site.v2.json && node scripts/compat_aliases.mjs dist/site.v2.json dist/site.v2.json && mkdir -p dist && cp -R data dist/data && cp dist/site.v2.json site.json && cp dist/site.v2.json dist/site.json",
     "serve": "npx http-server -c-1 -p 5173 .",
     "preview": "open http://localhost:5173 && npm run serve",
     "publish": "npm run build && mkdir -p docs && cp index.html docs/index.html && cp site.json docs/site.json"

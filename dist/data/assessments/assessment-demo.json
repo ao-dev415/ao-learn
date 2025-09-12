@@ -1,0 +1,43 @@
+{
+  "id": "assess-demo",
+  "title": "Demo Assessment",
+  "showProgressBar": "top",
+  "pages": [
+    {
+      "name": "page1",
+      "elements": [
+        {
+          "type": "rating",
+          "name": "confidence",
+          "title": "How confident do you feel about this topic?",
+          "rateMin": 1,
+          "rateMax": 5,
+          "minRateDescription": "Not at all",
+          "maxRateDescription": "Very"
+        },
+        {
+          "type": "matrix",
+          "name": "litmus",
+          "title": "Mark true/false",
+          "columns": ["True", "False"],
+          "rows": [
+            { "value": "r1", "text": "An IRA is a type of account." },
+            { "value": "r2", "text": "Stocks are loans you make to a company." }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "page2",
+      "elements": [
+        {
+          "type": "radiogroup",
+          "name": "final",
+          "title": "Which is typically taxed as ordinary income?",
+          "choices": ["Qualified dividends", "W2 wages", "Long-term capital gains"],
+          "correctAnswer": "W2 wages"
+        }
+      ]
+    }
+  ]
+}
