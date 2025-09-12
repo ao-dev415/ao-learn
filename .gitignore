@@ -8,3 +8,4 @@ dist/site.v2.json
 docs/
 .DS_Store
 .cache
+node_modules/
