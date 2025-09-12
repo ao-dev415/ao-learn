@@ -1,0 +1,25 @@
+{
+  "chapter_id": "ch-02",
+  "sections": [
+    {
+      "h2_id": "being-real",
+      "sub_objectives": [
+        {
+          "h3_id": "why-keep-a-budget",
+          "title": "Why Keep a Budget?",
+          "body_private_html": "<p>The most challenging part of the budgeting process is gathering information. However, it is much more manageable than it seems.</p>"
+        }
+      ]
+    },
+    {
+      "h2_id": "understanding-inflation",
+      "sub_objectives": [
+        {
+          "h3_id": "what-is-the-cpi",
+          "title": "What's the CPI?",
+          "body_private_html": "<p>This is the full, detailed, and gated content for the H3, which feeds the RAG system.</p>"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "book": {
+    "id": "rpbasics-2025",
+    "title": "Retirement Planning Basics (2025)",
+    "slug": "retirement-planning-basics-2025"
+  },
+  "chapter": {
+    "id": "ch-06",
+    "title": "Distributions",
+    "slug": "distributions",
+    "public_url": "/retirement-planning-basics-2025/distributions/",
+    "intro_public_html": "<p>A 250-400 word introductory paragraph for the chapter hub page.</p>",
+    "seo_meta": {
+      "title_tag": "Distributions: A Guide to Retirement Account Withdrawals",
+      "meta_description": "Learn about the different types of retirement account distributions and strategies for taking money out in retirement."
+    }
+  },
+  "sections": [
+    {
+      "h2_id": "dc-plan-distributions",
+      "title": "DC Plan Distributions",
+      "is_h3_elevated": false,
+      "public_url": "/retirement-planning-basics-2025/distributions/dc-plan-distributions/",
+      "preview_public_html": "<p>A 150-250 word summary for the chapter hub page, teasing the content of this section.</p>",
+      "section_public_html": "<h2>DC Plan Distributions</h2><p>This is the main public content for the H2 page. It should be a 600-1,000 word overview.</p>",
+      "sub_objectives": [
+        {
+          "h3_id": "leave-money-in-plan",
+          "title": "Option 1: Leave the money in the plan (if permitted).",
+          "teaser_public": "Leaving money in an old employer plan may maintain creditor protection but limits investment options.",
+          "body_private_html": "<p>This is the full, detailed, and gated content for the H3, which feeds the RAG system.</p>",
+          "chunks": [
+            {
+              "chunk_id": "rp25.ch06.dc-plan-distributions.leave-money.c1",
+              "text_plain": "Likely, no additional contributions allowed...",
+              "parent_refs": { "chapter_id": "ch-06", "h2_id": "dc-plan-distributions", "h3_id": "leave-money-in-plan" }
+            }
+          ]
+        },
+        {
+          "h3_id": "transfer-to-new-employer-plan",
+          "title": "Option 2: Transfer the money to a new employer plan.",
+          "teaser_public": "Transferring funds to a new plan allows for continued contributions and maintains creditor protection.",
+          "body_private_html": "<p>Full private text here.</p>",
+          "chunks": [
+            {
+              "chunk_id": "rp25.ch06.dc-plan-distributions.transfer-to-new.c1",
+              "text_plain": "If working, the employee can continue to make contributions...",
+              "parent_refs": { "chapter_id": "ch-06", "h2_id": "dc-plan-distributions", "h3_id": "transfer-to-new-employer-plan" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "h2_id": "net-unrealized-appreciation",
+      "title": "Net Unrealized Appreciation",
+      "is_h3_elevated": true,
+      "public_url": "/retirement-planning-basics-2025/distributions/net-unrealized-appreciation/",
+      "preview_public_html": "<p>A summary for the chapter hub page describing the NUA tax strategy for company stock.</p>",
+      "section_public_html": "<h2>Net Unrealized Appreciation (NUA)</h2><p>This is the public overview (900-1,200 words) for the elevated H3 page, explaining how NUA works in detail.</p>",
+      "sub_objectives": [
+        {
+          "h3_id": "nua-details",
+          "title": "What are the details?",
+          "teaser_public": "A brief sentence explaining the core requirements and benefits of NUA.",
+          "body_private_html": "<p>The rule applies to individuals who own shares of a company they work for AND the shares are in a 401(k) or similar qualified account.</p>",
+          "chunks": [
+            {
+              "chunk_id": "rp25.ch06.nua.details.c1",
+              "text_plain": "This applies to individuals who own shares of a company they work for...",
+              "parent_refs": { "chapter_id": "ch-06", "h2_id": "net-unrealized-appreciation", "h3_id": "nua-details" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

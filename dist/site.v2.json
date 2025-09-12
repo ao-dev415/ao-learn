@@ -1,53 +1,294 @@
 {
   "version": "2.0",
   "book": {
-    "id": "ao-2024",
-    "title": "ao-2024",
-    "slug": "ao-2024"
+    "id": "rpbasics-2025",
+    "title": "Retirement Planning Basics (2025)",
+    "slug": "retirement-planning-basics-2025"
   },
   "chapters": [
     {
-      "id": "ch-03",
-      "title": "CH-03",
-      "slug": "ch-03",
-      "public_url": "/ao-2024/ch-03/",
+      "id": "ch-02",
+      "title": "Expenses",
+      "slug": "expenses",
+      "public_url": "/retirement-planning-basics-2025/expenses/",
       "intro_public_html": "",
       "intro_public_format": "markdown",
       "sections": [
         {
-          "h2_id": "lo-discovery-scoping",
-          "title": "Learning Objectives — Discovery & Scoping",
-          "public_url": "/ao-2024/ch-03/lo-discovery-scoping/",
-          "preview_public_html": "",
+          "h2_id": "being-real",
+          "title": "Being Real",
+          "public_url": "/retirement-planning-basics-2025/expenses/being-real/",
+          "preview_public_html": "<p>Being realistic about your retirement expectations is the first essential step in financial planning. It involves setting achievable goals and understanding the financial implications of those goals. In a partnership, both individuals must agree on their retirement expectations. Unrealistic plans are often doomed to fail from the start. This section explores how to align your retirement goals with your financial reality.</p>",
           "preview_public_format": "html",
-          "section_public_html": "## Learning Objectives — Discovery & Scoping\n\n### You will be able to\n- Frame a discovery call that’s Advice-Only compliant.\n- Separate *scope* (problems) from *solutions* (products).\n- Capture constraints, risks, and success metrics in plain language.\n\n### Core ideas to watch for\n- **Outcome > Offering:** Start from the client’s desired change, not your menu.\n- **Evidence first:** Ask for artifacts (statements, docs, timelines) before opinions.\n- **Bound the work:** Who, what, when, where, how will we measure it?\n\n### Quick knowledge check\nBelow is a quick inline quiz. Answer now to check understanding.\n\n[[quiz:quiz-ch3]]\n\n### From notes to scope\n- Convert raw notes into a 1-page scope: problems → constraints → target outcomes.\n- Flag unknowns and set assumptions with owners and dates.\n\n---\n**Assessment**\nComplete the Chapter 3 assessment to confirm mastery.\n\n[[assessment:assessment-ch3]]\n",
+          "section_public_html": "<h2>Being Realistic About Retirement</h2><p>For many, retirement confidence is high, but the reality can be quite different. Historically, studies have shown a disconnect between workers’ expectations and retirees’ experiences, especially concerning working for pay after retirement and calculating savings needs. This overview will help you bridge that gap by using data-driven insights to ground your financial plans in reality.</p>",
           "section_public_format": "markdown",
           "sub_objectives": [
             {
-              "h3_id": "quick-knowledge-check",
-              "title": "Quick knowledge check",
-              "visibility": "public_inline",
-              "teaser_public": "",
-              "body_public_html": ""
-            },
-            {
-              "h3_id": "chapter-3-assessment",
-              "title": "Chapter 3 Assessment",
-              "visibility": "public_inline",
-              "teaser_public": "",
+              "h3_id": "why-keep-a-budget",
+              "title": "Why Keep a Budget?",
+              "teaser_public": "A realistic budget is a cornerstone of cash flow analysis and is crucial for making critical financial decisions.",
+              "visibility": "gated",
               "body_public_html": ""
             }
           ],
-          "id": "lo-discovery-scoping",
-          "section_id": "lo-discovery-scoping",
-          "slug": "lo-discovery-scoping",
-          "public_html": "## Learning Objectives — Discovery & Scoping\n\n### You will be able to\n- Frame a discovery call that’s Advice-Only compliant.\n- Separate *scope* (problems) from *solutions* (products).\n- Capture constraints, risks, and success metrics in plain language.\n\n### Core ideas to watch for\n- **Outcome > Offering:** Start from the client’s desired change, not your menu.\n- **Evidence first:** Ask for artifacts (statements, docs, timelines) before opinions.\n- **Bound the work:** Who, what, when, where, how will we measure it?\n\n### Quick knowledge check\nBelow is a quick inline quiz. Answer now to check understanding.\n\n[[quiz:quiz-ch3]]\n\n### From notes to scope\n- Convert raw notes into a 1-page scope: problems → constraints → target outcomes.\n- Flag unknowns and set assumptions with owners and dates.\n\n---\n**Assessment**\nComplete the Chapter 3 assessment to confirm mastery.\n\n[[assessment:assessment-ch3]]\n",
+          "id": "being-real",
+          "section_id": "being-real",
+          "slug": "being-real",
+          "public_html": "<h2>Being Realistic About Retirement</h2><p>For many, retirement confidence is high, but the reality can be quite different. Historically, studies have shown a disconnect between workers’ expectations and retirees’ experiences, especially concerning working for pay after retirement and calculating savings needs. This overview will help you bridge that gap by using data-driven insights to ground your financial plans in reality.</p>",
+          "public_format": "markdown"
+        },
+        {
+          "h2_id": "understanding-inflation",
+          "title": "Understanding Inflation",
+          "public_url": "/retirement-planning-basics-2025/expenses/understanding-inflation/",
+          "preview_public_html": "<p>Money's purchasing power erodes over time due to inflation. This section introduces key metrics like the Consumer Price Index (CPI) and explains why a standard 3% inflation rate may not be sufficient for all of your retirement expenses. You will learn how to customize your inflation assumptions to create a more accurate and sustainable financial plan.</p>",
+          "preview_public_format": "html",
+          "section_public_html": "<h2>Understanding Inflation and Your Retirement Plan</h2><p>While the Consumer Price Index (CPI) provides a benchmark for the cost of living, it may not perfectly reflect regional price variations or specific expenses like medical costs and education. A prudent approach is to use a standard inflation rate as a starting point but be prepared to customize it for different areas of your budget. This section provides an in-depth look at how various economic factors can affect your purchasing power and offers strategies to stay ahead.</p>",
+          "section_public_format": "markdown",
+          "sub_objectives": [
+            {
+              "h3_id": "what-is-the-cpi",
+              "title": "What's the CPI?",
+              "teaser_public": "The Consumer Price Index (CPI) is a widely used measure of inflation that tracks the change in prices of a basket of consumer goods and services.",
+              "visibility": "gated",
+              "body_public_html": ""
+            }
+          ],
+          "id": "understanding-inflation",
+          "section_id": "understanding-inflation",
+          "slug": "understanding-inflation",
+          "public_html": "<h2>Understanding Inflation and Your Retirement Plan</h2><p>While the Consumer Price Index (CPI) provides a benchmark for the cost of living, it may not perfectly reflect regional price variations or specific expenses like medical costs and education. A prudent approach is to use a standard inflation rate as a starting point but be prepared to customize it for different areas of your budget. This section provides an in-depth look at how various economic factors can affect your purchasing power and offers strategies to stay ahead.</p>",
+          "public_format": "markdown"
+        }
+      ]
+    },
+    {
+      "id": "ch-03",
+      "title": "Cash Flow & Net Worth",
+      "slug": "cash-flow-net-worth",
+      "public_url": "/retirement-planning-basics-2025/cash-flow-net-worth/",
+      "intro_public_html": "",
+      "intro_public_format": "markdown",
+      "sections": [
+        {
+          "h2_id": "key-planning-documents",
+          "title": "Key Planning Documents",
+          "public_url": "/retirement-planning-basics-2025/cashflow-networth/key-planning-documents/",
+          "preview_public_html": "<p>To get a basic idea of a retirement plan's sustainability, you need a Net Worth Statement and a Cash Flow Statement. This section provides a clear overview of both documents, explaining their purpose and what information they provide to help you better understand your financial health.</p>",
+          "preview_public_format": "html",
+          "section_public_html": "<h2>Net Worth and Cash Flow Statements</h2><p>A **Net Worth Statement** provides a global overview of your financial situation, helping you identify your overall savings available for retirement. A **Cash Flow Statement** details annual inflows and outflows, enabling a deeper analysis of where your money is coming from and going to. This foundational understanding is vital for pinpointing areas for improvement and making informed decisions.</p>",
+          "section_public_format": "markdown",
+          "sub_objectives": [
+            {
+              "h3_id": "positive-cash-flow",
+              "title": "Positive Cash Flow",
+              "teaser_public": "Positive cash flow is the new money available to save or deploy after all current expenses are met.",
+              "visibility": "gated",
+              "body_public_html": ""
+            }
+          ],
+          "id": "key-planning-documents",
+          "section_id": "key-planning-documents",
+          "slug": "key-planning-documents",
+          "public_html": "<h2>Net Worth and Cash Flow Statements</h2><p>A **Net Worth Statement** provides a global overview of your financial situation, helping you identify your overall savings available for retirement. A **Cash Flow Statement** details annual inflows and outflows, enabling a deeper analysis of where your money is coming from and going to. This foundational understanding is vital for pinpointing areas for improvement and making informed decisions.</p>",
+          "public_format": "markdown"
+        },
+        {
+          "h2_id": "compounding-interest",
+          "title": "Compounding Interest",
+          "public_url": "/retirement-planning-basics-2025/cashflow-networth/compounding-interest/",
+          "preview_public_html": "<p>Compounding interest is the reinvestment of interest to grow an investment over time. It is the key to offsetting long-term inflation and building foundational wealth. This section explains the principle of compounding and its importance for long-term financial stability.</p>",
+          "preview_public_format": "html",
+          "section_public_html": "<h2>The Power of Compounding Interest</h2><p>The essence of wealth creation is setting money aside for a very long time, allowing compounding interest to work its magic. This overview will help you understand the concept of compounding and its role as a hedge against inflation. You will also learn why having short-term cash reserves allows you to capture long-term compounding interest with other money.</p>",
+          "section_public_format": "markdown",
+          "sub_objectives": [
+            {
+              "h3_id": "using-the-time-value-of-money",
+              "title": "Using the Time Value of Money",
+              "teaser_public": "Understanding the time value of money is essential for predicting the long-term sustainability of a financial plan.",
+              "visibility": "gated",
+              "body_public_html": ""
+            }
+          ],
+          "id": "compounding-interest",
+          "section_id": "compounding-interest",
+          "slug": "compounding-interest",
+          "public_html": "<h2>The Power of Compounding Interest</h2><p>The essence of wealth creation is setting money aside for a very long time, allowing compounding interest to work its magic. This overview will help you understand the concept of compounding and its role as a hedge against inflation. You will also learn why having short-term cash reserves allows you to capture long-term compounding interest with other money.</p>",
+          "public_format": "markdown"
+        }
+      ]
+    },
+    {
+      "id": "ch-05",
+      "title": "Guarantees",
+      "slug": "guarantees",
+      "public_url": "/retirement-planning-basics-2025/guarantees/",
+      "intro_public_html": "",
+      "intro_public_format": "markdown",
+      "sections": [
+        {
+          "h2_id": "social-security-basics",
+          "title": "Social Security Basics",
+          "public_url": "/retirement-planning-basics-2025/guarantees/social-security-basics/",
+          "preview_public_html": "<p>President Franklin D. Roosevelt signed the Social Security Act in 1935 to boost retirement income and savings. This section explains the fundamentals of Social Security, including how benefits are estimated and the key factors that can affect your monthly payout.</p>",
+          "preview_public_format": "html",
+          "section_public_html": "<h2>Social Security Fundamentals</h2><p>The calculation for your Social Security benefit is based on your highest 35 years of earnings. This section walks you through the concepts of Average Indexed Monthly Earnings (AIME) and Primary Insurance Amount (PIA) and discusses how to get a projection of your benefits. It also provides an overview of the factors that can change your benefit amount over time.</p>",
+          "section_public_format": "markdown",
+          "sub_objectives": [
+            {
+              "h3_id": "estimating-my-benefits",
+              "title": "Estimating my benefits",
+              "teaser_public": "Social Security uses a formula based on your highest 35 years of earnings to estimate your benefits.",
+              "visibility": "gated",
+              "body_public_html": ""
+            },
+            {
+              "h3_id": "taking-social-security",
+              "title": "Taking Social Security",
+              "teaser_public": "Deciding when to take Social Security requires evaluating several variables, including longevity, career choices, and market performance.",
+              "visibility": "gated",
+              "body_public_html": ""
+            },
+            {
+              "h3_id": "the-earnings-limit",
+              "title": "The Earnings Limit",
+              "teaser_public": "If you work past age 65, the earnings limit may reduce your Social Security benefits, especially if you start collecting them before your Full Retirement Age.",
+              "visibility": "gated",
+              "body_public_html": ""
+            }
+          ],
+          "id": "social-security-basics",
+          "section_id": "social-security-basics",
+          "slug": "social-security-basics",
+          "public_html": "<h2>Social Security Fundamentals</h2><p>The calculation for your Social Security benefit is based on your highest 35 years of earnings. This section walks you through the concepts of Average Indexed Monthly Earnings (AIME) and Primary Insurance Amount (PIA) and discusses how to get a projection of your benefits. It also provides an overview of the factors that can change your benefit amount over time.</p>",
+          "public_format": "markdown"
+        },
+        {
+          "h2_id": "defined-benefit-plans",
+          "title": "Defined Benefit Plans",
+          "public_url": "/retirement-planning-basics-2025/guarantees/defined-benefit-plans/",
+          "preview_public_html": "<p>A Defined Benefit Plan (DBP) is an employer-offered pension plan that generally pays a lump sum or monthly annuity. It traditionally provides a guaranteed retirement benefit and can be a stable source of income for life. This section explains the characteristics of these plans and how they differ from other retirement vehicles.</p>",
+          "preview_public_format": "html",
+          "section_public_html": "<h2>Pensions and Defined Benefit Plans</h2><p>Defined Benefit Plans are traditional pensions that offer a lump sum or monthly annuity based on an employee's earnings and age. These plans often provide a guaranteed benefit and may include a cost-of-living adjustment (COLA). We will explore the pros and cons of these plans and provide key questions to ask your plan administrator when considering a lump sum versus a pension option.</p>",
+          "section_public_format": "markdown",
+          "sub_objectives": [
+            {
+              "h3_id": "pension-vs-lump-sum",
+              "title": "Pension vs. Lump Sum",
+              "teaser_public": "Choosing between a pension and a lump sum is a personal and factual decision that requires careful analysis of longevity, risk tolerance, and cash flow needs.",
+              "visibility": "gated",
+              "body_public_html": ""
+            }
+          ],
+          "id": "defined-benefit-plans",
+          "section_id": "defined-benefit-plans",
+          "slug": "defined-benefit-plans",
+          "public_html": "<h2>Pensions and Defined Benefit Plans</h2><p>Defined Benefit Plans are traditional pensions that offer a lump sum or monthly annuity based on an employee's earnings and age. These plans often provide a guaranteed benefit and may include a cost-of-living adjustment (COLA). We will explore the pros and cons of these plans and provide key questions to ask your plan administrator when considering a lump sum versus a pension option.</p>",
+          "public_format": "markdown"
+        },
+        {
+          "h2_id": "wep-and-gpo",
+          "title": "WEP and GPO",
+          "public_url": "/retirement-planning-basics-2025/guarantees/wep-and-gpo/",
+          "preview_public_html": "<p>The Windfall Elimination Provision (WEP) and the Government Pension Offset (GPO) are two rules that may reduce Social Security benefits for those who also receive a pension from non-covered work. This section details how these rules work and helps you understand if they apply to your situation.</p>",
+          "preview_public_format": "html",
+          "section_public_html": "<h2>Understanding WEP and GPO Offsets</h2><p>The WEP works by changing the formula used to calculate a worker’s benefits, potentially reducing the amount of Social Security received by the worker and their family. Similarly, the GPO applies to spousal and survivor benefits for those with a pension from a non-covered government job, and it could significantly reduce or even eliminate these benefits. This page provides a clear overview of these complex rules and includes tables and examples to help you determine if you might be affected.</p>",
+          "section_public_format": "markdown",
+          "sub_objectives": [
+            {
+              "h3_id": "windfall-elimination-provision",
+              "title": "Windfall Elimination Provision (WEP)",
+              "teaser_public": "The WEP can reduce Social Security benefits for workers with a pension from non-covered work, but guarantees benefits won't be reduced by more than half the pension amount.",
+              "visibility": "gated",
+              "body_public_html": ""
+            },
+            {
+              "h3_id": "government-pension-offset",
+              "title": "Government Pension Offset (GPO)",
+              "teaser_public": "The GPO may reduce a spouse’s or widower's Social Security benefits if they have a pension from a non-covered government job.",
+              "visibility": "gated",
+              "body_public_html": ""
+            }
+          ],
+          "id": "wep-and-gpo",
+          "section_id": "wep-and-gpo",
+          "slug": "wep-and-gpo",
+          "public_html": "<h2>Understanding WEP and GPO Offsets</h2><p>The WEP works by changing the formula used to calculate a worker’s benefits, potentially reducing the amount of Social Security received by the worker and their family. Similarly, the GPO applies to spousal and survivor benefits for those with a pension from a non-covered government job, and it could significantly reduce or even eliminate these benefits. This page provides a clear overview of these complex rules and includes tables and examples to help you determine if you might be affected.</p>",
           "public_format": "markdown"
         }
       ]
     }
   ],
   "private_lookup": {
-    "ch-03": {}
+    "ch-02": {
+      "being-real": {
+        "why-keep-a-budget": {
+          "title": "Why Keep a Budget?",
+          "body_private_html": "<p>The most challenging part of the budgeting process is gathering information. However, it is much more manageable than it seems.</p>",
+          "h3_body_private_format": "markdown"
+        }
+      },
+      "understanding-inflation": {
+        "what-is-the-cpi": {
+          "title": "What's the CPI?",
+          "body_private_html": "<p>This is the full, detailed, and gated content for the H3, which feeds the RAG system.</p>",
+          "h3_body_private_format": "markdown"
+        }
+      }
+    },
+    "ch-03": {
+      "key-planning-documents": {
+        "positive-cash-flow": {
+          "title": "Positive Cash Flow",
+          "body_private_html": "<p>This is the full, detailed, and gated content from the PDF, which feeds the RAG system.</p>",
+          "h3_body_private_format": "markdown"
+        }
+      },
+      "compounding-interest": {
+        "using-the-time-value-of-money": {
+          "title": "Using the Time Value of Money",
+          "body_private_html": "<p>This is the full, detailed, and gated content for the H3, which feeds the RAG system.</p>",
+          "h3_body_private_format": "markdown"
+        }
+      }
+    },
+    "ch-05": {
+      "social-security-basics": {
+        "estimating-my-benefits": {
+          "title": "Estimating my benefits",
+          "body_private_html": "<p>This is the full, detailed, and gated content from the PDF.</p>",
+          "h3_body_private_format": "markdown"
+        },
+        "taking-social-security": {
+          "title": "Taking Social Security",
+          "body_private_html": "<p>This is the full, detailed, and gated content from the PDF.</p>",
+          "h3_body_private_format": "markdown"
+        },
+        "the-earnings-limit": {
+          "title": "The Earnings Limit",
+          "body_private_html": "<p>This is the full, detailed, and gated content from the PDF.</p>",
+          "h3_body_private_format": "markdown"
+        }
+      },
+      "defined-benefit-plans": {
+        "pension-vs-lump-sum": {
+          "title": "Pension vs. Lump Sum",
+          "body_private_html": "<p>This is the full, detailed, and gated content from the PDF.</p>",
+          "h3_body_private_format": "markdown"
+        }
+      },
+      "wep-and-gpo": {
+        "windfall-elimination-provision": {
+          "title": "Windfall Elimination Provision (WEP)",
+          "body_private_html": "<p>This is the full, detailed, and gated content from the PDF.</p>",
+          "h3_body_private_format": "markdown"
+        },
+        "government-pension-offset": {
+          "title": "Government Pension Offset (GPO)",
+          "body_private_html": "<p>This is the full, detailed, and gated content from the PDF.</p>",
+          "h3_body_private_format": "markdown"
+        }
+      }
+    }
   }
 }

@@ -1,64 +1,203 @@
 <!doctype html>
 <html lang="en">
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Learning Objective Editor</title>
-<style>
-body{margin:0;font:14px/1.45 system-ui;background:#0b0d10;color:#e8eef3}
-header{padding:10px 12px;background:#0c1015;border-bottom:1px solid #1e242c;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-input,textarea,button{border-radius:8px;border:1px solid #233041;background:#0d131a;color:#e8eef3;padding:8px 10px}
-textarea{width:100%;min-height:60px;margin-top:4px}
-button{background:#0e2723;border-color:#11433b;cursor:pointer}
-section{border:1px solid #1f2630;border-radius:10px;padding:10px;margin:0 0 10px;background:#0e1218}
-label{display:block;font-weight:600;margin-top:6px}
-</style>
-<header>
-  <b>Learning Objective Editor</b>
-  <input id="file" type="file" accept=".json,application/json">
-  <button id="add" disabled>Add Objective</button>
-  <button id="save" disabled>Save File</button>
-  <button id="export" disabled>Export to site.json</button>
-</header>
-<main id="out"><div>Load a file to begin editing.</div></main>
-<script>
-let DATA=null, FNAME='';
-const $=id=>document.getElementById(id);
-const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
-$('file').onchange=e=>{
-  const f=e.target.files?.[0]; if(!f) return; FNAME=f.name;
-  const fr=new FileReader();
-  fr.onload=()=>{try{DATA=JSON.parse(fr.result); if(!Array.isArray(DATA.objectives)) DATA.objectives=[]; render(); $('add').disabled=$('save').disabled=$('export').disabled=false;}catch(err){$('out').textContent='Parse error: '+err.message}};
-  fr.readAsText(f);
-};
-$('add').onclick=()=>{DATA.objectives.push({objective:'',snippet:'',preview:''}); render();};
-function bindInputs(){
-  document.querySelectorAll('[data-i][data-k]').forEach(el=>{
-    el.oninput=e=>{const i=+el.dataset.i,k=el.dataset.k; DATA.objectives[i][k]=el.value;};
-  });
-}
-function render(){
-  const out=$('out'); out.innerHTML='';
-  DATA.objectives.forEach((o,i)=>{
-    const sec=document.createElement('section');
-    sec.innerHTML=`<label>Objective<input data-i="${i}" data-k="objective" value="${esc(o.objective)}" placeholder="Objective"></label>
-<label>Snippet<textarea data-i="${i}" data-k="snippet" placeholder="Snippet">${esc(o.snippet)}</textarea></label>
-<label>Preview<textarea data-i="${i}" data-k="preview" placeholder="Preview">${esc(o.preview)}</textarea></label>`;
-    out.appendChild(sec);
-  });
-  bindInputs();
-}
-$('save').onclick=()=>{
-  const blob=new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=FNAME; a.click();
-};
-$('export').onclick=async()=>{
-  try{
-    const r=await fetch('../site.json'); const site=await r.json();
-    const m=FNAME.match(/assessment-ch(\d+)/); if(!m) throw new Error('Cannot infer chapter from filename');
-    const idx=+m[1]-1; if(!site.chapters||!site.chapters[idx]) throw new Error('Chapter index out of range');
-    site.chapters[idx].los=DATA.objectives.map(o=>({title:o.objective,preview:o.preview,snippets:[{title:'Body',body:o.snippet}]}));
-    const blob=new Blob([JSON.stringify(site,null,2)],{type:'application/json'});
-    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='site.json'; a.click();
-  }catch(err){alert('Export error: '+err.message);}
-};
-</script>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Learning Objective Editor</title>
+  <style>
+    body { margin: 0; font: 14px/1.45 system-ui; background: #0b0d10; color: #e8eef3; }
+    header { padding: 10px 12px; background: #0c1015; border-bottom: 1px solid #1e242c; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    main { padding: 20px; }
+    section { border: 1px solid #1f2630; border-radius: 10px; padding: 15px; margin-bottom: 15px; background: #0e1218; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .h3-group { border-left: 3px solid #00d0b6; padding-left: 15px; margin-top: 10px; }
+    input, textarea, button, select { border-radius: 8px; border: 1px solid #233041; background: #0d131a; color: #e8eef3; padding: 8px 10px; box-sizing: border-box; }
+    label { display: block; font-weight: 600; margin-top: 6px; }
+    input, textarea, select { width: 100%; margin-top: 4px; }
+    textarea { min-height: 80px; }
+    button { background: #0e2723; border-color: #11433b; cursor: pointer; }
+    button.remove-btn { background: #e74c3c; border-color: #c0392b; }
+    #h2-selector { width: auto; }
+    #h3-buttons { display: flex; gap: 8px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <b>Learning Objective Editor</b>
+    <input id="file" type="file" accept=".json,application/json">
+    <select id="h2-selector" disabled></select>
+    <button id="save" disabled>Save Section</button>
+  </header>
+  
+  <main id="out">
+    <div>Load a chapter file to begin.</div>
+  </main>
+
+  <script>
+    let masterData = null;
+    let fileName = '';
+    const $ = id => document.getElementById(id);
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[m]));
+
+    $('file').onchange = e => {
+      const f = e.target.files?.[0];
+      if (!f) return;
+      fileName = f.name;
+      const fr = new FileReader();
+      fr.onload = () => {
+        try {
+          masterData = JSON.parse(fr.result);
+          if (!masterData.sections) masterData.sections = [];
+          populateH2Selector();
+          $('h2-selector').disabled = false;
+        } catch (err) {
+          $('out').innerHTML = `<p style="color: #c0392b;">Parse error: ${err.message}</p>`;
+        }
+      };
+      fr.readAsText(f);
+    };
+
+    function populateH2Selector() {
+      const selector = $('h2-selector');
+      selector.innerHTML = '<option value="">Select an H2...</option>';
+      masterData.sections.forEach(sec => {
+        const option = document.createElement('option');
+        option.value = sec.h2_id;
+        option.textContent = sec.title;
+        selector.appendChild(option);
+      });
+      selector.onchange = e => {
+        const selectedH2Id = e.target.value;
+        if (selectedH2Id) {
+          renderSection(selectedH2Id);
+          $('save').disabled = false;
+        } else {
+          $('out').innerHTML = '<div>Select a section to edit.</div>';
+          $('save').disabled = true;
+        }
+      };
+    }
+
+    function renderSection(h2Id) {
+      const out = $('out');
+      const section = masterData.sections.find(s => s.h2_id === h2Id);
+      if (!section) {
+        out.innerHTML = '<div>Section not found.</div>';
+        return;
+      }
+
+      out.innerHTML = '';
+      const sectionEl = document.createElement('section');
+      sectionEl.id = `section-${section.h2_id}`;
+      sectionEl.innerHTML = `
+        <div class="section-header">
+          <h3>H2 Section: ${esc(section.title)}</h3>
+          <button class="remove-btn" onclick="removeSection('${section.h2_id}')">Remove Section</button>
+        </div>
+        <label>H2 Title</label>
+        <input data-k="title" value="${esc(section.title)}">
+        <label>Public Preview (for H1 hub)</label>
+        <textarea data-k="preview_public_html">${esc(section.preview_public_html)}</textarea>
+        <label>Public Body (for this H2 page)</label>
+        <textarea data-k="section_public_html">${esc(section.section_public_html)}</textarea>
+        <h4>Sub-objectives (H3s)</h4>
+        <div id="h3-container"></div>
+        <div id="h3-buttons">
+          <button onclick="addH3('${section.h2_id}')">Add H3</button>
+        </div>
+      `;
+      out.appendChild(sectionEl);
+
+      const h3Container = sectionEl.querySelector('#h3-container');
+      (section.sub_objectives || []).forEach((h3, i) => renderH3(h3, h3Container, section.h2_id, i));
+      bindInputs(sectionEl);
+    }
+    
+    function renderH3(h3, container, h2Id, index) {
+        const h3El = document.createElement('div');
+        h3El.className = 'h3-group';
+        h3El.innerHTML = `
+            <div class="section-header">
+                <h5>H3: ${esc(h3.title)}</h5>
+                <button class="remove-btn" onclick="removeH3('${h2Id}', ${index})">Remove H3</button>
+            </div>
+            <label>H3 Title</label>
+            <input data-i="${index}" data-k="title" value="${esc(h3.title)}">
+            <label>Public Teaser (1 sentence)</label>
+            <textarea data-i="${index}" data-k="teaser_public">${esc(h3.teaser_public)}</textarea>
+            <label>Private Body (Full content)</label>
+            <textarea data-i="${index}" data-k="body_private_html">${esc(h3.body_private_html)}</textarea>
+        `;
+        container.appendChild(h3El);
+    }
+
+    function bindInputs(root) {
+      root.querySelectorAll('input[data-k], textarea[data-k]').forEach(el => {
+        el.oninput = e => {
+          const h2Id = $('h2-selector').value;
+          const section = masterData.sections.find(s => s.h2_id === h2Id);
+          if (!section) return;
+
+          const key = el.dataset.k;
+          if (el.dataset.i !== undefined) { // It's an H3 input
+            const index = +el.dataset.i;
+            if (!section.sub_objectives[index]) {
+                section.sub_objectives[index] = {};
+            }
+            section.sub_objectives[index][key] = e.target.value;
+          } else { // It's an H2 input
+            section[key] = e.target.value;
+          }
+        };
+      });
+    }
+
+    function addH3(h2Id) {
+        const section = masterData.sections.find(s => s.h2_id === h2Id);
+        if (!section) return;
+        if (!section.sub_objectives) section.sub_objectives = [];
+        section.sub_objectives.push({
+            h3_id: `h3-${Date.now()}`,
+            title: 'New Sub-objective',
+            teaser_public: '',
+            body_private_html: ''
+        });
+        renderSection(h2Id);
+    }
+    
+    function removeH3(h2Id, index) {
+        const section = masterData.sections.find(s => s.h2_id === h2Id);
+        if (section) {
+            section.sub_objectives.splice(index, 1);
+            renderSection(h2Id);
+        }
+    }
+
+    function removeSection(h2Id) {
+        masterData.sections = masterData.sections.filter(s => s.h2_id !== h2Id);
+        $('out').innerHTML = '<div>Section removed. Select a new section or save the file.</div>';
+        populateH2Selector();
+        $('save').disabled = true;
+    }
+
+    $('save').onclick = () => {
+      if (!masterData || !fileName) {
+        alert('No file loaded to save.');
+        return;
+      }
+      const jsonString = JSON.stringify(masterData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+      alert('File saved successfully! Please remember to push to your repository.');
+    };
+  </script>
+
+</body>
 </html>

@@ -1,0 +1,50 @@
+{
+  "chapter_id": "ch-05",
+  "sections": [
+    {
+      "h2_id": "social-security-basics",
+      "sub_objectives": [
+        {
+          "h3_id": "estimating-my-benefits",
+          "title": "Estimating my benefits",
+          "body_private_html": "<p>This is the full, detailed, and gated content from the PDF.</p>"
+        },
+        {
+          "h3_id": "taking-social-security",
+          "title": "Taking Social Security",
+          "body_private_html": "<p>This is the full, detailed, and gated content from the PDF.</p>"
+        },
+        {
+          "h3_id": "the-earnings-limit",
+          "title": "The Earnings Limit",
+          "body_private_html": "<p>This is the full, detailed, and gated content from the PDF.</p>"
+        }
+      ]
+    },
+    {
+      "h2_id": "defined-benefit-plans",
+      "sub_objectives": [
+        {
+          "h3_id": "pension-vs-lump-sum",
+          "title": "Pension vs. Lump Sum",
+          "body_private_html": "<p>This is the full, detailed, and gated content from the PDF.</p>"
+        }
+      ]
+    },
+    {
+      "h2_id": "wep-and-gpo",
+      "sub_objectives": [
+        {
+          "h3_id": "windfall-elimination-provision",
+          "title": "Windfall Elimination Provision (WEP)",
+          "body_private_html": "<p>This is the full, detailed, and gated content from the PDF.</p>"
+        },
+        {
+          "h3_id": "government-pension-offset",
+          "title": "Government Pension Offset (GPO)",
+          "body_private_html": "<p>This is the full, detailed, and gated content from the PDF.</p>"
+        }
+      ]
+    }
+  ]
+}
