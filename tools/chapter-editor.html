@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chapter JSON Editor</title>
+  <style>
+    body { font-family: sans-serif; margin: 0; padding: 20px; background:#f4f4f9; }
+    .container { max-width: 900px; margin:auto; background:#fff; padding:30px; border-radius:8px; box-shadow:0 4px 6px rgba(0,0,0,0.1);}
+    h1,h2,h3,h4{color:#2c3e50;margin-top:25px;}
+    .controls{display:flex;gap:10px;margin-bottom:20px;}
+    button{padding:10px 15px;border:none;border-radius:5px;cursor:pointer;}
+    button.load{background:#3498db;color:#fff;} button.save{background:#2ecc71;color:#fff;}
+    button.export{background:#9b59b6;color:#fff;} button.remove{background:#e74c3c;color:#fff;}
+    .form-group{margin-bottom:15px;}
+    .form-group label{display:block;margin-bottom:5px;font-weight:bold;}
+    input[type=text],textarea,select{width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box;}
+    .section,.sub{border:1px solid #ddd;padding:15px;margin-bottom:20px;border-radius:5px;background:#f9f9f9;}
+    .header{display:flex;justify-content:space-between;align-items:center;}
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Chapter JSON Editor</h1>
+  <div class="controls">
+    <button class="load" onclick="loadChapter()">Load Chapter JSON</button>
+    <button class="save" onclick="saveChapter()">Save Chapter JSON</button>
+    <button class="export" onclick="exportSite()">Export to site.json</button>
+  </div>
+
+  <div id="form">
+    <h2>Book</h2>
+    <div class="form-group"><label>Book Title</label><input id="book-title"/></div>
+
+    <h2>Chapter</h2>
+    <div class="form-group"><label>Chapter Title</label><input id="chapter-title"/></div>
+    <div class="form-group"><label>Intro HTML</label><textarea id="chapter-intro" rows="4"></textarea></div>
+
+    <h2>Sections</h2>
+    <div id="sections"></div>
+    <button onclick="addSection()">Add Section</button>
+  </div>
+</div>
+
+<script>
+let chapterData=null, sectionCounter=0, subCounter=0;
+
+function loadChapter(){
+  const input=document.createElement('input');
+  input.type='file'; input.accept='.json';
+  input.onchange=e=>{
+    const file=e.target.files[0];
+    if(!file) return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      try{
+        chapterData=JSON.parse(ev.target.result);
+        renderChapter();
+      }catch(err){alert('Invalid JSON');}
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function renderChapter(){
+  document.getElementById('book-title').value=chapterData.book?.title||'';
+  document.getElementById('chapter-title').value=chapterData.chapter?.title||'';
+  document.getElementById('chapter-intro').value=chapterData.chapter?.intro_public_html||'';
+  const container=document.getElementById('sections');
+  container.innerHTML='';
+  (chapterData.sections||[]).forEach(sec=>addSection(sec));
+}
+
+function addSection(sec={title:'',preview_public_html:'',section_public_html:'',section_public_format:'markdown',sub_objectives:[]}){
+  const container=document.getElementById('sections');
+  const id=sec.h2_id||`sec-${sectionCounter++}`;
+  const el=document.createElement('div');
+  el.className='section';
+  el.innerHTML=`
+    <div class="header"><h3>Section</h3><button class="remove" onclick="this.closest('.section').remove()">Remove</button></div>
+    <div class="form-group"><label>Title</label><input class="title" data-id="${id}" value="${sec.title}"/></div>
+    <div class="form-group"><label>Preview HTML</label><textarea class="preview" rows="2">${sec.preview_public_html||''}</textarea></div>
+    <div class="form-group"><label>Body</label><textarea class="body" rows="4">${sec.section_public_html||''}</textarea></div>
+    <div class="form-group"><label>Format</label>
+      <select class="format">
+        <option value="html" ${sec.section_public_format==='html'?'selected':''}>HTML</option>
+        <option value="markdown" ${sec.section_public_format!=='html'?'selected':''}>Markdown</option>
+      </select>
+    </div>
+    <h4>Sub‑Objectives</h4>
+    <div class="subs"></div>
+    <button onclick="addSub(this.parentNode)">Add H3</button>`;
+  container.appendChild(el);
+  sec.sub_objectives?.forEach(sub=>addSub(el,sub));
+}
+
+function addSub(sectionEl,sub={title:'',teaser_public:'',visibility:'gated',body_public_html:'',h3_body_public_format:'markdown'}){
+  const container=sectionEl.querySelector('.subs');
+  const id=sub.h3_id||`sub-${subCounter++}`;
+  const isInline=sub.visibility==='public_inline';
+  const el=document.createElement('div');
+  el.className='sub';
+  el.innerHTML=`
+    <div class="header"><h5>H3</h5><button class="remove" onclick="this.closest('.sub').remove()">Remove</button></div>
+    <div class="form-group"><label>Title</label><input class="sub-title" data-id="${id}" value="${sub.title}"/></div>
+    <div class="form-group"><label>Teaser</label><textarea class="teaser" rows="2">${sub.teaser_public||''}</textarea></div>
+    <div class="form-group"><label>Visibility</label>
+      <select class="visibility">
+        <option value="gated" ${sub.visibility==='gated'?'selected':''}>Gated</option>
+        <option value="public_inline" ${sub.visibility==='public_inline'?'selected':''}>Public Inline</option>
+        <option value="public_page" ${sub.visibility==='public_page'?'selected':''}>Public Page</option>
+      </select>
+    </div>
+    <div class="form-group body-wrapper" style="display:${isInline?'block':'none'}">
+      <label>Body</label><textarea class="sub-body" rows="3">${sub.body_public_html||''}</textarea>
+      <label>Format</label>
+      <select class="sub-format">
+        <option value="html" ${sub.h3_body_public_format==='html'?'selected':''}>HTML</option>
+        <option value="markdown" ${sub.h3_body_public_format!=='html'?'selected':''}>Markdown</option>
+      </select>
+    </div>`;
+  container.appendChild(el);
+  el.querySelector('.visibility').addEventListener('change',e=>{
+    el.querySelector('.body-wrapper').style.display=e.target.value==='public_inline'?'block':'none';
+  });
+}
+
+function collectData(){
+  return {
+    ...chapterData,
+    book:{...chapterData.book,title:document.getElementById('book-title').value},
+    chapter:{
+      ...chapterData.chapter,
+      title:document.getElementById('chapter-title').value,
+      intro_public_html:document.getElementById('chapter-intro').value
+    },
+    sections:[...document.querySelectorAll('.section')].map(secEl=>{
+      const section={
+        h2_id:secEl.querySelector('.title').dataset.id,
+        title:secEl.querySelector('.title').value,
+        preview_public_html:secEl.querySelector('.preview').value,
+        section_public_html:secEl.querySelector('.body').value,
+        section_public_format:secEl.querySelector('.format').value,
+        sub_objectives:[...secEl.querySelectorAll('.sub')].map(subEl=>{
+          const subObj={
+            h3_id:subEl.querySelector('.sub-title').dataset.id,
+            title:subEl.querySelector('.sub-title').value,
+            teaser_public:subEl.querySelector('.teaser').value,
+            visibility:subEl.querySelector('.visibility').value
+          };
+          if(subObj.visibility==='public_inline'){
+            subObj.body_public_html=subEl.querySelector('.sub-body').value;
+            subObj.h3_body_public_format=subEl.querySelector('.sub-format').value;
+          }
+          return subObj;
+        })
+      };
+      return section;
+    })
+  };
+}
+
+function saveChapter(){
+  if(!chapterData){alert('Load a chapter JSON first');return;}
+  const blob=new Blob([JSON.stringify(collectData(),null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=(chapterData.chapter?.slug||'chapter')+'.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function exportSite(){
+  if(!chapterData){alert('Load a chapter JSON first');return;}
+  const siteObj={book:document.getElementById('book-title').value, chapters:[collectData()]};
+  const blob=new Blob([JSON.stringify(siteObj,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='site.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+</script>
+</body>
+</html>
