@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quiz Editor</title>
+<style>
+body{margin:0;font:14px/1.45 system-ui;background:#0b0d10;color:#e8eef3}
+header{padding:10px 12px;background:#0c1015;border-bottom:1px solid #1e242c;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+input,textarea,button{border-radius:8px;border:1px solid #233041;background:#0d131a;color:#e8eef3;padding:8px 10px}
+textarea{width:100%;min-height:60px;margin-top:4px}
+button{background:#0e2723;border-color:#11433b;cursor:pointer}
+section{border:1px solid #1f2630;border-radius:10px;padding:10px;margin:0 0 10px;background:#0e1218}
+label{display:block;font-weight:600;margin-top:6px}
+</style>
+<header>
+  <b>Quiz Editor</b>
+  <input id="file" type="file" accept=".json,application/json">
+  <button id="add" disabled>Add Question</button>
+  <button id="save" disabled>Save File</button>
+  <button id="export" disabled>Export to site.json</button>
+</header>
+<main id="out"><div>Load a quiz file to edit.</div></main>
+<script>
+let DATA=null,FNAME='';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
+$('file').onchange=e=>{
+  const f=e.target.files?.[0]; if(!f) return; FNAME=f.name;
+  const fr=new FileReader();
+  fr.onload=()=>{try{DATA=JSON.parse(fr.result); render(); $('add').disabled=$('save').disabled=$('export').disabled=false;}catch(err){$('out').textContent='Parse error: '+err.message}};
+  fr.readAsText(f);
+};
+$('add').onclick=()=>{getEls().push({type:'radiogroup',title:'',choices:[],correctAnswer:''}); render();};
+function getEls(){return DATA.data?.elements || (DATA.pages?.[0]?.elements||(DATA.pages=[{elements:[]}],DATA.pages[0].elements));}
+function bindInputs(){
+  document.querySelectorAll('[data-i][data-k]').forEach(el=>{
+    el.oninput=()=>{const i=+el.dataset.i,k=el.dataset.k,els=getEls();
+      if(k==='choices') els[i].choices=el.value.split(/\n+/);
+      else els[i][k]=el.value;};
+  });
+}
+function render(){
+  const out=$('out'); out.innerHTML='';
+  const els=getEls();
+  els.forEach((q,i)=>{
+    const sec=document.createElement('section');
+    sec.innerHTML=`<label>Question<input data-i="${i}" data-k="title" value="${esc(q.title)}" placeholder="Question text"></label>
+<label>Choices<textarea data-i="${i}" data-k="choices" placeholder="One choice per line">${esc((q.choices||[]).join('\n'))}</textarea></label>
+<label>Correct Answer<input data-i="${i}" data-k="correctAnswer" value="${esc(q.correctAnswer)}" placeholder="Correct answer"></label>`;
+    out.appendChild(sec);
+  });
+  bindInputs();
+}
+$('save').onclick=()=>{
+  const blob=new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=FNAME; a.click();
+};
+$('export').onclick=async()=>{
+  try{
+    const r=await fetch('../site.json'); const site=await r.json();
+    if(!site.quizzes) site.quizzes={};
+    site.quizzes[DATA.id||FNAME.replace(/\.json$/,'')]=DATA;
+    const blob=new Blob([JSON.stringify(site,null,2)],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='site.json'; a.click();
+  }catch(err){alert('Export error: '+err.message);}
+};
+</script>
+</html>
