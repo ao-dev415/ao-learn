@@ -34,6 +34,25 @@
           "teaser_public": "Understanding the time value of money is essential for predicting the long-term sustainability of a financial plan."
         }
       ]
+    },
+    {
+      "h2_id": "chapter-3-assessment",
+      "title": "Chapter 3 Assessment",
+      "public_url": "/retirement-planning-basics-2025/cashflow-networth/chapter-3-assessment/",
+      "preview_public_html": "<p>Complete the Chapter 3 assessment to confirm your mastery of the material covered in this chapter.</p>",
+      "section_public_html": "<h2>Assessment</h2><p>This assessment will test your knowledge on the concepts covered in this chapter, including budgeting, inflation, and retirement planning expectations. [[assessment:assessment-demo]]</p>",
+      "sub_objectives": [
+        {
+          "h3_id": "chapter-3-assessment",
+          "title": "Chapter 3 Assessment",
+          "visibility": "public_inline",
+          "type": "assessment",
+          "assessment": {
+            "id": "assessment-demo",
+            "src": "assessment-demo.json"
+          }
+        }
+      ]
     }
   ]
 }

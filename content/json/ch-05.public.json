@@ -28,6 +28,16 @@
           "h3_id": "the-earnings-limit",
           "title": "The Earnings Limit",
           "teaser_public": "If you work past age 65, the earnings limit may reduce your Social Security benefits, especially if you start collecting them before your Full Retirement Age."
+        },
+        {
+          "h3_id": "knowledge-check-quiz",
+          "title": "Knowledge Check",
+          "visibility": "public_inline",
+          "type": "quiz",
+          "quiz": {
+            "id": "quiz-demo",
+            "src": "quiz-demo.json"
+          }
         }
       ]
     },
@@ -50,7 +60,7 @@
       "title": "WEP and GPO",
       "public_url": "/retirement-planning-basics-2025/guarantees/wep-and-gpo/",
       "preview_public_html": "<p>The Windfall Elimination Provision (WEP) and the Government Pension Offset (GPO) are two rules that may reduce Social Security benefits for those who also receive a pension from non-covered work. This section details how these rules work and helps you understand if they apply to your situation.</p>",
-      "section_public_html": "<h2>Understanding WEP and GPO Offsets</h2><p>The WEP works by changing the formula used to calculate a worker’s benefits, potentially reducing the amount of Social Security received by the worker and their family. Similarly, the GPO applies to spousal and survivor benefits for those with a pension from a non-covered government job, and it could significantly reduce or even eliminate these benefits. This page provides a clear overview of these complex rules and includes tables and examples to help you determine if you might be affected.</p>",
+      "section_public_html": "<h2>Understanding WEP and GPO Offsets</h2><p>Here is a quick quiz to check your understanding of these concepts.</p>[[quiz:quiz-demo]]<p>The WEP works by changing the formula used to calculate a worker’s benefits, potentially reducing the amount of Social Security received by the worker and their family. Similarly, the GPO applies to spousal and survivor benefits for those with a pension from a non-covered government job, and it could significantly reduce or even eliminate these benefits. This page provides a clear overview of these complex rules and includes tables and examples to help you determine if you might be affected.</p>",
       "sub_objectives": [
         {
           "h3_id": "windfall-elimination-provision",
@@ -61,6 +71,26 @@
           "h3_id": "government-pension-offset",
           "title": "Government Pension Offset (GPO)",
           "teaser_public": "The GPO may reduce a spouse’s or widower's Social Security benefits if they have a pension from a non-covered government job."
+        },
+        {
+          "h3_id": "knowledge-check-quiz",
+          "title": "Knowledge Check",
+          "visibility": "public_inline",
+          "type": "quiz",
+          "quiz": {
+            "id": "quiz-demo",
+            "src": "quiz-demo.json"
+          }
+        },
+        {
+          "h3_id": "chapter-5-assessment",
+          "title": "Chapter 5 Assessment",
+          "visibility": "public_inline",
+          "type": "assessment",
+          "assessment": {
+            "id": "assessment-ch5",
+            "src": "assessment-ch5.json"
+          }
         }
       ]
     }
