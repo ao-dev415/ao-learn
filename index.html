@@ -448,8 +448,8 @@ document.addEventListener('DOMContentLoaded', function() {
       }));
       foot.appendChild(h('div', {}, h('a', {
         href: 'https://adviceonly.info/important-disclosures-and-privacy/',
-        target: '_blank',
-        rel: 'noopener'
+        target': '_blank',
+        rel':'noopener'
       }, 'Privacy')));
       NAV.appendChild(foot);
     }
@@ -471,7 +471,7 @@ document.addEventListener('DOMContentLoaded', function() {
           list.sort((a,b)=>new Date(`${a.date}T${a.time||'00:00'}:00`)-new Date(`${b.date}T${b.time||'00:00'}:00`));
           const ev=list.find(e=>new Date(`${e.date}T${e.time||'00:00'}:00`)>=new Date())||list[0];
           evHost.appendChild(h('div',{class:'muted'},fmtDate(ev.date,ev.tz,ev.time)));
-          evHost.appendChild(h('div',{style:'font-weight:600;margin-top:4px'},ev.title||'Event'));
+          evHost.appendChild(h('div',{style:'font-weight:600',marginTop:'4px'},ev.title||'Event'));
           if(ev.mode)evHost.appendChild(h('div',{class:'muted',style:'margin-top:2px'},ev.mode));
           if(ev.ctaUrl&&ev.ctaLabel)evHost.appendChild(h('div',{style:'margin-top:8px'},h('a',{href:ev.ctaUrl,class:'btn',target:'_blank',rel:'noopener'},ev.ctaLabel)));
         }
