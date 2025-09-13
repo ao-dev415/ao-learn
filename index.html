@@ -380,29 +380,28 @@ function extractTokenIndices(text, token){
 // Resolve instrument src by ref using registry (fallback to data/*)
   
 function resolveAssessmentSrc(ref){
-  try{
-    const REG = window.REGISTRY || null;
-    const map = REG?.assessments || {};
-    // prefer registry mapping, otherwise fall back to data/
-    const src = (map[ref]?.src) || `data/assessments/${ref}.json`;
-    return src;
-  }catch(e){
-    console.warn('[assess] resolveAssessmentSrc failed', e);
-    return `data/assessments/${ref}.json`;
+  try {
+    const REG = window.REGISTRY || {};
+    const map = (REG.assessments || {});
+    const src = map[ref] && map[ref].src;
+    return src || "data/assessments/" + ref + ".json";
+  } catch(e){
+    console.warn("[helpers] resolveAssessmentSrc fallback", e);
+    return "data/assessments/" + ref + ".json";
   }
 }
 .json`;
   }
   
 function resolveQuizSrc(ref){
-  try{
-    const REG = window.REGISTRY || null;
-    const map = REG?.quizzes || {};
-    const src = (map[ref]?.src) || `data/quizzes/${ref}.json`;
-    return src;
-  }catch(e){
-    console.warn('[quiz] resolveQuizSrc failed', e);
-    return `data/quizzes/${ref}.json`;
+  try {
+    const REG = window.REGISTRY || {};
+    const map = (REG.quizzes || {});
+    const src = map[ref] && map[ref].src;
+    return src || "data/quizzes/" + ref + ".json";
+  } catch(e){
+    console.warn("[helpers] resolveQuizSrc fallback", e);
+    return "data/quizzes/" + ref + ".json";
   }
 }
 .json`;
