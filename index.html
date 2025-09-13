@@ -557,14 +557,17 @@ function resolveQuizSrc(ref){
           const assessMatches = [...(s.body.matchAll(/\[\[assessment:([a-z0-9._-]+)\]\]/gi) || [])].map(m => m[1]);
           const quizMatches   = [...(s.body.matchAll(/\[\[quiz:([a-z0-9._-]+)\]\]/gi) || [])].map(m => m[1]);
 
-          }
-          const imgTokens = extractTokenIndices(s.body,'img').filter(i=>pool[i] && pool[i].kind==='image');
-          const vidTokens = extractTokenIndices(s.body,'vid').filter(i=>pool[i] && pool[i].kind==='video');
-          if(imgTokens.length || vidTokens.length) hasMediaToken = true;
-          [...imgTokens.map(i=>({i,kind:'img'})), ...vidTokens.map(i=>({i,kind:'vid'}))].sort((a,b)=>a.i-b.i).forEach(t => addFigure(pool[t.i]));
-        }
-      });
+          // Render inline
+          quizMatches.forEach(id => renderQuiz({ id, src: resolveQuizSrc(id) }, key));
+          assessMatches.forEach(id => renderAssessment({ id, src: resolveAssessmentSrc(id) }, key));
 
+          // Media token figures (original)
+          const imgTokens = extractTokenIndices(s.body,'img').filter(i => pool[i] && pool[i].kind === 'image');
+          const vidTokens = extractTokenIndices(s.body,'vid').filter(i => pool[i] && pool[i].kind === 'video');
+          if (imgTokens.length || vidTokens.length) hasMediaToken = true;
+          [...imgTokens.map(i => ({ i, kind:'img' })), ...vidTokens.map(i => ({ i, kind:'vid' }))]
+            .sort((a,b) => a.i - b.i)
+            .forEach(t => addFigure(pool[t.i]));
       if(!hasMediaToken && pool[0]) addFigure(pool[0]);
 
       // assessment invitation at end of chapter
