@@ -660,10 +660,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function setActiveMenu() {
-      const r = (location.hash.replace('#','') || 'home').split(':')[0];
-      MENU.querySelectorAll('a[data-route']).forEach(a => {
-        a.setAttribute('aria-current', a.dataset.route === r ? 'page' : 'false');
-      });
+  const r = (location.hash.replace("#","") || "home").split(":")[0];
+  MENU.querySelectorAll("a[data-route]").forEach(a => {
+    a.setAttribute("aria-current", a.dataset.route === r ? "page" : "false");
+  });
+}
+);
     }
 
     function renderHome(){
