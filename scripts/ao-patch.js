@@ -6,6 +6,33 @@
 // - Normalizes quizzes so {ref/src} render without inlined payloads
 // - Monkey-patches __ao_adaptV2ToLegacy after it exists
 
+<script>
+/* AO: full->public fallback */
+(function () {
+  const p = new URLSearchParams(location.search);
+  const wantsFull = p.has('full');
+  const origFetch = window.fetch;
+
+  window.fetch = async function(input, init) {
+    if (typeof input === 'string' && input.endsWith('/full/site.json')) {
+      let r = await origFetch(input, init);
+      if (!r.ok) {
+        console.warn('[AO] full/site.json missing; falling back to site.json');
+        // Remove ?full=1 so the UI reflects public mode
+        if (wantsFull) {
+          p.delete('full');
+          history.replaceState(null, '', location.pathname + (p.size ? '?' + p.toString() : ''));
+        }
+        return origFetch('site.json', init);
+      }
+      return r;
+    }
+    return origFetch(input, init);
+  };
+})();
+</script>
+
+
 (function registryWarmLoad(){
   var g = window;
   if (g.__aoEnsureRegistry) return;
