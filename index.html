@@ -229,6 +229,38 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 <script>
+<script>
+/* ===== Restored boot() (exported) ===== */
+function boot(){
+      try{
+        site=await loadSiteJSON();
+        if (__ao_isV2Shape(site)) {
+          try {
+            site = __ao_adaptV2ToLegacy(site);
+            console.log('[AO] adapted v2 → legacy');
+          } catch(e){ console.warn('[AO] adapt failed:', e); }
+        }
+      }catch(e){
+        if(!WANT_DEMO){
+          if(NAV)NAV.innerHTML='';
+          NAV.append(h('div',{class:'muted'},`Could not load site.json (${e.message||e}).`));
+          site={title:'',chapters:[],events:[]};
+        }else{
+          site=makeDemoSite();
+        }
+      }
+
+      chapters=(site.chapters||[]).map((ch,i)=>({ch,ord:chapterOrderIndex(ch,i)})).sort((a,b)=>a.ord-b.ord).map(x=>x.ch);
+      buildLeftNav();
+      buildDocs();
+      refreshRail();
+      route();
+      window.addEventListener('hashchange',route);
+    }
+
+try{ if(typeof window.boot!=='function' && typeof boot==='function') window.boot=boot; }catch{}
+</script>
+
 // ===== Boot (safe) =====
 document.addEventListener('DOMContentLoaded', async () => {
   try {
