@@ -18,6 +18,28 @@
   <script src="static/js/vendor/survey/survey.core.min.js"></script>
   <script src="static/js/vendor/survey/survey-js-ui.min.js"></script>
 
+<script>
+  // Warm the registry ASAP; everything still works if it arrives late.
+  (function () {
+    const g = window;
+    g.REGISTRY = g.REGISTRY || null;
+
+    g.__ao_ensureRegistry = (function () {
+      let p;
+      return function () {
+        if (p) return p;
+        p = fetch('data/registry.json', { cache: 'no-store' })
+          .then(r => r.ok ? r.json() : { quizzes: {}, assessments: {} })
+          .catch(() => ({ quizzes: {}, assessments: {} }))
+          .then(j => (g.REGISTRY = j, j));
+        return p;
+      };
+    })();
+
+    g.__ao_ensureRegistry();
+  })();
+</script>
+
   <script>
     // Warm the registry ASAP; everything still works if it arrives late.
     (function () {
@@ -368,22 +390,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function extractTokenIndices(text,token){
       const re=token==='img'?/\[\[img:(\d+)\]\]/gi:/\[\[vid:(\d+)\]\]/gi;
       const inds=[];
-      (text||'').replace(re,(_,n)=>{inds.push(Math.max(1,parseInt(n,10))-1);return'';}
-
-
-  // Resolve instrument src by ref using registry (fallback to data/*)
-  function resolveAssessmentSrc(ref){
-    const r = window.REGISTRY;
-    const item = r?.assessments?.[ref];
-    return (item && (item.src || item.href)) || `data/assessments/${ref}.json`;
-  }
-  function resolveQuizSrc(ref){
-    const r = window.REGISTRY;
-    const item = r?.quizzes?.[ref];
-    return (item && (item.src || item.href)) || `data/quizzes/${ref}.json`;
-  }
-
-);
+      (text||'').replace(re,(_,n)=>{inds.push(Math.max(1,parseInt(n,10))-1);return'';});
       return inds;
     }
     function openZoom(node){
@@ -516,27 +523,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (s.type === 'quiz' && s.quiz) { renderQuiz(s.quiz, key); return; }
         if (s.type === 'assessment' && s.assessment) { renderAssessment(s.assessment, key); return; }
         if (s.title) MAIN.append(h('h3', {}, s.title));
-        
         if (s.body) {
-          // 1) strip media tokens from paragraph copy
           const strippedBody = s.body.replace(/\[\[(img|vid):\d+\]\]/gi, '').trim();
           if (strippedBody) MAIN.append(h('p', {}, strippedBody));
-
-          // 2) media tokens -> figures
-          const imgTokens = extractTokenIndices(s.body,'img').filter(i=>pool[i] && pool[i].kind==='image');
-          const vidTokens = extractTokenIndices(s.body,'vid').filter(i=>pool[i] && pool[i].kind==='video');
-          if (imgTokens.length || vidTokens.length) hasMediaToken = true;
-          [...imgTokens.map(i=>({i,kind:'img'})), ...vidTokens.map(i=>({i,kind:'vid'}))]
-            .sort((a,b)=>a.i-b.i).forEach(t => addFigure(pool[t.i]));
-
-          // 3) NEW: instrument tokens
-          const assessMatches = [...(s.body.matchAll(/\[\[assessment:([a-z0-9._-]+)\]\]/gi) || [])].map(m => m[1]);
-          const quizMatches   = [...(s.body.matchAll(/\[\[quiz:([a-z0-9._-]+)\]\]/gi) || [])].map(m => m[1]);
-
-          // Render inline
-          quizMatches.forEach(id => renderQuiz({ id, src: resolveQuizSrc(id) }, key));
-          assessMatches.forEach(id => renderAssessment({ id, src: resolveAssessmentSrc(id) }, key));
-        }, strippedBody));
           const imgTokens = extractTokenIndices(s.body,'img').filter(i=>pool[i] && pool[i].kind==='image');
           const vidTokens = extractTokenIndices(s.body,'vid').filter(i=>pool[i] && pool[i].kind==='video');
           if(imgTokens.length || vidTokens.length) hasMediaToken = true;
