@@ -231,34 +231,45 @@ document.addEventListener('DOMContentLoaded', function () {
 <script>
 /* ===== Restored boot() (exported) ===== */
 async function boot(){
-  const WANT_DEMO = /[?&]demo=1/.test(location.search);
+  const WANT_DEMO = /[?&]demo=1\b/.test(location.search);
+  const NAV = document.getElementById('nav') || document.getElementById('menu');
 
-      try{
-        site=await loadSiteJSON();
-        if (__ao_isV2Shape(site)) {
-          try {
-            site = __ao_adaptV2ToLegacy(site);
-            console.log('[AO] adapted v2 → legacy');
-          } catch(e){ console.warn('[AO] adapt failed:', e); }
-        }
-      }catch(e){
-        if(!WANT_DEMO){
-          if(NAV)NAV.innerHTML='';
-          NAV.append(h('div',{class:'muted'},`Could not load site.json (${e.message||e}).`));
-          site={title:'',chapters:[],events:[]};
-        }else{
-          site=makeDemoSite();
-        }
-      }
-
-      chapters=(site.chapters||[]).map((ch,i)=>({ch,ord:chapterOrderIndex(ch,i)})).sort((a,b)=>a.ord-b.ord).map(x=>x.ch);
-      buildLeftNav();
-      buildDocs();
-      refreshRail();
-      route();
-      window.addEventListener('hashchange',route);
+  let site;
+  try {
+    site = await loadSiteJSON();
+    if (typeof __ao_isV2Shape === 'function' && __ao_isV2Shape(site)) {
+      try { site = __ao_adaptV2ToLegacy(site); }
+      catch(e) { console.warn('[AO] adapt v2→legacy failed:', e); }
     }
-try{ if(typeof window.boot!=="function" && typeof boot==="function") window.boot=boot; }catch{}
+  } catch (e) {
+    if (!WANT_DEMO) {
+      if (NAV) {
+        NAV.innerHTML = '';
+        const d = document.createElement('div');
+        d.className = 'muted';
+        d.textContent = 'Could not load site.json';
+        NAV.appendChild(d);
+      }
+      site = { title:'', chapters:[], events:[] };
+    } else {
+      site = (typeof makeDemoSite === 'function') ? makeDemoSite() : { title:'Demo', chapters:[], events:[] };
+    }
+  }
+
+  // Render using existing helpers
+  try {
+    chapters = (site.chapters || []).map((ch,i)=>({ ch, ord: String.fromCharCode(97+i) }));
+    buildLeftNav && buildLeftNav();
+    buildDocs && buildDocs();
+    refreshRail && refreshRail();
+    route && route();
+    window.addEventListener('hashchange', route);
+  } catch (e) {
+    console.error('[boot] render failed', e);
+    throw e;
+  }
+}
+try { window.boot = boot; } catch {}
 </script>
 
 <script>
