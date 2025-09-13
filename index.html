@@ -1025,19 +1025,22 @@ function renderHome(){
       } catch { return false; }
     }
     function __ao_plainText(s){
-      if (!s) return "";
-      s = String(s);
-      s = s.replace(/```[\s\S]*?```/g, ' ');
-      s = s.replace(/`([^`]+)`/g, '$1']);
-      s = s.replace(/<\/?(p|strong|em|b|i|u|h\d|ul|ol|li|br|hr|div)[^>]*>/gi, ' ');
-      s = s.replace(/<[^>]+>/g, ' ');
-      s = s.replace(/\*\*([^*]+)\*\*/g, '$1')
-           .replace(/\*([^*]+)\*/g, '$1')
-           .replace(/_([^_]+)_/g, '$1')
-           .replace(/^\s*#+\s*/gm, '');
-      return s.replace(/\s+/g, ' ').trim();
-    )}
-    function __ao_adaptV2ToLegacy(v2){
+  if (s == null) return '';
+  s = String(s);
+  // strip style/script blocks first
+  s = s.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+  s = s.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+  // strip remaining HTML tags
+  s = s.replace(/<[^>]+>/g, '');
+  // decode a few common entities
+  s = s.replace(/&nbsp;/gi, ' ')
+       .replace(/&amp;/gi, '&')
+       .replace(/&lt;/gi, '<')
+       .replace(/&gt;/gi, '>');
+  // collapse whitespace
+  return s.replace(/\s+/g, ' ').trim();
+}
+function __ao_adaptV2ToLegacy(v2){
       try { v2 = __ao_patch_preAdapt(v2); } catch (e) { console.warn('[AO] preAdapt failed:', e); }
       const out = {
         title: (v2.book && (v2.book.title || v2.book.id)) || (v2.title || ""),
