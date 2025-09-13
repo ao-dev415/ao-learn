@@ -665,10 +665,8 @@ document.addEventListener('DOMContentLoaded', function() {
     a.setAttribute("aria-current", a.dataset.route === r ? "page" : "false");
   });
 }
-);
-    }
 
-    function renderHome(){
+function renderHome(){
       stopTiming();
       if(MAIN)MAIN.innerHTML='';
       MAIN.append(
