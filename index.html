@@ -231,6 +231,8 @@ document.addEventListener('DOMContentLoaded', function () {
 <script>
 /* ===== Restored boot() (exported) ===== */
 async function boot(){
+  const WANT_DEMO = /[?&]demo=1/.test(location.search);
+
       try{
         site=await loadSiteJSON();
         if (__ao_isV2Shape(site)) {
