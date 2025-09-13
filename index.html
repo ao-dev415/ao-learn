@@ -1161,6 +1161,7 @@ function __ao_adaptV2ToLegacy(v2){
     
 boot();
   })();
+});
 </script>
 
 <script>
@@ -1177,6 +1178,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const get  = () => { try { return JSON.parse(LS.getItem(KEY) || '{}'); } catch { return {}; } };
   const set  = (v) => { try { LS.setItem(KEY, JSON.stringify(v)); } catch {} };
+
   const apply = (c) => {
     // Hook analytics loaders here if you want; no-op by default.
     if (!hasGPC() && c.ga) { window.dataLayer = window.dataLayer || []; }
@@ -1198,18 +1200,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     if (saveBtn) saveBtn.addEventListener('click', save);
   }
+});
 </script>
 
 <script>
 /* ===== AO Modal & SurveyJS Logic (safe minimal stub) ===== */
 document.addEventListener('DOMContentLoaded', function () {
-  // Keep the listener structure valid; no template literals so the fixer can't break it.
   document.addEventListener('click', function (e) {
     const btn = e.target && e.target.closest && e.target.closest('.ao-token');
     if (!btn) return;
     e.preventDefault();
     // TODO: wire to SurveyJS here if needed.
     console.log('[ao-token]', btn.dataset && btn.dataset.kind, btn.dataset && btn.dataset.id);
+  });
+});
 </script>
 </body>
 </html>
