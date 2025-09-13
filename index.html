@@ -520,6 +520,15 @@ document.addEventListener('DOMContentLoaded', function() {
         if (s.body) {
           // 1) strip media tokens from paragraph copy
           const strippedBody = s.body.replace(/\[\[(img|vid):\d+\]\]/gi, '').trim();
+          // Inline instrument tokens (assessment & quiz)
+          try{
+            const assessMatches = [...(s.body.matchAll(/\[\[assessment:([a-z0-9._-]+)\]\]/gi) || [])].map(m => m[1]);
+            const quizMatches   = [...(s.body.matchAll(/\[\[quiz:([a-z0-9._-]+)\]\]/gi) || [])].map(m => m[1]);
+
+            quizMatches.forEach(id => renderQuiz({ id, src: resolveQuizSrc(id) }, key));
+            assessMatches.forEach(id => renderAssessment({ id, src: resolveAssessmentSrc(id) }, key));
+          }catch(e){ console.warn('[tokens] parse failed', e); }
+
           if (strippedBody) MAIN.append(h('p', {}, strippedBody));
 
           // 2) media tokens -> figures
