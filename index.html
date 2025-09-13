@@ -85,10 +85,7 @@
               const regQ = REG && ref ? REG.quizzes?.[ref] : null;
               const src = so.src || (regQ && regQ.src) || (ref ? ('data/quizzes/' + ref + '.json') : null);
               if (src) so.quiz = { src }; // renderQuiz() will lazy-load by src
-            }
-          });
-        });
-      });
+            }});
 
       return v2;
     }
