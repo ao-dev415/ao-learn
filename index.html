@@ -557,10 +557,7 @@ function resolveQuizSrc(ref){
           const assessMatches = [...(s.body.matchAll(/\[\[assessment:([a-z0-9._-]+)\]\]/gi) || [])].map(m => m[1]);
           const quizMatches   = [...(s.body.matchAll(/\[\[quiz:([a-z0-9._-]+)\]\]/gi) || [])].map(m => m[1]);
 
-          // Render inline
-          quizMatches.forEach(id => renderQuiz({ id, src: resolveQuizSrc(id) }, key));
-          assessMatches.forEach(id => renderAssessment({ id, src: resolveAssessmentSrc(id) }, key));
-        });
+          }
           const imgTokens = extractTokenIndices(s.body,'img').filter(i=>pool[i] && pool[i].kind==='image');
           const vidTokens = extractTokenIndices(s.body,'vid').filter(i=>pool[i] && pool[i].kind==='video');
           if(imgTokens.length || vidTokens.length) hasMediaToken = true;
