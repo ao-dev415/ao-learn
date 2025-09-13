@@ -40,35 +40,8 @@
   })();
 </script>
 
-// AO PATCH: promote assessment + allow quiz-by-ref (with registry or fallback)
-function __ao_patch_preAdapt(v2) {
 
-    const REG = window.REGISTRY; // may still be null when this runs
-
-    (v2.chapters || []).forEach(ch => {
-      // Promote first section-level assessment to chapter.assessment
-      if (!ch.assessment) {
-        const sec = (ch.sections || []).find(s =>
-          (s.sub_objectives || []).some(so => so && so.type === 'assessment' && (so.assessment || so.src || so.ref))
-        );
-        if (sec) {
-          const so = (sec.sub_objectives || []).find(x => x && x.type === 'assessment');
-          const ref = so.ref || (so.assessment && so.assessment.id) || null;
-          const regA = REG && ref ? REG.assessments?.[ref] : null;
-
-          const src =
-            (so.assessment && so.assessment.src) ||  // explicit in data
-            so.src ||                                 // explicit on node
-            (regA && regA.src) ||                     // from registry if ready
-            (ref ? ('data/assessments/' + ref + '.json') : null); // fallback by ref
-
-          if (src) {
-            ch.assessment = {
-              id: ref || (so.assessment && so.assessment.id) || 'assessment',
-              title: sec.title || 'Knowledge Check',
-              href: '/' + (ref || 'assessment'),
-              src: src
-            };
+;
             ch.items = Array.isArray(ch.items) ? ch.items : [];
             if (!ch.items.some(it => it && it.type === 'assessment')) {
               ch.items.push({ type: 'assessment', title: ch.assessment.title, href: ch.assessment.href });
@@ -93,7 +66,60 @@ function __ao_patch_preAdapt(v2) {
 
     return v2;
   }
-  // function __ao_adaptV2ToLegacy(v2){
+  // <script>
+/* AO PATCH: promote chapter assessment + allow quiz-by-ref (registry or fallback) */
+function __ao_patch_preAdapt(v2) {
+  const REG = window.REGISTRY || null; // may be null when this runs
+
+  (v2.chapters || []).forEach(ch => {
+    // Promote first section-level assessment to chapter.assessment
+    if (!ch.assessment) {
+      const sec = (ch.sections || []).find(s =>
+        (s.sub_objectives || []).some(so => so && so.type === 'assessment' && (so.assessment || so.src || so.ref))
+      );
+      if (sec) {
+        const so = (sec.sub_objectives || []).find(x => x && x.type === 'assessment');
+        const ref = so.ref || (so.assessment && so.assessment.id) || null;
+        const regA = REG && ref ? (REG.assessments && REG.assessments[ref]) : null;
+        const src =
+          (so.assessment && so.assessment.src) ||
+          so.src ||
+          (regA && regA.src) ||
+          (ref ? ('data/assessments/' + ref + '.json') : null);
+
+        if (src) {
+          ch.assessment = {
+            id: ref || (so.assessment && so.assessment.id) || 'assessment',
+            title: sec.title || 'Knowledge Check',
+            href: '/' + (ref || 'assessment'),
+            src: src
+          };
+          ch.items = Array.isArray(ch.items) ? ch.items : [];
+          if (!ch.items.some(it => it && it.type === 'assessment')) {
+            ch.items.push({ type: 'assessment', title: ch.assessment.title, href: ch.assessment.href });
+          }
+        }
+      }
+    }
+
+    // Normalize quizzes so they render even if payloads aren’t inlined
+    (ch.sections || []).forEach(sec => {
+      sec.sub_objectives = (sec.sub_objectives || []).map(so => {
+        if (!so || so.type !== 'quiz') return so;
+        const ref = so.ref || so.id || null;
+        const regQ = REG && ref ? (REG.quizzes && REG.quizzes[ref]) : null;
+        const quizSrc = so.src || (regQ && regQ.src) || (ref ? ('data/quizzes/' + ref + '.json') : null);
+        if (!so.quiz) so.quiz = {};
+        if (!so.quiz.src) so.quiz.src = quizSrc;
+        return so;
+      });
+    });
+  });
+
+  return v2;
+}
+</script>
+function __ao_adaptV2ToLegacy(v2){
   //   try { v2 = __ao_patch_preAdapt(v2); } catch(e){ console.warn('[AO] preAdapt failed:', e); }
   //   ...
   // 
@@ -840,19 +866,7 @@ function __ao_plainText(s){
   return s.replace(/\s+/g, ' ').trim();
 }
 /* AO PATCH: promote assessment + allow quiz-by-ref */
-function __ao_patch_preAdapt(v2){
-  (v2.chapters||[]).forEach(ch=>{
-    // Promote first section-level assessment to chapter.assessment
-    if (!ch.assessment) {
-      const sec = (ch.sections||[]).find(s =>
-        (s.sub_objectives||[]).some(so => so && so.type==='assessment' && (so.assessment||so.src||so.ref))
-      );
-      if (sec) {
-        const so = (sec.sub_objectives||[]).find(x => x && x.type==='assessment');
-        const src =
-          (so.assessment && so.assessment.src) ||
-          so.src ||
-          (so.ref ? `/data/assessments/${so.ref}.json` : null);
+.json` : null);
         if (src) ch.assessment = { title: sec.title || 'Chapter Assessment', src };
       }
     }
