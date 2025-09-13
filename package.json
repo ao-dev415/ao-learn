@@ -1,8 +1,19 @@
 {
+  "name": "ao-learn-build",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
   "scripts": {
-    "build": "node scripts/merge_content.mjs && node scripts/merge_assessments.mjs dist/site.v2.json dist/site.v2.json && node scripts/compat_aliases.mjs dist/site.v2.json dist/site.v2.json && mkdir -p dist && cp -R data dist/data && cp dist/site.v2.json site.json && cp dist/site.v2.json dist/site.json",
+    "clean": "rimraf dist site.json || true",
+    "validate": "node scripts/validate_instruments.mjs",
+    "build:site": "node scripts/build_site.mjs",
+    "build:seo": "node scripts/generate_seo.mjs",
+    "build:rag": "node scripts/generate_rag_index.mjs",
+    "build": "npm run clean && npm run validate && npm run build:site && npm run build:seo && npm run build:rag",
     "serve": "npx http-server -c-1 -p 5173 .",
-    "preview": "open http://localhost:5173 && npm run serve",
-    "publish": "npm run build && mkdir -p docs && cp index.html docs/index.html && cp site.json docs/site.json"
+    "preview": "open http://localhost:5173 && npm run serve"
+  },
+  "devDependencies": {
+    "rimraf": "^6.0.0"
   }
 }

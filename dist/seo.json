@@ -1,0 +1,128 @@
+{
+  "#ch1-lo1": {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Being Real",
+    "description": "Being realistic about your retirement expectations is the first essential step in financial planning. It involves setting achievable goals and understanding the financial implications of those goals. In a partnership, both individuals must agree on their retirement expectations. Unrealistic plans are often doomed to fail from the start. This section explores how to align your retirement goals with your financial reality.",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "#ch1-lo1"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "Advice-Only"
+    }
+  },
+  "#ch1-lo2": {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Understanding Inflation",
+    "description": "Money's purchasing power erodes over time due to inflation. This section introduces key metrics like the Consumer Price Index (CPI) and explains why a standard 3% inflation rate may not be sufficient for all of your retirement expenses. You will learn how to customize your inflation assumptions to create a more accurate and sustainable financial plan.",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "#ch1-lo2"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "Advice-Only"
+    }
+  },
+  "#ch1-lo3": {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Chapter 2 Assessment",
+    "description": "Complete the Chapter 2 assessment to confirm your mastery of the material covered in this chapter.",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "#ch1-lo3"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "Advice-Only"
+    }
+  },
+  "#ch2-lo1": {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Key Planning Documents",
+    "description": "To get a basic idea of a retirement plan's sustainability, you need a Net Worth Statement and a Cash Flow Statement. This section provides a clear overview of both documents, explaining their purpose and what information they provide to help you better understand your financial health.",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "#ch2-lo1"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "Advice-Only"
+    }
+  },
+  "#ch2-lo2": {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Compounding Interest",
+    "description": "Compounding interest is the reinvestment of interest to grow an investment over time. It is the key to offsetting long-term inflation and building foundational wealth. This section explains the principle of compounding and its importance for long-term financial stability.",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "#ch2-lo2"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "Advice-Only"
+    }
+  },
+  "#ch2-lo3": {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Chapter 3 Assessment",
+    "description": "Complete the Chapter 3 assessment to confirm your mastery of the material covered in this chapter.",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "#ch2-lo3"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "Advice-Only"
+    }
+  },
+  "#ch3-lo1": {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Social Security Basics",
+    "description": "President Franklin D. Roosevelt signed the Social Security Act in 1935 to boost retirement income and savings. This section explains the fundamentals of Social Security, including how benefits are estimated and the key factors that can affect your monthly payout.",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "#ch3-lo1"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "Advice-Only"
+    }
+  },
+  "#ch3-lo2": {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Defined Benefit Plans",
+    "description": "A Defined Benefit Plan (DBP) is an employer-offered pension plan that generally pays a lump sum or monthly annuity. It traditionally provides a guaranteed retirement benefit and can be a stable source of income for life. This section explains the characteristics of these plans and how they differ from other retirement vehicles.",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "#ch3-lo2"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "Advice-Only"
+    }
+  },
+  "#ch3-lo3": {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "WEP and GPO",
+    "description": "The Windfall Elimination Provision (WEP) and the Government Pension Offset (GPO) are two rules that may reduce Social Security benefits for those who also receive a pension from non-covered work. This section details how these rules work and helps you understand if they apply to your situation.",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "#ch3-lo3"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "Advice-Only"
+    }
+  }
+}

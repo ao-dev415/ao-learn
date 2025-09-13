@@ -1,0 +1,58 @@
+{
+  "docs": [
+    {
+      "id": "ch1.lo1",
+      "url": "#ch1-lo1",
+      "title": "Being Real",
+      "text": "Being realistic about your retirement expectations is the first essential step in financial planning. It involves setting achievable goals and understanding the financial implications of those goals. In a partnership, both individuals must agree on their retirement expectations. Unrealistic plans are often doomed to fail from the start. This section explores how to align your retirement goals with your financial reality. Overview Being Realistic About Retirement For many, retirement confidence is high, but the reality can be quite different. Historically, studies have shown a disconnect between workers’ expectations and retirees’ experiences, especially concerning working for pay after retirement and calculating savings needs. This overview will help you bridge that gap by using data-driven insights to ground your financial plans in reality. Why Keep a Budget? A realistic budget is a cornerstone of cash flow analysis and is crucial for making critical financial decisions."
+    },
+    {
+      "id": "ch1.lo2",
+      "url": "#ch1-lo2",
+      "title": "Understanding Inflation",
+      "text": "Money's purchasing power erodes over time due to inflation. This section introduces key metrics like the Consumer Price Index (CPI) and explains why a standard 3% inflation rate may not be sufficient for all of your retirement expenses. You will learn how to customize your inflation assumptions to create a more accurate and sustainable financial plan. Overview Understanding Inflation and Your Retirement Plan Here is a quick quiz to check your understanding of these concepts. [[quiz:quiz-demo]] A prudent approach is to use a standard inflation rate as a starting point but be prepared to customize it for different areas of your budget. This section provides an in-depth look at how various economic factors can affect your purchasing power and offers strategies to stay ahead. What's the CPI? The Consumer Price Index (CPI) is a widely used measure of inflation that tracks the change in prices of a basket of consumer goods and services. Knowledge Check"
+    },
+    {
+      "id": "ch1.lo3",
+      "url": "#ch1-lo3",
+      "title": "Chapter 2 Assessment",
+      "text": "Complete the Chapter 2 assessment to confirm your mastery of the material covered in this chapter. Overview Assessment This assessment will test your knowledge on the concepts covered in this chapter, including budgeting, inflation, and retirement planning expectations. [[assessment:assessment-demo]] Chapter 2 Assessment"
+    },
+    {
+      "id": "ch2.lo1",
+      "url": "#ch2-lo1",
+      "title": "Key Planning Documents",
+      "text": "To get a basic idea of a retirement plan's sustainability, you need a Net Worth Statement and a Cash Flow Statement. This section provides a clear overview of both documents, explaining their purpose and what information they provide to help you better understand your financial health. Overview Net Worth and Cash Flow Statements A Net Worth Statement provides a global overview of your financial situation, helping you identify your overall savings available for retirement. A Cash Flow Statement details annual inflows and outflows, enabling a deeper analysis of where your money is coming from and going to. This foundational understanding is vital for pinpointing areas for improvement and making informed decisions. Positive Cash Flow Positive cash flow is the new money available to save or deploy after all current expenses are met."
+    },
+    {
+      "id": "ch2.lo2",
+      "url": "#ch2-lo2",
+      "title": "Compounding Interest",
+      "text": "Compounding interest is the reinvestment of interest to grow an investment over time. It is the key to offsetting long-term inflation and building foundational wealth. This section explains the principle of compounding and its importance for long-term financial stability. Overview The Power of Compounding Interest The essence of wealth creation is setting money aside for a very long time, allowing compounding interest to work its magic. This overview will help you understand the concept of compounding and its role as a hedge against inflation. You will also learn why having short-term cash reserves allows you to capture long-term compounding interest with other money. Using the Time Value of Money Understanding the time value of money is essential for predicting the long-term sustainability of a financial plan."
+    },
+    {
+      "id": "ch2.lo3",
+      "url": "#ch2-lo3",
+      "title": "Chapter 3 Assessment",
+      "text": "Complete the Chapter 3 assessment to confirm your mastery of the material covered in this chapter. Overview Assessment This assessment will test your knowledge on the concepts covered in this chapter, including budgeting, inflation, and retirement planning expectations. [[assessment:assessment-demo]] Chapter 3 Assessment"
+    },
+    {
+      "id": "ch3.lo1",
+      "url": "#ch3-lo1",
+      "title": "Social Security Basics",
+      "text": "President Franklin D. Roosevelt signed the Social Security Act in 1935 to boost retirement income and savings. This section explains the fundamentals of Social Security, including how benefits are estimated and the key factors that can affect your monthly payout. Overview Social Security Fundamentals The calculation for your Social Security benefit is based on your highest 35 years of earnings. This section walks you through the concepts of Average Indexed Monthly Earnings (AIME) and Primary Insurance Amount (PIA) and discusses how to get a projection of your benefits. It also provides an overview of the factors that can change your benefit amount over time. Estimating my benefits Social Security uses a formula based on your highest 35 years of earnings to estimate your benefits. Taking Social Security Deciding when to take Social Security requires evaluating several variables, including longevity, career choices, and market performance. The Earnings Limit If you work past age 65, the earnings limit may reduce your Social Security benefits, especially if you start collecting them before your Full Retirement Age. Knowledge Check"
+    },
+    {
+      "id": "ch3.lo2",
+      "url": "#ch3-lo2",
+      "title": "Defined Benefit Plans",
+      "text": "A Defined Benefit Plan (DBP) is an employer-offered pension plan that generally pays a lump sum or monthly annuity. It traditionally provides a guaranteed retirement benefit and can be a stable source of income for life. This section explains the characteristics of these plans and how they differ from other retirement vehicles. Overview Pensions and Defined Benefit Plans Defined Benefit Plans are traditional pensions that offer a lump sum or monthly annuity based on an employee's earnings and age. These plans often provide a guaranteed benefit and may include a cost-of-living adjustment (COLA). We will explore the pros and cons of these plans and provide key questions to ask your plan administrator when considering a lump sum versus a pension option. Pension vs. Lump Sum Choosing between a pension and a lump sum is a personal and factual decision that requires careful analysis of longevity, risk tolerance, and cash flow needs."
+    },
+    {
+      "id": "ch3.lo3",
+      "url": "#ch3-lo3",
+      "title": "WEP and GPO",
+      "text": "The Windfall Elimination Provision (WEP) and the Government Pension Offset (GPO) are two rules that may reduce Social Security benefits for those who also receive a pension from non-covered work. This section details how these rules work and helps you understand if they apply to your situation. Overview Understanding WEP and GPO Offsets Here is a quick quiz to check your understanding of these concepts. [[quiz:quiz-demo]] The WEP works by changing the formula used to calculate a worker’s benefits, potentially reducing the amount of Social Security received by the worker and their family. Similarly, the GPO applies to spousal and survivor benefits for those with a pension from a non-covered government job, and it could significantly reduce or even eliminate these benefits. This page provides a clear overview of these complex rules and includes tables and examples to help you determine if you might be affected. Windfall Elimination Provision (WEP) The WEP can reduce Social Security benefits for workers with a pension from non-covered work, but guarantees benefits won't be reduced by more than half the pension amount. Government Pension Offset (GPO) The GPO may reduce a spouse’s or widower's Social Security benefits if they have a pension from a non-covered government job. Knowledge Check Chapter 5 Assessment"
+    }
+  ]
+}
