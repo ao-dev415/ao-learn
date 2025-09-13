@@ -1028,7 +1028,7 @@ function renderHome(){
       if (!s) return "";
       s = String(s);
       s = s.replace(/```[\s\S]*?```/g, ' ');
-      s = s.replace(/`([^`]+)`/g, '$1');
+      s = s.replace(/`([^`]+)`/g, '$1']);
       s = s.replace(/<\/?(p|strong|em|b|i|u|h\d|ul|ol|li|br|hr|div)[^>]*>/gi, ' ');
       s = s.replace(/<[^>]+>/g, ' ');
       s = s.replace(/\*\*([^*]+)\*\*/g, '$1')
@@ -1036,7 +1036,7 @@ function renderHome(){
            .replace(/_([^_]+)_/g, '$1')
            .replace(/^\s*#+\s*/gm, '');
       return s.replace(/\s+/g, ' ').trim();
-    }
+    )}
     function __ao_adaptV2ToLegacy(v2){
       try { v2 = __ao_patch_preAdapt(v2); } catch (e) { console.warn('[AO] preAdapt failed:', e); }
       const out = {
@@ -1156,8 +1156,8 @@ function renderHome(){
 
     
 boot();
-})();
-</script>
+)}})();
+]}})})</script>
 
 <script>
 // ===== AO Privacy Popup & Consent (clean) =====
