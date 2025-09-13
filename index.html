@@ -14,6 +14,7 @@
   <link rel="preconnect" href="https://www.clarity.ms" crossorigin>
 
   <link href="static/js/vendor/survey/survey-core.min.css" rel="stylesheet"/>
+</script>
   <script src="static/js/vendor/survey/survey.core.min.js"></script>
 <script src="static/js/vendor/survey/survey-js-ui.min.js"></script>
 <script>
@@ -74,7 +75,6 @@ function __ao_adaptV2ToLegacy(v2){
 
   (function() {
     const GA_ID = 'G-C2E79R93CQ';
-    const CLARITY_ID = 't38u1ekrco';</script>
 </head>
 <body>
 
@@ -368,7 +368,6 @@ document.addEventListener('DOMContentLoaded', function() {
       MAIN.append(
         h('h1',{}, `${ch.title || 'Chapter'} — ${lo.title || 'Learning Objective'}`),
         h('p',{class:'lead'}, lo.preview || 'This is preview text for this learning objective.')
-      );
       
       const pool = [...normalizeMedia(lo.images), ...normalizeMedia(lo.image||lo.img)];
       (lo.snippets||[]).forEach(s=>{ pool.push(...normalizeMedia(s.images), ...normalizeMedia(s.image||s.img)); });
@@ -410,7 +409,6 @@ document.addEventListener('DOMContentLoaded', function() {
       MAIN.append(
         h('h1', {}, `${ch.title || 'Chapter'} — Assessment`),
         container
-      );
       renderAssessment(ch.assessment, `${chIdx+1}`, container);
     }
     
@@ -517,7 +515,6 @@ document.addEventListener('DOMContentLoaded', function() {
       MAIN.append(
         h('h1',{},site?.title||site?.book?.title||'Advice-Only®'),
         h('p',{class:'lead'},'Welcome. Browse chapters on the left, or use search above.')
-      );
       const{done,total,pct}=totals();
       MAIN.append(
         h('div',{class:'cardlet'},
@@ -529,7 +526,6 @@ document.addEventListener('DOMContentLoaded', function() {
             h('a',{href:'#events',class:'btn'},'View Events')
           )
         )
-      );
     }
 
     function renderEvents(){
@@ -548,7 +544,6 @@ document.addEventListener('DOMContentLoaded', function() {
       MAIN.append(
         h('h1',{},'Privacy Policy (US/California)'),
         h('p',{class:'lead'}, 'Summary: We don’t collect personal information on our servers. Your reading progress and quiz results are saved on your device only.')
-      );
       MAIN.append(
         h('div',{class:'cardlet'},
           h('h4',{},'What we collect'),
@@ -567,7 +562,6 @@ document.addEventListener('DOMContentLoaded', function() {
           h('p',{},'• We do not share your personal information for cross-context behavioral advertising.'),
           h('p',{},'• We do not combine your on-device learning data with server logs or third-party data.')
         )
-      );
     }
     
     async function renderAbout(){
@@ -604,7 +598,6 @@ document.addEventListener('DOMContentLoaded', function() {
       MAIN.append(
         h('h1',{},'My Data'),
         h('p',{class:'lead'},'Local-only engagement, quiz results, and assessments (nothing leaves your browser).')
-      );
       MAIN.append(
         h('div',{class:'data-grid'},
           h('div',{class:'cardlet'},
@@ -622,7 +615,6 @@ document.addEventListener('DOMContentLoaded', function() {
             h('div',{class:'muted',style:'margin-top:8px'}, `Total time: ${Math.round(agg.totalSecs/60)} min`)
           )
         )
-      );
       const table=h('table',{class:'data-table', style:'margin-top:8px'});
       table.innerHTML=`<thead><tr><th>Chapter / LO</th><th style="text-align:right">Time (s)</th><th style="text-align:right">Status</th></tr></thead><tbody></tbody>`;
       const tb=table.querySelector('tbody');
@@ -715,7 +707,6 @@ document.addEventListener('DOMContentLoaded', function() {
             h('div',{html: hilite(`${r.chTitle} — ${r.loTitle}`, qTokens)}),
             h('small',{html: hilite(pv, qTokens)})
           )
-        );
       });
       SEARCH_DD.classList.add('show');
     }
