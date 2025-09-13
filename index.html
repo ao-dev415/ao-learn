@@ -81,5 +81,42 @@
     </div>
     <div id="aoSurveyContainer"></div>
   </div>
+
+<script src="scripts/ao-patch.js"></script>
+<script>
+(async function boot() {
+  const params = new URLSearchParams(location.search);
+  const url = params.has('full') ? 'full/site.json' : 'site.json';
+
+  // load v2 site model
+  const r = await fetch(url);
+  if (!r.ok) {
+    document.getElementById('nav').innerHTML =
+      '<div class="muted">Failed to load site.json</div>';
+    return;
+  }
+  const v2 = await r.json();
+
+  // adapt to legacy shape (use our pre-adapter if the app adapter isn't present)
+  const adapt =
+    (typeof window.__ao_adaptV2ToLegacy === 'function' && window.__ao_adaptV2ToLegacy) ||
+    (typeof window.__ao_patch_preAdapt === 'function' && (x => window.__ao_patch_preAdapt(x))) ||
+    (x => x);
+
+  const site = adapt(v2);
+
+  // very small nav render so the page is usable
+  const nav = document.getElementById('nav');
+  const parts = [];
+  (site.chapters || []).forEach((ch, ci) => {
+    parts.push(`<div class="muted" style="margin:.5rem 0;font-weight:600">${ch.title || ('Chapter ' + (ci+1))}</div>`);
+    (ch.los || []).forEach((lo, li) => {
+      parts.push(`<a href="#c${ci}l${li}" class="nav-lo" style="display:block;margin:.25rem 0">${lo.title || 'Learning Objective'}</a>`);
+    });
+  });
+  nav.innerHTML = parts.join('') || '<div class="muted">No content.</div>';
+})();
+</script>
+
 </body>
 </html>
