@@ -1,4 +1,4 @@
-// AO patch: full->public fallback + v2 pre-adapt (assessments & quiz refs) + adapter hook
+// AO patch: full->public fallback + v2 pre-adapt (assessments & quiz refs) + adapter hook (early + late)
 (function () {
   'use strict';
 
@@ -65,16 +65,47 @@
     return v2;
   }
 
-  // 4) Monkey-patch the adapter if present (or expose preAdapt for later)
+  // 4) Hook the adapter EARLY if it's already present
   const original = window.__ao_adaptV2ToLegacy;
-  if (typeof original === 'function') {
+  function wrapAdapter(fn) {
     const patched = function (v2) {
       try { v2 = preAdapt(v2); } catch (e) { console.warn('[AO] preAdapt failed:', e); }
-      return original(v2);
+      return fn(v2);
     };
     patched.__aoPatched = true;
-    window.__ao_adaptV2ToLegacy = patched;
-  } else {
-    window.__ao_patch_preAdapt = preAdapt;
+    return patched;
   }
+  if (typeof original === 'function' && !original.__aoPatched) {
+    window.__ao_adaptV2ToLegacy = wrapAdapter(original);
+  }
+
+  // 4b) Hook the adapter LATE if it gets defined after us
+  if (typeof window.__ao_adaptV2ToLegacy !== 'function' || !window.__ao_adaptV2ToLegacy.__aoPatched) {
+    try {
+      Object.defineProperty(window, '__ao_adaptV2ToLegacy', {
+        configurable: true,
+        enumerable: true,
+        get() { return this.___ao_adaptV2ToLegacy; },
+        set(fn) {
+          if (typeof fn === 'function' && !fn.__aoPatched) {
+            this.___ao_adaptV2ToLegacy = wrapAdapter(fn);
+          } else {
+            this.___ao_adaptV2ToLegacy = fn;
+          }
+        }
+      });
+    } catch (e) {
+      // If defineProperty fails (already non-configurable), fall back to polling once.
+      const t = setInterval(() => {
+        if (typeof window.__ao_adaptV2ToLegacy === 'function' && !window.__ao_adaptV2ToLegacy.__aoPatched) {
+          window.__ao_adaptV2ToLegacy = wrapAdapter(window.__ao_adaptV2ToLegacy);
+          clearInterval(t);
+        }
+      }, 20);
+      setTimeout(() => clearInterval(t), 2000);
+    }
+  }
+
+  // Expose for debugging
+  window.__ao_patch_preAdapt = preAdapt;
 })();
