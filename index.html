@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <script>
 /* ===== Restored boot() (exported) ===== */
-function boot(){
+async function boot(){
       try{
         site=await loadSiteJSON();
         if (__ao_isV2Shape(site)) {
@@ -256,8 +256,7 @@ function boot(){
       route();
       window.addEventListener('hashchange',route);
     }
-
-try{ if(typeof window.boot!=='function' && typeof boot==='function') window.boot=boot; }catch{}
+try{ if(typeof window.boot!=="function" && typeof boot==="function") window.boot=boot; }catch{}
 </script>
 
 <script>
