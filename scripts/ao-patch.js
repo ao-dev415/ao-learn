@@ -1,81 +1,91 @@
-/* AO patch: chapter assessment + quiz/assessment-by-ref */
+// scripts/ao-patch.js
 (function () {
   'use strict';
 
-  const TOKEN_RE = /\[\[\s*assessment:([\w-]+)\s*\]\]/ig;
-
-  function resolveFromRegistry(kind, id, fallback) {
+  function regSrc(kind, id) {
     try {
-      const REG = window.REGISTRY || null;
-      if (!REG || !id) return fallback;
-      const table = kind === 'assessment' ? REG.assessments : REG.quizzes;
-      const src = table && table[id] && table[id].src;
-      return src || fallback;
+      const reg = window.REGISTRY || {};
+      const tbl = reg[kind + 's'] || reg[kind];
+      return tbl?.[id]?.src || null;
     } catch {
-      return fallback;
+      return null;
     }
   }
+  const fallbackSrc = (kind, id) => `data/${kind}s/${id}.json`;
 
-  function pickAssessmentFromSection(sec) {
-    // A) explicit sub_objective { type: 'assessment', ref/src/... }
-    const so = (sec.sub_objectives || []).find(
-      x => x && x.type === 'assessment' && (x.ref || x.assessment?.id || x.src || x.assessment?.src)
-    );
-    if (so) {
-      const id  = so.ref || so.assessment?.id || null;
-      const src = so.assessment?.src || so.src || (id ? `data/assessments/${id}.json` : null);
-      return { id, src, title: so.title || sec.title || 'Chapter Assessment' };
+  function stripAssessmentTokens(s) {
+    if (!s) return { text: s, ids: [] };
+    const ids = [];
+    const text = s.replace(/\[\[(assessment):([a-z0-9_-]+)\]\]/gi, (_m, _k, id) => {
+      ids.push(id);
+      return '';
+    });
+    return { text, ids };
+  }
+
+  function fromSubObjective(ch, sec) {
+    const list = (sec?.sub_objectives) || [];
+    const so = list.find(x => x && (x.type === 'assessment' || x.kind === 'assessment'));
+    if (!so) return null;
+
+    const id = so.ref || so.id || so.assessment?.id || null;
+    const src = so.src || so.assessment?.src || (id && (regSrc('assessment', id) || fallbackSrc('assessment', id))) || null;
+    const title = sec?.title || 'Chapter Assessment';
+    if (!src) return null;
+    return { id, src, title };
+  }
+
+  function fromTokens(ch, sec) {
+    const fields = ['section_public_html', 'section_body', 'body', 'preview_public_html', 'preview'];
+    for (const f of fields) {
+      if (Object.prototype.hasOwnProperty.call(sec, f) && typeof sec[f] === 'string') {
+        const { text, ids } = stripAssessmentTokens(sec[f]);
+        if (ids.length) {
+          sec[f] = text; // mutate to remove token from content
+          const id = ids[0];
+          const src = regSrc('assessment', id) || fallbackSrc('assessment', id);
+          const title = sec?.title || 'Chapter Assessment';
+          return { id, src, title };
+        }
+      }
     }
-
-    // B) token in HTML [[assessment:ID]]
-    const html = `${sec.section_public_html || ''} ${sec.preview_public_html || ''}`;
-    TOKEN_RE.lastIndex = 0;
-    const m = TOKEN_RE.exec(html);
-    if (m) {
-      const id = m[1];
-      // Also strip token from the HTML so it doesn't show in body
-      if (sec.section_public_html) sec.section_public_html = sec.section_public_html.replace(TOKEN_RE, '').trim();
-      if (sec.preview_public_html) sec.preview_public_html = sec.preview_public_html.replace(TOKEN_RE, '').trim();
-      return { id, src: `data/assessments/${id}.json`, title: sec.title || 'Chapter Assessment' };
-    }
-
     return null;
   }
 
-  function preAdapt(v2) {
-    (v2.chapters || []).forEach(ch => {
-      // 1) Promote to chapter.assessment if we can infer one
-      if (!ch.assessment) {
-        let found = null;
-        for (const sec of (ch.sections || [])) {
-          const f = pickAssessmentFromSection(sec);
-          if (f) { found = f; break; }
-        }
-        if (found) {
-          const resolved = resolveFromRegistry('assessment', found.id, found.src);
-          ch.assessment = {
-            id: found.id || 'assessment',
-            title: found.title || 'Chapter Assessment',
-            src: resolved
-          };
-        }
-      }
-
-      // 2) Normalize quizzes so they load by ref/src even if payload isn’t inline
-      (ch.sections || []).forEach(sec => {
-        (sec.sub_objectives || []).forEach(so => {
-          if (so && so.type === 'quiz') {
-            const id  = so.ref || so.id || so.quiz?.id || null;
-            const viaReg = id ? resolveFromRegistry('quiz', id, null) : null;
-            if (!so.quiz) so.quiz = {};
-            so.quiz.src = so.quiz.src || so.src || viaReg || (id ? `data/quizzes/${id}.json` : null);
+  function normalizeQuizzes(ch) {
+    (ch.sections || []).forEach(sec => {
+      (sec.sub_objectives || []).forEach(so => {
+        if (so && so.type === 'quiz') {
+          if (!so.quiz) so.quiz = {};
+          if (!so.quiz.src) {
+            const qid = so.ref || so.id || null;
+            so.quiz.src = so.src || (qid && (regSrc('quiz', qid) || fallbackSrc('quiz', qid))) || so.quiz.src;
           }
-        });
+        }
       });
+    });
+  }
+
+  function patch(v2) {
+    (v2.chapters || []).forEach(ch => {
+      // Find/construct chapter assessment once
+      if (!ch.assessment || !ch.assessment.src) {
+        let found = null;
+        (ch.sections || []).some(sec => {
+          found = fromSubObjective(ch, sec) || fromTokens(ch, sec);
+          return !!found;
+        });
+        if (found) ch.assessment = { id: found.id, title: found.title, src: found.src };
+      }
+      normalizeQuizzes(ch);
     });
     return v2;
   }
 
-  // Expose for the main adapter: __ao_adaptV2ToLegacy will call this if present
-  window.__ao_patch_preAdapt = preAdapt;
+  // Chain onto any existing preAdapt
+  const prev = window.__ao_patch_preAdapt;
+  window.__ao_patch_preAdapt = function (v2) {
+    try { v2 = prev ? prev(v2) : v2; } catch (e) { console.warn('[AO] preAdapt(prev) failed:', e); }
+    try { return patch(v2); } catch (e) { console.warn('[AO] token/assessment patch failed', e); return v2; }
+  };
 })();
