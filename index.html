@@ -1029,7 +1029,8 @@ function renderHome(){
   s = String(s);
   // strip style/script blocks first
   s = s.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
-  s = s.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+  s = s.replace(/</script>
+<script[^>]*>[\s\S]*?<\/script>/gi, '');
   // strip remaining HTML tags
   s = s.replace(/<[^>]+>/g, '');
   // decode a few common entities
