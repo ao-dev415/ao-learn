@@ -2,7 +2,7 @@
   async function boot(){
     try{
       const resp = await fetch('dist/seo.json', { cache: 'no-store' });
-      if (!resp.ok) { return; }
+      if (!resp.ok) return;
       const seo = await resp.json();
       function apply(route){
         const data = seo[route];
@@ -13,9 +13,7 @@
       }
       apply(location.hash || '#home');
       window.addEventListener('hashchange', ()=>apply(location.hash || '#home'));
-    }catch(e){
-      // optional
-    }
+    }catch{}
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();

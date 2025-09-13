@@ -1,15 +1,17 @@
 {
   "name": "ao-learn-build",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
     "clean": "rimraf dist site.json || true",
+    "prebuild": "node scripts/ingest_chapters.mjs || true",
     "validate": "node scripts/validate_instruments.mjs",
     "build:site": "node scripts/build_site.mjs",
     "build:seo": "node scripts/generate_seo.mjs",
     "build:rag": "node scripts/generate_rag_index.mjs",
     "build": "npm run clean && npm run validate && npm run build:site && npm run build:seo && npm run build:rag",
+    "registry:sync": "node scripts/sync_registry.mjs",
     "serve": "npx http-server -c-1 -p 5173 .",
     "preview": "open http://localhost:5173 && npm run serve"
   },

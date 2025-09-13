@@ -55,12 +55,7 @@
             }
           ]
         }
-      ],
-      "assessment": {
-        "id": "assessment-demo",
-        "title": "Chapter 2 Assessment",
-        "src": "data/assessments/assessment-demo.json"
-      }
+      ]
     },
     {
       "title": "Cash Flow & Net Worth",
@@ -107,12 +102,7 @@
             }
           ]
         }
-      ],
-      "assessment": {
-        "id": "assessment-demo",
-        "title": "Chapter 3 Assessment",
-        "src": "assessment-demo.json"
-      }
+      ]
     },
     {
       "title": "Guarantees",
@@ -191,12 +181,7 @@
             }
           ]
         }
-      ],
-      "assessment": {
-        "id": "assessment-ch5",
-        "title": "WEP and GPO",
-        "src": "data/assessments/assessment-ch5.json"
-      }
+      ]
     }
   ]
 }

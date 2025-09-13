@@ -1,17 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const outDir = 'dist';
-fs.mkdirSync(outDir, { recursive: true });
-
 function exists(p){ try { fs.accessSync(p); return true; } catch { return false; } }
 function readJSON(p){ return JSON.parse(fs.readFileSync(p, 'utf8')); }
 function writeJSON(p, obj){ fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, JSON.stringify(obj, null, 2)); }
 
-function isV2(obj){
-  try { return obj && Array.isArray(obj.chapters) && Array.isArray(obj.chapters[0]?.sections); }
-  catch { return false; }
-}
+function isV2(obj){ try { return obj && Array.isArray(obj.chapters) && Array.isArray(obj.chapters[0]?.sections); } catch { return false; } }
 
 function patchPreAdapt(v2){
   (v2.chapters || []).forEach(ch => {
@@ -26,13 +20,9 @@ function patchPreAdapt(v2){
     (ch.sections || []).forEach(sec => {
       (sec.sub_objectives || []).forEach(so => {
         if (so && so.type === 'quiz') {
-          if (!so.quiz) {
-            const src = so.src || (so.ref ? `data/quizzes/${so.ref}.json` : null);
-            if (src) so.quiz = { src };
-          } else if (!so.quiz.src) {
-            const src = so.src || (so.ref ? `data/quizzes/${so.ref}.json` : null);
-            if (src) so.quiz.src = src;
-          }
+          const src = so.src || (so.ref ? `data/quizzes/${so.ref}.json` : null);
+          if (!so.quiz) so.quiz = {};
+          if (!so.quiz.src) so.quiz.src = src;
         }
       });
     });
@@ -55,23 +45,13 @@ function plain(s=''){
 }
 
 function adaptV2ToLegacy(v2){
-  const out = {
-    title: (v2.book && (v2.book.title || v2.book.id)) || (v2.title || ""),
-    events: Array.isArray(v2.events) ? v2.events.slice() : [],
-    chapters: []
-  };
+  const out = { title: (v2.book && (v2.book.title || v2.book.id)) || (v2.title || ""), events: Array.isArray(v2.events) ? v2.events.slice() : [], chapters: [] };
   (v2.chapters || []).forEach(ch => {
     const legacyCh = { title: ch.title || ch.slug || 'Chapter', los: [] };
     if (ch.assessment) legacyCh.assessment = ch.assessment;
     (ch.sections || []).forEach(sec => {
-      const lo = {
-        title: sec.title || sec.h2_id || 'Learning Objective',
-        preview: sec.preview_public_html || "",
-        snippets: []
-      };
-      if (sec.section_public_html) {
-        lo.snippets.push({ title: "Overview", body: plain(sec.section_public_html) });
-      }
+      const lo = { title: sec.title || sec.h2_id || 'Learning Objective', preview: sec.preview_public_html || "", snippets: [] };
+      if (sec.section_public_html) lo.snippets.push({ title: "Overview", body: plain(sec.section_public_html) });
       (sec.sub_objectives || []).forEach(so => {
         if ((so.type === 'quiz' || so.kind === 'quiz') && so.quiz) {
           lo.snippets.push({ type: 'quiz', title: so.title || 'Quick Check', quiz: so.quiz });
@@ -95,24 +75,51 @@ function adaptV2ToLegacy(v2){
   return out;
 }
 
-function copyDataFolder() {
+// Public redaction (keeps your gating intact)
+function readPublicConfig(){
+  try { return JSON.parse(fs.readFileSync('content/public.config.json','utf8')); }
+  catch { return { includeQuizzes: true, includeAssessments: false, keepGatedSnippets: true, stripBodiesOver: 2000 }; }
+}
+
+function redactForPublic(site, cfg){
+  const copy = JSON.parse(JSON.stringify(site));
+  (copy.chapters||[]).forEach(ch => {
+    if (!cfg.includeAssessments) delete ch.assessment;
+    (ch.los||[]).forEach(lo => {
+      lo.snippets = (lo.snippets||[]).filter(s => {
+        if (s?.type === 'assessment') return false;
+        if (s?.type === 'quiz') return !!cfg.includeQuizzes;
+        if (s?.body === '(Gated content)' && !cfg.keepGatedSnippets) return false;
+        return true;
+      }).map(s => {
+        if (s?.body && typeof s.body === 'string' && cfg.stripBodiesOver && s.body.length > cfg.stripBodiesOver) {
+          s.body = s.body.slice(0, cfg.stripBodiesOver) + '…';
+        }
+        return s;
+      });
+    });
+  });
+  return copy;
+}
+
+function copyDataFolder(){
   if (!exists('data')) return;
-  const dest = path.join('dist','data');
-  fs.mkdirSync(dest, { recursive: true });
-  const copyRecursive = (src, dst) => {
-    fs.mkdirSync(dst, { recursive: true });
+  const dst = 'dist/data';
+  fs.mkdirSync(dst, { recursive: true });
+  const cp = (src, dest) => {
+    fs.mkdirSync(dest, { recursive: true });
     for (const e of fs.readdirSync(src)) {
       const s = path.join(src, e);
-      const d = path.join(dst, e);
+      const d = path.join(dest, e);
       const st = fs.statSync(s);
-      if (st.isDirectory()) copyRecursive(s, d);
+      if (st.isDirectory()) cp(s, d);
       else fs.copyFileSync(s, d);
     }
   };
-  copyRecursive('data', dest);
+  cp('data', dst);
 }
 
-function main() {
+function main(){
   let src = 'content/site.v2.json';
   if (!exists(src)) src = 'site.json';
   if (!exists(src)) throw new Error('No content/site.v2.json or site.json found.');
@@ -126,13 +133,21 @@ function main() {
     console.log('[build] legacy site.json passthrough');
   }
 
+  // full
   writeJSON('dist/full/site.json', site);
-  writeJSON('dist/site.json', site);
-  try { fs.copyFileSync('dist/site.json', 'site.json'); } catch {}
+
+  // public (redacted)
+  const cfg = readPublicConfig();
+  const pub = redactForPublic(site, cfg);
+  writeJSON('dist/public/site.json', pub);
+
+  // copies for viewer/Pages
+  try { fs.copyFileSync('dist/public/site.json', 'site.json'); } catch {}
+  fs.mkdirSync('full', { recursive: true });
+  try { fs.copyFileSync('dist/full/site.json', 'full/site.json'); } catch {}
 
   copyDataFolder();
-
-  console.log('[build] wrote dist/full/site.json, dist/site.json, site.json');
+  console.log('[build] wrote dist/full/site.json, dist/public/site.json, site.json, full/site.json');
 }
 
 try { main(); } catch (e) { console.error(e); process.exit(1); }
