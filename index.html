@@ -1159,7 +1159,7 @@ function __ao_adaptV2ToLegacy(v2){
 
     
 boot();
-});
+})();
 </script>
 
 <script>
@@ -1197,7 +1197,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     if (saveBtn) saveBtn.addEventListener('click', save);
   }
-});
 </script>
 
 <script>
@@ -1210,8 +1209,6 @@ document.addEventListener('DOMContentLoaded', function () {
     e.preventDefault();
     // TODO: wire to SurveyJS here if needed.
     console.log('[ao-token]', btn.dataset && btn.dataset.kind, btn.dataset && btn.dataset.id);
-  });
-});
 </script>
 </body>
 </html>
