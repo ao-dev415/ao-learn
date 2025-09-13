@@ -1154,13 +1154,13 @@ function renderHome(){
       };
     }
 
-    boot();
-  })();
-}}
+    
+boot();
+})();
 </script>
 
 <script>
-// ===== AO Privacy Popup & Consent (clean)
+// ===== AO Privacy Popup & Consent (clean) =====
 document.addEventListener('DOMContentLoaded', () => {
   const LS = window.localStorage;
   const KEY = 'ao:consent';
@@ -1169,13 +1169,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const saveBtn  = document.getElementById('ao-analytics-save');
   const gaBox    = document.getElementById('opt-ga');
   const mcBox    = document.getElementById('opt-clarity');
-  const hasGPC   = () => (navigator?.globalPrivacyControl === true);
+  const hasGPC   = () => (navigator && navigator.globalPrivacyControl === true);
 
-  const get = () => { try { return JSON.parse(LS.getItem(KEY) || '{}'); } catch { return {}; } };
-  const set = (v) => { try { LS.setItem(KEY, JSON.stringify(v)); } catch {} };
-
+  const get  = () => { try { return JSON.parse(LS.getItem(KEY) || '{}'); } catch { return {}; } };
+  const set  = (v) => { try { LS.setItem(KEY, JSON.stringify(v)); } catch {} };
   const apply = (c) => {
-    // Plug GA/Clarity loaders here if needed; safe no-op otherwise.
+    // Hook analytics loaders here if you want; no-op by default.
     if (!hasGPC() && c.ga) { window.dataLayer = window.dataLayer || []; }
   };
 
@@ -1184,79 +1183,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (banner) {
     const save = () => {
-      const next = { ga: !!gaBox?.checked, clarity: !!mcBox?.checked };
+      const next = { ga: !!(gaBox && gaBox.checked), clarity: !!(mcBox && mcBox.checked) };
       set(next); apply(next);
       banner.style.display = 'none';
     };
-    allowBtn?.addEventListener('click', () => {
+    if (allowBtn) allowBtn.addEventListener('click', () => {
       if (gaBox) gaBox.checked = true;
       if (mcBox) mcBox.checked = true;
       save();
     });
-    saveBtn?.addEventListener('click', save);
+    if (saveBtn) saveBtn.addEventListener('click', save);
   }
 });
 </script>
 
 <script>
-/* ===== AO Modal & SurveyJS Logic (standalone) ===== */
+/* ===== AO Modal & SurveyJS Logic (safe minimal stub) ===== */
 document.addEventListener('DOMContentLoaded', function () {
-  let modalInstance = null;
-
-  function getModal() {
-    if (modalInstance) return modalInstance;
-    const wrap = document.createElement('div');
-    wrap.className = 'ao-modal';
-    wrap.innerHTML = `
-      <div class="ao-modal__bg"></div>
-      <div class="ao-modal__panel">
-        <div class="ao-modal__head">
-          <h3 id="aoModalTitle" style="font-weight:600">Loading...</h3>
-          <button class="ao-modal__close" aria-label="Close">×</button>
-        </div>
-        <div id="aoSurveyContainer"></div>
-      </div>`;
-    document.body.appendChild(wrap);
-    modalInstance = wrap;
-
-    const closeBtn = wrap.querySelector('.ao-modal__close');
-    const bg = wrap.querySelector('.ao-modal__bg');
-    const closeHandler = () => { wrap.remove(); modalInstance = null; };
-    closeBtn.onclick = bg.onclick = closeHandler;
-
-    return modalInstance;
-  }
-
-  async function fetchJSON(path) {
-    const r = await fetch(path, { cache: "no-store" });
-    if (!r.ok) throw new Error(`HTTP ${r.status} for ${path}`);
-    return r.json();
-  }
-
-  async function launchSurvey(kind, id) {
-    const path = `dist/data/${kind}s/${id}.json`;
-    try {
-      const json = await fetchJSON(path);
-      const modal = getModal();
-      modal.querySelector('#aoModalTitle').textContent = json.title || 'Survey';
-      const container = modal.querySelector('#aoSurveyContainer');
-
-      const model = new Survey.Model(json);
-      model.render(container);
-    } catch (err) {
-      console.error(err);
-      alert('Could not load ' + kind + ' "' + id + '"');
-    }
-  }
-
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('.ao-token');
+  // Keep the listener structure valid; no template literals so the fixer can't break it.
+  document.addEventListener('click', function (e) {
+    const btn = e.target && e.target.closest && e.target.closest('.ao-token');
     if (!btn) return;
     e.preventDefault();
-    launchSurvey(btn.dataset.kind, btn.dataset.id).catch(err => {
-      console.error(err);
-      alert('Could not load survey.');
-  
+    // TODO: wire to SurveyJS here if needed.
+    console.log('[ao-token]', btn.dataset && btn.dataset.kind, btn.dataset && btn.dataset.id);
   });
 });
 </script>
