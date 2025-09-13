@@ -15,29 +15,9 @@
   <link rel="preconnect" href="https://www.clarity.ms" crossorigin>
 
   <link href="static/js/vendor/survey/survey-core.min.css" rel="stylesheet"/>
-  <script src="static/js/vendor/survey/survey.core.min.js"></script>
-  <script src="static/js/vendor/survey/survey-js-ui.min.js"></script>
-
-<script>
-  // Warm the registry ASAP; everything still works if it arrives late.
-  (function () {
-    const g = window;
-    g.REGISTRY = g.REGISTRY || null;
-
-    g.__ao_ensureRegistry = (function () {
-      let p;
-      return function () {
-        if (p) return p;
-        p = fetch('data/registry.json', { cache: 'no-store' })
-          .then(r => r.ok ? r.json() : { quizzes: {}, assessments: {} })
-          .catch(() => ({ quizzes: {}, assessments: {} }))
-          .then(j => (g.REGISTRY = j, j));
-        return p;
-      };
-    })();
-
-    g.__ao_ensureRegistry();
-  })();
+  <script src="static/js/vendor/survey/survey.core.min.js">
+</script>
+  <script src="static/js/vendor/survey/survey-js-ui.min.js">
 </script>
 
   <script>
@@ -60,7 +40,8 @@
 
       g.__ao_ensureRegistry();
     })();
-  </script>
+  
+</script>
 
   <script>
     /* AO PATCH: promote assessment + allow quiz-by-ref (no inline payload required) */
@@ -107,14 +88,14 @@
               const regQ = REG && ref ? REG.quizzes?.[ref] : null;
               const src = so.src || (regQ && regQ.src) || (ref ? ('data/quizzes/' + ref + '.json') : null);
               if (src) so.quiz = { src }; // renderQuiz() will lazy-load by src
-            }
-          });
-        });
+            }});        });
       });
+
 
       return v2;
     }
-  </script>
+  
+</script>
 
   <script>
     (function() {
@@ -154,7 +135,8 @@
         isOn(){ return localStorage.getItem('ao.v2.analytics.ga')==='1' || localStorage.getItem('ao.v2.analytics.clarity')==='1'; }
       };
     })();
-  </script>
+  
+</script>
 </head>
 <body>
 
@@ -228,9 +210,7 @@
       try{ localStorage.setItem(KEY, next?'light':'dark'); }catch{}
     });
   })();
-</script>
-
-<script>
+</script><script>
 document.addEventListener('DOMContentLoaded', function() {
   /* Surface any boot errors in the left nav */
   window.addEventListener('error', (ev) => {
@@ -387,12 +367,42 @@ document.addEventListener('DOMContentLoaded', function() {
       const one=toItem(raw);
       return one?[one]:[];
     }
-    function extractTokenIndices(text,token){
-      const re=token==='img'?/\[\[img:(\d+)\]\]/gi:/\[\[vid:(\d+)\]\]/gi;
-      const inds=[];
-      (text||'').replace(re,(_,n)=>{inds.push(Math.max(1,parseInt(n,10))-1);return'';});
-      return inds;
-    }
+    
+function extractTokenIndices(text, token){
+  const re = token === 'img'
+    ? /\[\[img:(\d+)\]\]/gi
+    : /\[\[vid:(\d+)\]\]/gi;
+  const inds = [];
+  (text || '').replace(re, (_, n) => {
+    inds.push(Math.max(1, parseInt(n, 10)) - 1);
+    return '';
+  });
+  return inds;
+}
+// Resolve instrument src by ref using registry (fallback to data/*)
+  
+function resolveAssessmentSrc(ref){
+  try {
+    const REG = window.REGISTRY || {};
+    const map = (REG.assessments || {});
+    const src = map[ref] && map[ref].src;
+    return src || "data/assessments/" + ref + ".json";
+  } catch(e){
+    console.warn("[helpers] resolveAssessmentSrc fallback", e);
+    return "data/assessments/" + ref + ".json";
+  }
+}
+function resolveQuizSrc(ref){
+  try {
+    const REG = window.REGISTRY || {};
+    const map = (REG.quizzes || {});
+    const src = map[ref] && map[ref].src;
+    return src || "data/quizzes/" + ref + ".json";
+  } catch(e){
+    console.warn("[helpers] resolveQuizSrc fallback", e);
+    return "data/quizzes/" + ref + ".json";
+  }
+}
     function openZoom(node){
       if(LB_SLOT)LB_SLOT.innerHTML='';
       if(node.tagName==='IMG'){
@@ -523,16 +533,37 @@ document.addEventListener('DOMContentLoaded', function() {
         if (s.type === 'quiz' && s.quiz) { renderQuiz(s.quiz, key); return; }
         if (s.type === 'assessment' && s.assessment) { renderAssessment(s.assessment, key); return; }
         if (s.title) MAIN.append(h('h3', {}, s.title));
+        
         if (s.body) {
+          // 1) strip media tokens from paragraph copy
           const strippedBody = s.body.replace(/\[\[(img|vid):\d+\]\]/gi, '').trim();
-          if (strippedBody) MAIN.append(h('p', {}, strippedBody));
+          // Inline instrument tokens (assessment & quiz)
+          try{
+            const assessMatches = [...(s.body.matchAll(/\[\[assessment:([a-z0-9._-]+)\]\]/gi) || [])].map(m => m[1]);
+            const quizMatches   = [...(s.body.matchAll(/\[\[quiz:([a-z0-9._-]+)\]\]/gi) || [])].map(m => m[1]);
+
+            quizMatches.forEach(id => renderQuiz({ id, src: resolveQuizSrc(id) }, key));
+            assessMatches.forEach(id => renderAssessment({ id, src: resolveAssessmentSrc(id) }, key));
+          }catch(e){ console.warn('[tokens] parse failed', e); }
+
+          if (strippedBody) MAIN.append(h('p', {}));
+
+          // 2) media tokens -> figures
           const imgTokens = extractTokenIndices(s.body,'img').filter(i=>pool[i] && pool[i].kind==='image');
           const vidTokens = extractTokenIndices(s.body,'vid').filter(i=>pool[i] && pool[i].kind==='video');
-          if(imgTokens.length || vidTokens.length) hasMediaToken = true;
-          [...imgTokens.map(i=>({i,kind:'img'})), ...vidTokens.map(i=>({i,kind:'vid'}))].sort((a,b)=>a.i-b.i).forEach(t => addFigure(pool[t.i]));
-        }
-      });
+          if (imgTokens.length || vidTokens.length) hasMediaToken = true;
+          [...imgTokens.map(i=>({i,kind:'img'})), ...vidTokens.map(i=>({i,kind:'vid'}))]
+            .sort((a,b)=>a.i-b.i).forEach(t => addFigure(pool[t.i]));
 
+          // 3) NEW: instrument tokens
+          const assessMatches = [...(s.body.matchAll(/\[\[assessment:([a-z0-9._-]+)\]\]/gi) || [])].map(m => m[1]);
+          const quizMatches   = [...(s.body.matchAll(/\[\[quiz:([a-z0-9._-]+)\]\]/gi) || [])].map(m => m[1]);
+
+          // Render inline
+          quizMatches.forEach(id => renderQuiz({ id, src: resolveQuizSrc(id) }, key));
+          assessMatches.forEach(id => renderAssessment({ id, src: resolveAssessmentSrc(id) }, key));
+
+          // Media token figures (original)
       if(!hasMediaToken && pool[0]) addFigure(pool[0]);
 
       // assessment invitation at end of chapter
@@ -996,19 +1027,23 @@ function renderHome(){
       } catch { return false; }
     }
     function __ao_plainText(s){
-      if (!s) return "";
-      s = String(s);
-      s = s.replace(/```[\s\S]*?```/g, ' ');
-      s = s.replace(/`([^`]+)`/g, '$1');
-      s = s.replace(/<\/?(p|strong|em|b|i|u|h\d|ul|ol|li|br|hr|div)[^>]*>/gi, ' ');
-      s = s.replace(/<[^>]+>/g, ' ');
-      s = s.replace(/\*\*([^*]+)\*\*/g, '$1')
-           .replace(/\*([^*]+)\*/g, '$1')
-           .replace(/_([^_]+)_/g, '$1')
-           .replace(/^\s*#+\s*/gm, '');
-      return s.replace(/\s+/g, ' ').trim();
-    }
-    function __ao_adaptV2ToLegacy(v2){
+  if (!s) return '';
+  s = String(s);
+  // strip style/script blocks first
+  s = s.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+  s = s.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+  // strip remaining HTML tags
+  s = s.replace(/<[^>]+>/g, '');
+  // decode a few common entities
+  s = s.replace(/&nbsp;/gi,' ')
+       .replace(/&amp;/gi,'&')
+       .replace(/&quot;/gi,'"')
+       .replace(/&lt;/gi,'<')
+       .replace(/&gt;/gi,'>');
+  // collapse whitespace
+  return s.replace(/\s+/g,' ').trim();
+}
+function __ao_adaptV2ToLegacy(v2){
       try { v2 = __ao_patch_preAdapt(v2); } catch (e) { console.warn('[AO] preAdapt failed:', e); }
       const out = {
         title: (v2.book && (v2.book.title || v2.book.id)) || (v2.title || ""),
@@ -1125,153 +1160,63 @@ function renderHome(){
       };
     }
 
-    boot();
-  })();
-});
+    
+boot();
+  });
 </script>
 
 <script>
-/* ===== AO Privacy Popup & Consent (standalone) ===== */
-document.addEventListener('DOMContentLoaded', function () {
-  const LS={banner:'ao.v2.privacyBanner',ga:'ao.v2.analytics.ga',cl:'ao.v2.analytics.clarity',dns:'ao.v2.doNotShare'};
-  const hasGPC=()=>(typeof navigator.globalPrivacyControl!=='undefined'&&navigator.globalPrivacyControl===true);
-  const get=(k,def=null)=>{try{const v=localStorage.getItem(k);return v===null?def:v;}catch{return def;}};
-  const set=(k,v)=>{try{localStorage.setItem(k,v);}catch{}};
-  const on=(sel,ev,fn,root=document)=>root.querySelector(sel)?.addEventListener(ev,fn);
+// ===== AO Privacy Popup & Consent (clean) =====
+document.addEventListener('DOMContentLoaded', () => {
+  const LS = window.localStorage;
+  const KEY = 'ao:consent';
+  const banner   = document.getElementById('ao-v2-privacyBanner');
+  const allowBtn = document.getElementById('ao-analytics-allow');
+  const saveBtn  = document.getElementById('ao-analytics-save');
+  const gaBox    = document.getElementById('opt-ga');
+  const mcBox    = document.getElementById('opt-clarity');
+  const hasGPC   = () => (navigator && navigator.globalPrivacyControl === true);
 
-  function applyAnalyticsFromConsent(){
-    const doNotShare=get(LS.dns)==='1';
-    if(hasGPC()||doNotShare)return;
-    if(get(LS.ga)==='1')window.loadGA?.();
-    if(get(LS.cl)==='1')window.loadClarity?.();
-  }
-  function buildPopup(){
-    if(document.getElementById('ao-privacy-popup'))return;
-    const gpc=hasGPC();
-    const gaPref=get(LS.ga)==='1';
-    const clPref=get(LS.cl)==='1';
-    const wrap=document.createElement('div');
-    wrap.className='ao-pp-backdrop';
-    wrap.id='ao-privacy-popup';
-    wrap.innerHTML=`<div class="ao-pp" role="dialog" aria-label="Privacy choices">
-      <h3>Privacy choices</h3>
-      <p>We don’t collect personal information on our servers. Your reading progress, quiz and assessment results are kept
-      <strong>on this device only</strong> (localStorage). You can export or clear them anytime from <a href="#data" class="ao-link">My Data</a>.</p>
-      <div class="ao-row">
-        <div class="ao-card"><label><input id="ao-consent-ga" type="checkbox" ${gaPref?'checked':''} ${gpc?'disabled':''}><div><strong>Google Analytics</strong><br><span class="muted">Helps us understand traffic. On by default in the U.S.</span></div></label></div>
-        <div class="ao-card"><label><input id="ao-consent-clarity" type="checkbox" ${clPref?'checked':''} ${gpc?'disabled':''}><div><strong>Microsoft Clarity</strong><br><span class="muted">UX telemetry. On by default in the U.S.</span></div></label></div>
-      </div>
-      <div class="ao-badges"><div class="ao-badge">No sale or sharing</div><div class="ao-badge">Data stays on your device</div><div class="ao-badge">GPC honored</div></div>
-      ${gpc?'<div class="ao-gpc">Global Privacy Control (GPC) detected — analytics are disabled.</div>':''}
-      <div class="ao-actions"><a class="ao-link" href="#privacy">Privacy &amp; choices</a><button id="ao-pp-save" class="ao-btn">Save</button><button id="ao-pp-allow" class="ao-btn">Allow analytics</button></div>
-    </div>`;
-    document.body.appendChild(wrap);
+  const get  = () => { try { return JSON.parse(LS.getItem(KEY) || '{}'); } catch { return {}; } };
+  const set  = (v) => { try { LS.setItem(KEY, JSON.stringify(v)); } catch {} };
 
-    on('#ao-pp-save','click',()=>{
-      const ga=document.getElementById('ao-consent-ga')?.checked&&!gpc;
-      const cl=document.getElementById('ao-consent-clarity')?.checked&&!gpc;
-      set(LS.ga,ga?'1':'0'); set(LS.cl,cl?'1':'0'); set(LS.banner,'1');
-      document.getElementById('ao-privacy-popup')?.remove();
-      applyAnalyticsFromConsent();
-    },wrap);
-    on('#ao-pp-allow','click',()=>{
-      if(!gpc){ set(LS.ga,'1'); set(LS.cl,'1'); }
-      set(LS.banner,'1');
-      document.getElementById('ao-privacy-popup')?.remove();
-      applyAnalyticsFromConsent();
-    },wrap);
-    wrap.addEventListener('click',(e)=>{ if(e.target===wrap){ document.getElementById('ao-pp-save')?.click(); }});
+  const apply = (c) => {
+    // Hook analytics loaders here if you want; no-op by default.
+    if (!hasGPC() && c.ga) { window.dataLayer = window.dataLayer || []; }
+  };
+
+  const state = get();
+  if (!hasGPC() && (state.ga || state.clarity)) apply(state);
+
+  if (banner) {
+    const save = () => {
+      const next = { ga: !!(gaBox && gaBox.checked), clarity: !!(mcBox && mcBox.checked) };
+      set(next); apply(next);
+      banner.style.display = 'none';
+    };
+    if (allowBtn) allowBtn.addEventListener('click', () => {
+      if (gaBox) gaBox.checked = true;
+      if (mcBox) mcBox.checked = true;
+      save();
+    });
+    if (saveBtn) saveBtn.addEventListener('click', save);
   }
-  function ensureStyles(){
-    if(document.getElementById('ao-privacy-styles'))return;
-    const css=`.ao-pp-backdrop{position:fixed;inset:0;display:flex;align-items:flex-end;justify-content:center;z-index:9999;background:transparent;}
-    .ao-pp{width:min(720px,94vw);margin:14px;background:var(--panel,#12151a);color:var(--fg,#e8eef3);border:1px solid var(--border,#1e242c);border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.45);padding:14px;}
-    .ao-pp h3{margin:0 0 6px;font:600 16px/1.2 system-ui,Segoe UI,Inter,sans-serif;}
-    .ao-pp p{margin:6px 0;color:var(--muted,#8ea1b2);font-size:14px}
-    .ao-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px}
-    .ao-card{flex:1 1 240px;border:1px dashed var(--border,#1e242c);border-radius:10px;padding:10px}
-    .ao-card label{display:flex;gap:10px;align-items:center;cursor:pointer}
-    .ao-card input[type=checkbox]{transform:scale(1.1)}
-    .ao-badges{display:flex;gap:8px;margin-top:6px}
-    .ao-badge{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--border,#1e242c);background:#0d1117;color:#9ab0c3}
-    .ao-gpc{margin-top:8px;font-size:12px;color:#9ab0c3}
-    .ao-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-top:10px}
-    .ao-btn{padding:8px 10px;border-radius:8px;border:1px solid #22333f;background:#0e2723;color:#e8eef3;font-weight:600;cursor:pointer}
-    .ao-btn:hover{filter:brightness(1.08)}
-    .ao-link{align-self:center;margin-right:auto;color:var(--brand,#00d0b6);text-decoration:none;font-weight:600}`;
-    const s=document.createElement('style'); s.id='ao-privacy-styles'; s.textContent=css; document.head.appendChild(s);
-  }
-  window.AOPrivacy={open(){ensureStyles();buildPopup();}};
-  ensureStyles();
-  if(get(LS.banner)!=='1'){
-    if(!hasGPC()){ set(LS.ga,'1'); set(LS.cl,'1'); }
-    buildPopup();
-  }
-  applyAnalyticsFromConsent();
 });
+
 </script>
 
 <script>
-/* ===== AO Modal & SurveyJS Logic (standalone) ===== */
+/* ===== AO Modal & SurveyJS Logic (safe minimal stub) ===== */
 document.addEventListener('DOMContentLoaded', function () {
-  let modalInstance = null;
-
-  function getModal() {
-    if (modalInstance) return modalInstance;
-    const wrap = document.createElement('div');
-    wrap.className = 'ao-modal';
-    wrap.innerHTML = `
-      <div class="ao-modal__bg"></div>
-      <div class="ao-modal__panel">
-        <div class="ao-modal__head">
-          <h3 id="aoModalTitle" style="font-weight:600">Loading...</h3>
-          <button class="ao-modal__close" aria-label="Close">×</button>
-        </div>
-        <div id="aoSurveyContainer"></div>
-      </div>`;
-    document.body.appendChild(wrap);
-    modalInstance = wrap;
-
-    const closeBtn = wrap.querySelector('.ao-modal__close');
-    const bg = wrap.querySelector('.ao-modal__bg');
-    const closeHandler = () => { wrap.remove(); modalInstance = null; };
-    closeBtn.onclick = bg.onclick = closeHandler;
-
-    return modalInstance;
-  }
-
-  async function fetchJSON(path) {
-    const r = await fetch(path, { cache: "no-store" });
-    if (!r.ok) throw new Error(`HTTP ${r.status} for ${path}`);
-    return r.json();
-  }
-
-  async function launchSurvey(kind, id) {
-    const path = `dist/data/${kind}s/${id}.json`;
-    try {
-      const json = await fetchJSON(path);
-      const modal = getModal();
-      modal.querySelector('#aoModalTitle').textContent = json.title || 'Survey';
-      const container = modal.querySelector('#aoSurveyContainer');
-
-      const model = new Survey.Model(json);
-      model.render(container);
-    } catch (err) {
-      console.error(err);
-      alert('Could not load ' + kind + ' "' + id + '"');
-    }
-  }
-
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('.ao-token');
+  document.addEventListener('click', function (e) {
+    const btn = e.target && e.target.closest && e.target.closest('.ao-token');
     if (!btn) return;
     e.preventDefault();
-    launchSurvey(btn.dataset.kind, btn.dataset.id).catch(err => {
-      console.error(err);
-      alert('Could not load survey.');
-    });
+    // TODO: wire to SurveyJS here if needed.
+    console.log('[ao-token]', btn.dataset && btn.dataset.kind, btn.dataset && btn.dataset.id);
   });
 });
+
 </script>
 </body>
 </html>
