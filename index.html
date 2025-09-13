@@ -1025,21 +1025,21 @@ function renderHome(){
       } catch { return false; }
     }
     function __ao_plainText(s){
-  if (s == null) return '';
+  if (!s) return '';
   s = String(s);
   // strip style/script blocks first
   s = s.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
-  s = s.replace(/</script>
-<script[^>]*>[\s\S]*?<\/script>/gi, '');
+  s = s.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
   // strip remaining HTML tags
   s = s.replace(/<[^>]+>/g, '');
   // decode a few common entities
-  s = s.replace(/&nbsp;/gi, ' ')
-       .replace(/&amp;/gi, '&')
-       .replace(/&lt;/gi, '<')
-       .replace(/&gt;/gi, '>');
+  s = s.replace(/&nbsp;/gi,' ')
+       .replace(/&amp;/gi,'&')
+       .replace(/&quot;/gi,'"')
+       .replace(/&lt;/gi,'<')
+       .replace(/&gt;/gi,'>');
   // collapse whitespace
-  return s.replace(/\s+/g, ' ').trim();
+  return s.replace(/\s+/g,' ').trim();
 }
 function __ao_adaptV2ToLegacy(v2){
       try { v2 = __ao_patch_preAdapt(v2); } catch (e) { console.warn('[AO] preAdapt failed:', e); }
