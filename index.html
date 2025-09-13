@@ -17,6 +17,90 @@
   <script src="static/js/vendor/survey/survey.core.min.js"></script>
   <script src="static/js/vendor/survey/survey-js-ui.min.js"></script>
 
+<script>
+  // Warm the registry ASAP, but make everything work even if this arrives late.
+  (function () {
+    const g = window;
+    g.REGISTRY = g.REGISTRY || null;
+
+    g.__ao_ensureRegistry = (function () {
+      let p;
+      return function () {
+        if (p) return p;
+        p = fetch('data/registry.json', { cache: 'no-store' })
+          .then(r => r.ok ? r.json() : { quizzes: {}, assessments: {} })
+          .catch(() => ({ quizzes: {}, assessments: {} }))
+          .then(j => (g.REGISTRY = j, j));
+        return p;
+      };
+    })();
+
+    // Kick off the load early, but don't depend on it being done.
+    g.__ao_ensureRegistry();
+  })();
+</script>
+
+<script>
+  /* AO PATCH: promote assessment + allow quiz-by-ref with registry OR fallback */
+  function __ao_patch_preAdapt(v2) {
+    const REG = window.REGISTRY; // may still be null when this runs
+
+    (v2.chapters || []).forEach(ch => {
+      // Promote first section-level assessment to chapter.assessment
+      if (!ch.assessment) {
+        const sec = (ch.sections || []).find(s =>
+          (s.sub_objectives || []).some(so => so && so.type === 'assessment' && (so.assessment || so.src || so.ref))
+        );
+        if (sec) {
+          const so = (sec.sub_objectives || []).find(x => x && x.type === 'assessment');
+          const ref = so.ref || (so.assessment && so.assessment.id) || null;
+          const regA = REG && ref ? REG.assessments?.[ref] : null;
+
+          const src =
+            (so.assessment && so.assessment.src) ||  // explicit in data
+            so.src ||                                 // explicit on node
+            (regA && regA.src) ||                     // from registry if ready
+            (ref ? ('data/assessments/' + ref + '.json') : null); // fallback by ref
+
+          if (src) {
+            ch.assessment = {
+              id: ref || (so.assessment && so.assessment.id) || 'assessment',
+              title: sec.title || 'Knowledge Check',
+              href: '/' + (ref || 'assessment'),
+              src: src
+            };
+            ch.items = Array.isArray(ch.items) ? ch.items : [];
+            if (!ch.items.some(it => it && it.type === 'assessment')) {
+              ch.items.push({ type: 'assessment', title: ch.assessment.title, href: ch.assessment.href });
+            }
+          }
+        }
+      }
+
+      // Normalize quizzes so they render even if payloads aren’t inlined
+      (ch.sections || []).forEach(sec => {
+        sec.sub_objectives = (sec.sub_objectives || []).map(so => {
+          if (!so || so.type !== 'quiz') return so;
+          const ref = so.ref || so.id || null;
+          const regQ = REG && ref ? REG.quizzes?.[ref] : null;
+          const quizSrc = so.src || (regQ && regQ.src) || (ref ? ('data/quizzes/' + ref + '.json') : null);
+          if (!so.quiz) so.quiz = {};
+          if (!so.quiz.src) so.quiz.src = quizSrc;
+          return so;
+        });
+      });
+    });
+
+    return v2;
+  }
+
+  // Call pre-adapter at the top of your existing adapter:
+  // function __ao_adaptV2ToLegacy(v2){
+  //   try { v2 = __ao_patch_preAdapt(v2); } catch(e){ console.warn('[AO] preAdapt failed:', e); }
+  //   ...
+  // }
+</script>
+
   <script>
   (function() {
     const GA_ID = 'G-C2E79R93CQ';
@@ -380,7 +464,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
       if(!hasMediaToken && pool[0]) addFigure(pool[0]);
       // assessment invitation (optional, only if chapter has one)
-      if (ch.assessment) renderAssessmentInvitation(ch, chIdx);
+      if (ch.assessment && Array.isArray(ch.los) && loIdx === ch.los.length - 1) {
+  renderAssessmentInvitation(ch, chIdx);
     }
 
     function renderAssessmentView(ch, chIdx) {
@@ -757,8 +842,38 @@ function __ao_plainText(s){
   // Collapse whitespace
   return s.replace(/\s+/g, ' ').trim();
 }
+/* AO PATCH: promote assessment + allow quiz-by-ref */
+function __ao_patch_preAdapt(v2){
+  (v2.chapters||[]).forEach(ch=>{
+    // Promote first section-level assessment to chapter.assessment
+    if (!ch.assessment) {
+      const sec = (ch.sections||[]).find(s =>
+        (s.sub_objectives||[]).some(so => so && so.type==='assessment' && (so.assessment||so.src||so.ref))
+      );
+      if (sec) {
+        const so = (sec.sub_objectives||[]).find(x => x && x.type==='assessment');
+        const src =
+          (so.assessment && so.assessment.src) ||
+          so.src ||
+          (so.ref ? `/data/assessments/${so.ref}.json` : null);
+        if (src) ch.assessment = { title: sec.title || 'Chapter Assessment', src };
+      }
+    }
+    // Ensure quizzes can render even if they’re refs/src (no inline payload)
+    (ch.sections||[]).forEach(sec=>{
+      (sec.sub_objectives||[]).forEach(so=>{
+        if (so && so.type==='quiz' && !so.quiz) {
+          const src = so.src || (so.ref ? `/data/quizzes/${so.ref}.json` : null);
+          if (src) so.quiz = { src }; // renderQuiz() will lazy-load by src
+        }
+      });
+    });
+  });
+  return v2;
+}
 
 function __ao_adaptV2ToLegacy(v2){
+  try { v2 = __ao_patch_preAdapt(v2); } catch (e) { console.warn('[AO] preAdapt failed:', e); }
   const out = {
     title: (v2.book && (v2.book.title || v2.book.id)) || (v2.title || ""),
     events: Array.isArray(v2.events) ? v2.events.slice() : [],
