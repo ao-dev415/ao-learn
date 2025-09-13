@@ -1,8 +1,8 @@
 {
   "quizzes": {
-    "quiz-expenses-basics": { "src": "data/quizzes/expenses-basics.json", "version": "v1" }
+    "expenses-basics": { "src": "data/quizzes/expenses-basics.json" }
   },
   "assessments": {
-    "assess-ch01": { "src": "data/assessments/assessment-ch1.json", "version": "v3" }
+    "assessment-demo": { "src": "data/assessments/assessment-demo.json" }
   }
 }
