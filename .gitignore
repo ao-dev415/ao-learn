@@ -9,3 +9,5 @@ docs/
 .DS_Store
 .cache
 node_modules/
+source/book 3.docx
+source/quizzes 3.json
