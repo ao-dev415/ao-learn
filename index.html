@@ -229,51 +229,6 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 <script>
-/* ===== Restored boot() (exported) ===== */
-async function boot(){
-  const WANT_DEMO = /[?&]demo=1\b/.test(location.search);
-  const NAV = document.getElementById('nav') || document.getElementById('menu');
-
-  let site;
-  try {
-    site = await loadSiteJSON();
-    if (typeof __ao_isV2Shape === 'function' && __ao_isV2Shape(site)) {
-      try { site = __ao_adaptV2ToLegacy(site); }
-      catch(e) { console.warn('[AO] adapt v2→legacy failed:', e); }
-    }
-  } catch (e) {
-    if (!WANT_DEMO) {
-      if (NAV) {
-        NAV.innerHTML = '';
-        const d = document.createElement('div');
-        d.className = 'muted';
-        d.textContent = 'Could not load site.json';
-        NAV.appendChild(d);
-      }
-      site = { title:'', chapters:[], events:[] };
-    } else {
-      site = (typeof makeDemoSite === 'function') ? makeDemoSite() : { title:'Demo', chapters:[], events:[] };
-    }
-  }
-
-  // Render using existing helpers
-  try {
-    chapters = (site.chapters || []).map((ch,i)=>({ ch, ord: String.fromCharCode(97+i) }));
-    buildLeftNav && buildLeftNav();
-    buildDocs && buildDocs();
-    refreshRail && refreshRail();
-    route && route();
-    window.addEventListener('hashchange', route);
-  } catch (e) {
-    console.error('[boot] render failed', e);
-    throw e;
-  }
-}
-try { window.boot = boot; } catch {}
-</script>
-
-
-<script>
 /* ===== Minimal runtime shims (safe) ===== */
 window.buildLeftNav = window.buildLeftNav || function(){
   const nav = document.getElementById('nav');
@@ -290,19 +245,25 @@ window.refreshRail = window.refreshRail || function(){};   // no-op
 window.route       = window.route       || function(){};   // no-op
 </script>
 
-<script>// ===== Boot (safe) =====
+<script>
+// ===== Boot (safe) =====
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     if (typeof boot === 'function') {
       await boot();
-    } else {
-      console.warn('[boot] function not found; probing site.json directly…');
-      try {
-        const r = await fetch('site.json'); console.log('[probe] site.json', r.status);
-      } catch(e) { console.error('[probe] failed', e); }
+      return;
     }
   } catch (e) {
     console.error('[boot] failed', e);
+    // fall through to probe
+  }
+  // Probe site.json so we can see it in Network and log status
+  try {
+    const r = await fetch('site.json');
+    console.log('[probe] site.json', r.status);
+    if (!r.ok) console.warn('Could not load site.json');
+  } catch (e) {
+    console.error('[probe] failed', e);
   }
 });
 </script>
@@ -362,5 +323,58 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 </script>
+
+<script>
+/* ===== Restored boot() (exported, guarded) ===== */
+async function boot(){
+  const WANT_DEMO = /[?&]demo=1/.test(location.search);
+  const NAV = document.getElementById('nav') || document.getElementById('menu');
+
+  // Load site.json
+  let site;
+  try {
+    site = await (typeof loadSiteJSON==='function' ? loadSiteJSON() : (await fetch('site.json')).json());
+  } catch (e) {
+    console.error('[boot] loadSiteJSON failed', e);
+    throw e;
+  }
+
+  // Optionally adapt v2->legacy
+  try {
+    if (typeof __ao_isV2Shape==='function' && __ao_isV2Shape(site)) {
+      if (typeof __ao_adaptV2ToLegacy==='function') {
+        site = __ao_adaptV2ToLegacy(site);
+        console.log('[AO] adapted v2 → legacy');
+      }
+    }
+  } catch (e) {
+    console.warn('[AO] adapt failed:', e);
+  }
+
+  // Render (call helpers only if they exist)
+  try {
+    if (WANT_DEMO && NAV) {
+      const d=document.createElement('div');
+      d.className='muted';
+      d.textContent='Could not load full nav/docs in demo.';
+      NAV.innerHTML=''; NAV.appendChild(d);
+    } else {
+      if (typeof buildLeftNav === 'function') buildLeftNav();
+      if (typeof buildDocs    === 'function') buildDocs();
+      if (typeof refreshRail  === 'function') refreshRail();
+      if (typeof route        === 'function') {
+        route();
+        window.addEventListener('hashchange', route);
+      }
+    }
+    // expose to window for other blocks that expect it
+    try { window.boot = boot; } catch {}
+  } catch (e) {
+    console.error('[boot] render failed', e);
+    throw e;
+  }
+}
+</script>
+
 </body>
 </html>
