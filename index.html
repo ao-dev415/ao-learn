@@ -15,8 +15,10 @@
   <link rel="preconnect" href="https://www.clarity.ms" crossorigin>
 
   <link href="static/js/vendor/survey/survey-core.min.css" rel="stylesheet"/>
-  <script src="static/js/vendor/survey/survey.core.min.js"></script>
-  <script src="static/js/vendor/survey/survey-js-ui.min.js"></script>
+  <script src="static/js/vendor/survey/survey.core.min.js">
+</script>
+  <script src="static/js/vendor/survey/survey-js-ui.min.js">
+</script>
 
   <script>
     // Warm the registry ASAP; everything still works if it arrives late.
@@ -38,7 +40,8 @@
 
       g.__ao_ensureRegistry();
     })();
-  </script>
+  
+</script>
 
   <script>
     /* AO PATCH: promote assessment + allow quiz-by-ref (no inline payload required) */
@@ -85,11 +88,14 @@
               const regQ = REG && ref ? REG.quizzes?.[ref] : null;
               const src = so.src || (regQ && regQ.src) || (ref ? ('data/quizzes/' + ref + '.json') : null);
               if (src) so.quiz = { src }; // renderQuiz() will lazy-load by src
-            }});
+            }});        });
+      });
+
 
       return v2;
     }
-  </script>
+  
+</script>
 
   <script>
     (function() {
@@ -129,7 +135,10 @@
         isOn(){ return localStorage.getItem('ao.v2.analytics.ga')==='1' || localStorage.getItem('ao.v2.analytics.clarity')==='1'; }
       };
     })();
-  </script>
+  
+})();
+})();
+</script>
 </head>
 <body>
 
@@ -203,9 +212,11 @@
       try{ localStorage.setItem(KEY, next?'light':'dark'); }catch{}
     });
   })();
+})();
 </script>
 
-<script>
+
+</script><script>
 document.addEventListener('DOMContentLoaded', function() {
   /* Surface any boot errors in the left nav */
   window.addEventListener('error', (ev) => {
@@ -1158,7 +1169,8 @@ function __ao_adaptV2ToLegacy(v2){
     
 boot();
   })();
-});
+
+
 </script>
 
 <script>
@@ -1198,6 +1210,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (saveBtn) saveBtn.addEventListener('click', save);
   }
 });
+
 </script>
 
 <script>
@@ -1211,6 +1224,7 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('[ao-token]', btn.dataset && btn.dataset.kind, btn.dataset && btn.dataset.id);
   });
 });
+
 </script>
 </body>
 </html>
