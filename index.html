@@ -365,13 +365,19 @@ document.addEventListener('DOMContentLoaded', function() {
       const one=toItem(raw);
       return one?[one]:[];
     }
-    function extractTokenIndices(text,token){
-      const re=token==='img'?/\[\[img:(\d+)\]\]/gi:/\[\[vid:(\d+)\]\]/gi;
-      const inds=[];
-      (text||'').replace(re,(_,n)=>{inds.push(Math.max(1,parseInt(n,10))-1);return'';}
-
-
-  // Resolve instrument src by ref using registry (fallback to data/*)
+    
+function extractTokenIndices(text, token){
+  const re = token === 'img'
+    ? /\[\[img:(\d+)\]\]/gi
+    : /\[\[vid:(\d+)\]\]/gi;
+  const inds = [];
+  (text || '').replace(re, (_, n) => {
+    inds.push(Math.max(1, parseInt(n, 10)) - 1);
+    return '';
+  });
+  return inds;
+}
+// Resolve instrument src by ref using registry (fallback to data/*)
   
 function resolveAssessmentSrc(ref){
   try{
