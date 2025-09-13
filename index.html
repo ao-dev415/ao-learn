@@ -229,7 +229,25 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 <script>
-// ===== AO Privacy Popup & Consent (clean) =====
+// ===== Boot (safe) =====
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    if (typeof boot === 'function') {
+      await boot();
+    } else {
+      console.warn('[boot] function not found; probing site.json directly…');
+      try {
+        const r = await fetch('site.json'); console.log('[probe] site.json', r.status);
+      } catch(e) { console.error('[probe] failed', e); }
+    }
+  } catch (e) {
+    console.error('[boot] failed', e);
+  }
+});
+</script>
+
+<script>
+// ===== AO Privacy Popup & Consent (clean) ===== (clean) =====
 document.addEventListener('DOMContentLoaded', () => {
   const LS = window.localStorage;
   const KEY = 'ao:consent';
