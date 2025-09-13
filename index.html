@@ -1156,6 +1156,9 @@ function renderHome(){
 
     boot();
   })();
+});
+
+}}
 </script>
 
 <script>
@@ -1194,6 +1197,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     saveBtn?.addEventListener('click', save);
   }
+});
 </script>
 
 <script>
@@ -1254,7 +1258,9 @@ document.addEventListener('DOMContentLoaded', function () {
     launchSurvey(btn.dataset.kind, btn.dataset.id).catch(err => {
       console.error(err);
       alert('Could not load survey.');
-    });
+});
+
+}}
 </script>
 </body>
 </html>
