@@ -272,8 +272,25 @@ async function boot(){
 try { window.boot = boot; } catch {}
 </script>
 
+
 <script>
-// ===== Boot (safe) =====
+/* ===== Minimal runtime shims (safe) ===== */
+window.buildLeftNav = window.buildLeftNav || function(){
+  const nav = document.getElementById('nav');
+  if (!nav || !window.site || !Array.isArray(site.chapters)) return;
+  nav.innerHTML = '';
+  for (const ch of site.chapters){
+    const a = document.createElement('a');
+    a.href = '#'; a.textContent = ch.title || 'Chapter';
+    nav.appendChild(a);
+  }
+};
+window.buildDocs   = window.buildDocs   || function(){};   // no-op
+window.refreshRail = window.refreshRail || function(){};   // no-op
+window.route       = window.route       || function(){};   // no-op
+</script>
+
+<script>// ===== Boot (safe) =====
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     if (typeof boot === 'function') {
