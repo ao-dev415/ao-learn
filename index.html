@@ -544,7 +544,7 @@ function resolveQuizSrc(ref){
             assessMatches.forEach(id => renderAssessment({ id, src: resolveAssessmentSrc(id) }, key));
           }catch(e){ console.warn('[tokens] parse failed', e); }
 
-          if (strippedBody) MAIN.append(h('p', {}, strippedBody));
+          if (strippedBody) MAIN.append(h('p', {}));
 
           // 2) media tokens -> figures
           const imgTokens = extractTokenIndices(s.body,'img').filter(i=>pool[i] && pool[i].kind==='image');
@@ -560,7 +560,7 @@ function resolveQuizSrc(ref){
           // Render inline
           quizMatches.forEach(id => renderQuiz({ id, src: resolveQuizSrc(id) }, key));
           assessMatches.forEach(id => renderAssessment({ id, src: resolveAssessmentSrc(id) }, key));
-        }, strippedBody));
+        }));
           const imgTokens = extractTokenIndices(s.body,'img').filter(i=>pool[i] && pool[i].kind==='image');
           const vidTokens = extractTokenIndices(s.body,'vid').filter(i=>pool[i] && pool[i].kind==='video');
           if(imgTokens.length || vidTokens.length) hasMediaToken = true;
