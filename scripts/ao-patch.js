@@ -1,6 +1,3 @@
-cd /Users/quinc/Desktop/AO-V1
-
-cat > scripts/ao-patch.js <<'JS'
 // AO patch: full->public fallback + v2 pre-adapt (assessments & quiz refs) + adapter hook
 (function () {
   'use strict';
@@ -68,19 +65,16 @@ cat > scripts/ao-patch.js <<'JS'
     return v2;
   }
 
-  // 4) Monkey-patch the adapter if present
+  // 4) Monkey-patch the adapter if present (or expose preAdapt for later)
   const original = window.__ao_adaptV2ToLegacy;
   if (typeof original === 'function') {
     const patched = function (v2) {
       try { v2 = preAdapt(v2); } catch (e) { console.warn('[AO] preAdapt failed:', e); }
-      const out = original(v2);
-      return out;
+      return original(v2);
     };
     patched.__aoPatched = true;
     window.__ao_adaptV2ToLegacy = patched;
   } else {
-    // expose for later if adapter defines after us
     window.__ao_patch_preAdapt = preAdapt;
   }
 })();
-JS
