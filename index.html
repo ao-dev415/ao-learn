@@ -75,42 +75,7 @@ function __ao_adaptV2ToLegacy(v2){
 
   (function() {
     const GA_ID = 'G-C2E79R93CQ';
-    const CLARITY_ID = 't38u1ekrco';
-
-    function loadGA() {
-      if (!GA_ID || window.__gaLoaded) return;
-      window.__gaLoaded = true;
-      var s = document.createElement('script');
-      s.async = true;
-      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(GA_ID);
-      document.head.appendChild(s);
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){ dataLayer.push(arguments); }
-      window.gtag = gtag;
-      gtag('js', new Date());
-      gtag('config', GA_ID, { anonymize_ip: true });
-    }
-
-    function loadClarity() {
-      if (!CLARITY_ID || window.__clarityLoaded) return;
-      window.__clarityLoaded = true;
-      (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){ (c[a].q=c[a].q||[]).push(arguments); };
-        t=l.createElement(r); t.async=1; t.src='https://www.clarity.ms/tag/' + i;
-        y=l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t,y);
-      })(window, document, 'clarity', 'script', CLARITY_ID);
-    }
-    
-    window.loadGA = loadGA;
-    window.loadClarity = loadClarity;
-
-    window.AOAnalytics = {
-      enable(){ localStorage.setItem('ao.v2.analytics.ga','1'); localStorage.setItem('ao.v2.analytics.clarity','1'); window.loadGA?.(); window.loadClarity?.(); },
-      disable(){ localStorage.setItem('ao.v2.analytics.ga','0'); localStorage.setItem('ao.v2.analytics.clarity','0'); },
-      isOn(){ return localStorage.getItem('ao.v2.analytics.ga')==='1' || localStorage.getItem('ao.v2.analytics.clarity')==='1'; }
-    };
-  })();
-  </script>
+    const CLARITY_ID = 't38u1ekrco';</script>
 </head>
 <body>
 
@@ -894,7 +859,6 @@ async function boot(){try{site=await loadSiteJSON();
     boot();
   })();
 });
-</script>
 <script>
 /* ===== AO Privacy Popup & Consent (standalone) ===== */
 document.addEventListener('DOMContentLoaded', function () {
@@ -927,7 +891,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const wrap = document.createElement('div');
     wrap.className = 'ao-modal';
     wrap.innerHTML = `
-      <div class="ao-modal__bg"></div>
       <div class="ao-modal__panel">
         <div class="ao-modal__head">
           <h3 id="aoModalTitle" style="font-weight:600">Loading...</h3>
@@ -987,7 +950,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // enhanceTokens();
 });
 </script>
-<script src="scripts/ao-patch.js"></script>
 <script src="scripts/ao-patch.js"></script>
 </body>
 </html>
