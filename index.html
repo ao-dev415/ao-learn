@@ -1160,83 +1160,41 @@ function renderHome(){
 </script>
 
 <script>
-/* ===== AO Privacy Popup & Consent (standalone) ===== */
-document.addEventListener('DOMContentLoaded', function () {
-  const LS={banner:'ao.v2.privacyBanner',ga:'ao.v2.analytics.ga',cl:'ao.v2.analytics.clarity',dns:'ao.v2.doNotShare'};
-  const hasGPC=()=>(typeof navigator.globalPrivacyControl!=='undefined'&&navigator.globalPrivacyControl===true);
-  const get=(k,def=null)=>{try{const v=localStorage.getItem(k);return v===null?def:v;}catch{return def;}};
-  const set=(k,v)=>{try{localStorage.setItem(k,v);}catch{}};
-  const on=(sel,ev,fn,root=document)=>root.querySelector(sel)?.addEventListener(ev,fn);
+// ===== AO Privacy Popup & Consent (clean)
+document.addEventListener('DOMContentLoaded', () => {
+  const LS = window.localStorage;
+  const KEY = 'ao:consent';
+  const banner   = document.getElementById('ao-v2-privacyBanner');
+  const allowBtn = document.getElementById('ao-analytics-allow');
+  const saveBtn  = document.getElementById('ao-analytics-save');
+  const gaBox    = document.getElementById('opt-ga');
+  const mcBox    = document.getElementById('opt-clarity');
+  const hasGPC   = () => (navigator?.globalPrivacyControl === true);
 
-  function applyAnalyticsFromConsent(){
-    const doNotShare=get(LS.dns)==='1';
-    if(hasGPC()||doNotShare)return;
-    if(get(LS.ga)==='1')window.loadGA?.();
-    if(get(LS.cl)==='1')window.loadClarity?.();
-  }
-  function buildPopup(){
-    if(document.getElementById('ao-privacy-popup'))return;
-    const gpc=hasGPC();
-    const gaPref=get(LS.ga)==='1';
-    const clPref=get(LS.cl)==='1';
-    const wrap=document.createElement('div');
-    wrap.className='ao-pp-backdrop';
-    wrap.id='ao-privacy-popup';
-    wrap.innerHTML=`<div class="ao-pp" role="dialog" aria-label="Privacy choices">
-      <h3>Privacy choices</h3>
-      <p>We don’t collect personal information on our servers. Your reading progress, quiz and assessment results are kept
-      <strong>on this device only</strong> (localStorage). You can export or clear them anytime from <a href="#data" class="ao-link">My Data</a>.</p>
-      <div class="ao-row">
-        <div class="ao-card"><label><input id="ao-consent-ga" type="checkbox" ${gaPref?'checked':''} ${gpc?'disabled':''}><div><strong>Google Analytics</strong><br><span class="muted">Helps us understand traffic. On by default in the U.S.</span></div></label></div>
-        <div class="ao-card"><label><input id="ao-consent-clarity" type="checkbox" ${clPref?'checked':''} ${gpc?'disabled':''}><div><strong>Microsoft Clarity</strong><br><span class="muted">UX telemetry. On by default in the U.S.</span></div></label></div>
-      </div>
-      <div class="ao-badges"><div class="ao-badge">No sale or sharing</div><div class="ao-badge">Data stays on your device</div><div class="ao-badge">GPC honored</div></div>
-      ${gpc?'<div class="ao-gpc">Global Privacy Control (GPC) detected — analytics are disabled.</div>':''}
-      <div class="ao-actions"><a class="ao-link" href="#privacy">Privacy &amp; choices</a><button id="ao-pp-save" class="ao-btn">Save</button><button id="ao-pp-allow" class="ao-btn">Allow analytics</button></div>
-    </div>`;
-    document.body.appendChild(wrap);
+  const get = () => { try { return JSON.parse(LS.getItem(KEY) || '{}'); } catch { return {}; } };
+  const set = (v) => { try { LS.setItem(KEY, JSON.stringify(v)); } catch {} };
 
-    on('#ao-pp-save','click',()=>{
-      const ga=document.getElementById('ao-consent-ga')?.checked&&!gpc;
-      const cl=document.getElementById('ao-consent-clarity')?.checked&&!gpc;
-      set(LS.ga,ga?'1':'0'); set(LS.cl,cl?'1':'0'); set(LS.banner,'1');
-      document.getElementById('ao-privacy-popup')?.remove();
-      applyAnalyticsFromConsent();
-    },wrap);
-    on('#ao-pp-allow','click',()=>{
-      if(!gpc){ set(LS.ga,'1'); set(LS.cl,'1'); }
-      set(LS.banner,'1');
-      document.getElementById('ao-privacy-popup')?.remove();
-      applyAnalyticsFromConsent();
-    },wrap);
-    wrap.addEventListener('click',(e)=>{ if(e.target===wrap){ document.getElementById('ao-pp-save')?.click(); }});
+  const apply = (c) => {
+    // Plug GA/Clarity loaders here if needed; safe no-op otherwise.
+    if (!hasGPC() && c.ga) { window.dataLayer = window.dataLayer || []; }
+  };
+
+  const state = get();
+  if (!hasGPC() && (state.ga || state.clarity)) apply(state);
+
+  if (banner) {
+    const save = () => {
+      const next = { ga: !!gaBox?.checked, clarity: !!mcBox?.checked };
+      set(next); apply(next);
+      banner.style.display = 'none';
+    };
+    allowBtn?.addEventListener('click', () => {
+      if (gaBox) gaBox.checked = true;
+      if (mcBox) mcBox.checked = true;
+      save();
+    });
+    saveBtn?.addEventListener('click', save);
   }
-  function ensureStyles(){
-    if(document.getElementById('ao-privacy-styles'))return;
-    const css=`.ao-pp-backdrop{position:fixed;inset:0;display:flex;align-items:flex-end;justify-content:center;z-index:9999;background:transparent;}
-    .ao-pp{width:min(720px,94vw);margin:14px;background:var(--panel,#12151a);color:var(--fg,#e8eef3);border:1px solid var(--border,#1e242c);border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.45);padding:14px;}
-    .ao-pp h3{margin:0 0 6px;font:600 16px/1.2 system-ui,Segoe UI,Inter,sans-serif;}
-    .ao-pp p{margin:6px 0;color:var(--muted,#8ea1b2);font-size:14px}
-    .ao-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px}
-    .ao-card{flex:1 1 240px;border:1px dashed var(--border,#1e242c);border-radius:10px;padding:10px}
-    .ao-card label{display:flex;gap:10px;align-items:center;cursor:pointer}
-    .ao-card input[type=checkbox]{transform:scale(1.1)}
-    .ao-badges{display:flex;gap:8px;margin-top:6px}
-    .ao-badge{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--border,#1e242c);background:#0d1117;color:#9ab0c3}
-    .ao-gpc{margin-top:8px;font-size:12px;color:#9ab0c3}
-    .ao-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-top:10px}
-    .ao-btn{padding:8px 10px;border-radius:8px;border:1px solid #22333f;background:#0e2723;color:#e8eef3;font-weight:600;cursor:pointer}
-    .ao-btn:hover{filter:brightness(1.08)}
-    .ao-link{align-self:center;margin-right:auto;color:var(--brand,#00d0b6);text-decoration:none;font-weight:600}`;
-    const s=document.createElement('style'); s.id='ao-privacy-styles'; s.textContent=css; document.head.appendChild(s);
-  }
-  window.AOPrivacy={open(){ensureStyles();buildPopup();}};
-  ensureStyles();
-  if(get(LS.banner)!=='1'){
-    if(!hasGPC()){ set(LS.ga,'1'); set(LS.cl,'1'); }
-    buildPopup();
-  }
-  applyAnalyticsFromConsent();
 });
 </script>
 
