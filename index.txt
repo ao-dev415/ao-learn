@@ -18,6 +18,28 @@
   <script src="static/js/vendor/survey/survey.core.min.js"></script>
   <script src="static/js/vendor/survey/survey-js-ui.min.js"></script>
 
+<script>
+  // Warm the registry ASAP; everything still works if it arrives late.
+  (function () {
+    const g = window;
+    g.REGISTRY = g.REGISTRY || null;
+
+    g.__ao_ensureRegistry = (function () {
+      let p;
+      return function () {
+        if (p) return p;
+        p = fetch('data/registry.json', { cache: 'no-store' })
+          .then(r => r.ok ? r.json() : { quizzes: {}, assessments: {} })
+          .catch(() => ({ quizzes: {}, assessments: {} }))
+          .then(j => (g.REGISTRY = j, j));
+        return p;
+      };
+    })();
+
+    g.__ao_ensureRegistry();
+  })();
+</script>
+
   <script>
     // Warm the registry ASAP; everything still works if it arrives late.
     (function () {
