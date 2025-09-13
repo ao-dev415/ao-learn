@@ -372,15 +372,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
   // Resolve instrument src by ref using registry (fallback to data/*)
-  function resolveAssessmentSrc(ref){
-    const r = window.REGISTRY;
-    const item = r?.assessments?.[ref];
-    return (item && (item.src || item.href)) || `data/assessments/${ref}.json`;
+  
+function resolveAssessmentSrc(ref){
+  try{
+    const REG = window.REGISTRY || null;
+    const map = REG?.assessments || {};
+    // prefer registry mapping, otherwise fall back to data/
+    const src = (map[ref]?.src) || `data/assessments/${ref}.json`;
+    return src;
+  }catch(e){
+    console.warn('[assess] resolveAssessmentSrc failed', e);
+    return `data/assessments/${ref}.json`;
   }
-  function resolveQuizSrc(ref){
-    const r = window.REGISTRY;
-    const item = r?.quizzes?.[ref];
-    return (item && (item.src || item.href)) || `data/quizzes/${ref}.json`;
+}
+.json`;
+  }
+  
+function resolveQuizSrc(ref){
+  try{
+    const REG = window.REGISTRY || null;
+    const map = REG?.quizzes || {};
+    const src = (map[ref]?.src) || `data/quizzes/${ref}.json`;
+    return src;
+  }catch(e){
+    console.warn('[quiz] resolveQuizSrc failed', e);
+    return `data/quizzes/${ref}.json`;
+  }
+}
+.json`;
   }
 
 );
