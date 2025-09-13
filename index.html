@@ -81,42 +81,141 @@
     </div>
     <div id="aoSurveyContainer"></div>
   </div>
+<!-- AO: assessments/quizzes patch + boot + router -->
+  <script src="scripts/ao-patch.js"></script>
+  <script>
+  (async function boot(){
+    const params = new URLSearchParams(location.search);
+    const url = params.has('full') ? 'full/site.json' : 'site.json';
+    try {
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(r.status + ' ' + r.statusText);
+      const v2 = await r.json();
 
-<script src="scripts/ao-patch.js"></script>
-<script>
-(async function boot() {
-  const params = new URLSearchParams(location.search);
-  const url = params.has('full') ? 'full/site.json' : 'site.json';
+      const miniAdapt = (v2) => ({
+        chapters: (v2.chapters || []).map(ch => ({
+          title: ch.title || ch.slug || 'Chapter',
+          assessment: ch.assessment || null,
+          los: (ch.sections || []).map(sec => ({
+            title: sec.title || sec.h2_id || 'Learning Objective',
+            snippets: [
+              ...(sec.section_public_html
+                  ? [{ title: 'Overview', body: (sec.section_public_html||'').replace(/<[^>]+>/g,' ') }]
+                  : []),
+              ...((sec.sub_objectives || [])
+                  .filter(so => (so.type || so.kind) === 'quiz' && so.quiz)
+                  .map(so => ({ type:'quiz', title: so.title || 'Quick Check', quiz: so.quiz })))
+            ]
+          }))
+        }))
+      });
+      const adapt =
+        (typeof window.__ao_adaptV2ToLegacy === 'function' && window.__ao_adaptV2ToLegacy) ||
+        (typeof window.__ao_patch_preAdapt === 'function' && (x => window.__ao_patch_preAdapt(x))) ||
+        miniAdapt;
 
-  // load v2 site model
-  const r = await fetch(url);
-  if (!r.ok) {
-    document.getElementById('nav').innerHTML =
-      '<div class="muted">Failed to load site.json</div>';
-    return;
-  }
-  const v2 = await r.json();
+      const site = adapt(v2);
+      window.__AO_SITE = site;
 
-  // adapt to legacy shape (use our pre-adapter if the app adapter isn't present)
-  const adapt =
-    (typeof window.__ao_adaptV2ToLegacy === 'function' && window.__ao_adaptV2ToLegacy) ||
-    (typeof window.__ao_patch_preAdapt === 'function' && (x => window.__ao_patch_preAdapt(x))) ||
-    (x => x);
+      const left = document.getElementById('nav') || document.querySelector('.card');
+      const parts = [];
+      (site.chapters || []).forEach((ch, ci) => {
+        parts.push(`<div class="muted" style="margin:.5rem 0;font-weight:600">${(ch.title||'Chapter')}</div>`);
+        (ch.los || []).forEach((lo, li) => {
+          parts.push(`<a href="#c${ci}l${li}" class="nav-lo" style="display:block;margin:.25rem 0">${(lo.title||'Learning Objective')}</a>`);
+        });
+      });
+      if (left) left.innerHTML = parts.join('') || '<div class="muted">No content.</div>';
+    } catch(err) {
+      const left = document.getElementById('nav') || document.querySelector('.card');
+      if (left) left.innerHTML = '<div class="muted">Failed to load site.json</div>';
+      console.error(err);
+    }
+  })();
+  </script>
 
-  const site = adapt(v2);
+  <script>
+    function getMainEl() {
+      return document.getElementById('main')
+          || document.querySelector('#content')
+          || document.querySelector('.card.main')
+          || (function () {
+              const div = document.createElement('div');
+              div.className = 'card main';
+              div.style.marginTop = '1rem';
+              document.body.appendChild(div);
+              return div;
+            })();
+    }
+    function escapeHTML(s){ return (s||'').replace(/[&<>"]/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[m])); }
 
-  // very small nav render so the page is usable
-  const nav = document.getElementById('nav');
-  const parts = [];
-  (site.chapters || []).forEach((ch, ci) => {
-    parts.push(`<div class="muted" style="margin:.5rem 0;font-weight:600">${ch.title || ('Chapter ' + (ci+1))}</div>`);
-    (ch.los || []).forEach((lo, li) => {
-      parts.push(`<a href="#c${ci}l${li}" class="nav-lo" style="display:block;margin:.25rem 0">${lo.title || 'Learning Objective'}</a>`);
+    function renderLO(ci, li) {
+      const site = window.__AO_SITE;
+      const ch = site?.chapters?.[ci];
+      const lo = ch?.los?.[li];
+      const main = getMainEl();
+      if (!ch || !lo) { main.innerHTML = '<div class="muted">Select a learning objective from the left.</div>'; return; }
+      let html = `<h2 style="margin-bottom:.5rem">${escapeHTML(lo.title || 'Learning Objective')}</h2>`;
+      (lo.snippets || []).forEach(sn => {
+        if (sn.type === 'quiz' && sn.quiz && sn.quiz.src) {
+          html += `<div class="cardlet"><strong>Quick check</strong><br>
+                   <button class="btn" data-quiz="\${escapeHTML(sn.quiz.src)}">Take quiz</button></div>`;
+        } else if (sn.body) {
+          html += `<p>\${escapeHTML(sn.body)}</p>`;
+        } else if (sn.title) {
+          html += `<p>\${escapeHTML(sn.title)}</p>`;
+        }
+      });
+      if (ch.assessment && ch.assessment.src) {
+        html += `<div class="cardlet" style="margin-top:1rem">
+                 <strong>Chapter assessment</strong><br>
+                 <button class="btn" data-assessment="\${escapeHTML(ch.assessment.src)}">Start assessment</button>
+                 </div>`;
+      }
+      main.innerHTML = html;
+    }
+
+    function onRoute() {
+      const m = location.hash.match(/^#c(\d+)l(\d+)$/);
+      if (m) renderLO(+m[1], +m[2]);
+    }
+    window.addEventListener('hashchange', onRoute);
+    onRoute();
+
+    document.addEventListener('click', async (e) => {
+      const btn = e.target.closest('[data-quiz],[data-assessment]');
+      if (!btn) return;
+      e.preventDefault();
+      const src = btn.dataset.quiz || btn.dataset.assessment;
+      try {
+        const r = await fetch(src);
+        if (!r.ok) throw new Error(r.status + ' ' + r.statusText);
+        const json = await r.json();
+
+        const lb = document.getElementById('lightbox') || (function () {
+          const el = document.createElement('div');
+          el.id = 'lightbox';
+          el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:9999';
+          el.addEventListener('click', (ev)=>{ if (ev.target===el) el.remove(); });
+          document.body.appendChild(el);
+          return el;
+        })();
+        lb.innerHTML = '';
+        const panel = document.createElement('div');
+        panel.style.cssText = 'max-width:90vw;max-height:80vh;background:#1a1a1a;color:#ddd;padding:16px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.4)';
+        panel.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <strong>\${btn.dataset.quiz ? 'Quiz' : 'Assessment'}</strong>
+          <button class="btn" onclick="this.closest('#lightbox').remove()">Close</button>
+        </div>`;
+        const pre = document.createElement('pre');
+        pre.style.cssText = 'max-height:60vh;overflow:auto;padding:12px;background:#111;border-radius:12px';
+        pre.textContent = JSON.stringify(json, null, 2);
+        panel.appendChild(pre);
+        lb.appendChild(panel);
+      } catch (err) {
+        alert('Failed to load ' + src + '\n' + err.message);
+      }
     });
-  });
-  nav.innerHTML = parts.join('') || '<div class="muted">No content.</div>';
-})();
-</script>
-
+  </script>
 </body>
 </html>
