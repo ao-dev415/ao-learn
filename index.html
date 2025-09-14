@@ -388,5 +388,20 @@ async function boot(){
 }
 </script>
 
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const fn = (window.boot || (typeof boot==='function' ? boot : null));
+  if (!fn) { console.warn('[boot] not found'); return; }
+  try {
+    console.log('[boot] calling…');
+    await fn();
+    document.querySelector('.card .muted')?.textContent = 'Loaded.';
+    console.log('[boot] ok');
+  } catch (e) {
+    console.error('[boot] failed', e);
+  }
+});
+</script>
 </body>
 </html>
