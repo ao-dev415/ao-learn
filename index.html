@@ -321,87 +321,65 @@ document.addEventListener('DOMContentLoaded', function () {
 
 </script>
 
-<script>
-/* ===== Restored boot() (exported, guarded) ===== */
-async function boot(){
-  // 1) Load site.json (directly or via loadSiteJSON if present)
-  let site;
-  try{
-    site = await (typeof loadSiteJSON==='function'
-      ? loadSiteJSON()
-      : (await fetch('site.json')).json());
-  }catch(e){
-    console.error('[boot] load site.json failed', e);
-    throw e;
-  }
-
-  // 2) Adapt v2 -> legacy if those helpers exist
-  try{
-    if (typeof __ao_isV2Shape==='function' && __ao_isV2Shape(site) &&
-        typeof __ao_adaptV2ToLegacy==='function'){
-      site = __ao_adaptV2ToLegacy(site);
-      console.log('[AO] adapted v2 → legacy');
-    }
-  }catch(e){ console.warn('[AO] adapt failed:', e); }
-
-  // 3) Try legacy helpers first
-  let used=false;
-  try{
-    if (typeof buildLeftNav==='function'){ buildLeftNav(); used=true; }
-    if (typeof buildDocs   ==='function'){ buildDocs();    used=true; }
-    if (typeof refreshRail ==='function'){ refreshRail(); }
-    if (typeof route       ==='function'){ route(); window.addEventListener('hashchange', route); used=true; }
-  }catch(e){
-    console.warn('[boot] legacy render failed, will attempt minimal fallback', e);
-  }
-
-  // 4) Minimal fallback renderer (brand + simple nav + clear the "Loading..." msg)
-  if (!used){
-    try{
-      const brand=document.getElementById('brand');
-      if (brand && site?.title) brand.textContent = site.title;
-
-      const nav = document.getElementById('menu') || document.querySelector('nav.menu');
-      if (nav && Array.isArray(site?.chapters)){
-        nav.innerHTML='';
-        site.chapters.forEach((ch,i)=>{
-          const a=document.createElement('a');
-          a.textContent = ch.title || ('Chapter '+(i+1));
-          a.href = '#ch-'+i;
-          a.dataset.route='chapter';
-          nav.appendChild(a);
-        });
-      }
-
-      const main = document.querySelector('main') || document.getElementById('home') || document.getElementById('content');
-      if (main){
-        const loading = [...main.querySelectorAll('.muted')].find(n=>/loading/i.test(n.textContent||'')) || null;
-        if (loading) loading.textContent = 'Loaded.';
-      }
-    }catch(e){
-      console.warn('[minimal] render failed', e);
-    }
-  }
-
-  // 5) Expose for the DCL caller
-  try{ window.boot = boot; }catch{}
-}
-</script>
-
 
 <script>
+// ===== Boot (safe) =====
 document.addEventListener('DOMContentLoaded', async () => {
-  const fn = (window.boot || (typeof boot==='function' ? boot : null));
-  if (!fn) { console.warn('[boot] not found'); return; }
-  try {
-    console.log('[boot] calling…');
+  try{
+    const fn = window.boot || (typeof boot==='function' ? boot : null);
+    if (!fn){ console.warn('[boot] not found'); return; }
+    console.log('[boot] calling_');
     await fn();
-    (()=>{const _el=document.querySelector('.card .muted'); if(_el) _el.textContent = 'Loaded.';})();
     console.log('[boot] ok');
-  } catch (e) {
+  }catch(e){
     console.error('[boot] failed', e);
   }
 });
 </script>
+
+
+<script>
+async function boot(){
+  try{
+    const site = await fetch('site.json').then(r=>r.json());
+    window.__site = site;
+
+    const NAV =
+      document.getElementById('nav') ||
+      document.getElementById('menu') ||
+      document.querySelector('nav#nav, nav#menu, nav, #nav, #menu');
+
+    const statusEl = document.querySelector('.card .muted, .muted');
+
+    const hasLegacy =
+      typeof window.buildLeftNav === 'function' ||
+      typeof window.buildDocs    === 'function' ||
+      typeof window.refreshRail  === 'function' ||
+      typeof window.route        === 'function';
+
+    if (hasLegacy){
+      window.buildLeftNav?.(site);
+      window.buildDocs?.(site);
+      window.refreshRail?.();
+      window.route?.();
+      window.addEventListener('hashchange', window.route);
+    } else {
+      if (NAV){
+        const chapters = site.chapters || [];
+        NAV.innerHTML = chapters
+          .map((ch,i)=>`<a href="#ch${i}" data-route="ch${i}">${ch.title || `Chapter ${i+1}`}</a>`)
+          .join('');
+      }
+      if (statusEl) statusEl.textContent = 'Loaded.';
+    }
+  }catch(e){
+    console.error('[boot] render failed', e);
+    throw e;
+  }
+}
+// expose
+try{ window.boot = boot; }catch{}
+</script>
+
 </body>
 </html>
