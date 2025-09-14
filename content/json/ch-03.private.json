@@ -1,0 +1,25 @@
+{
+  "chapter_id": "ch-03",
+  "sections": [
+    {
+      "h2_id": "key-planning-documents",
+      "sub_objectives": [
+        {
+          "h3_id": "positive-cash-flow",
+          "title": "Positive Cash Flow",
+          "body_private_html": "<p>This is the full, detailed, and gated content from the PDF, which feeds the RAG system.</p>"
+        }
+      ]
+    },
+    {
+      "h2_id": "compounding-interest",
+      "sub_objectives": [
+        {
+          "h3_id": "using-the-time-value-of-money",
+          "title": "Using the Time Value of Money",
+          "body_private_html": "<p>This is the full, detailed, and gated content for the H3, which feeds the RAG system.</p>"
+        }
+      ]
+    }
+  ]
+}

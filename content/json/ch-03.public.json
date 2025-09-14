@@ -1,0 +1,58 @@
+{
+  "book": {
+    "id": "rpbasics-2025",
+    "title": "Retirement Planning Basics (2025)",
+    "slug": "retirement-planning-basics-2025"
+  },
+  "chapter_id": "ch-03",
+  "chapter_title": "Cash Flow & Net Worth",
+  "sections": [
+    {
+      "h2_id": "key-planning-documents",
+      "title": "Key Planning Documents",
+      "public_url": "/retirement-planning-basics-2025/cashflow-networth/key-planning-documents/",
+      "preview_public_html": "<p>To get a basic idea of a retirement plan's sustainability, you need a Net Worth Statement and a Cash Flow Statement. This section provides a clear overview of both documents, explaining their purpose and what information they provide to help you better understand your financial health.</p>",
+      "section_public_html": "<h2>Net Worth and Cash Flow Statements</h2><p>A **Net Worth Statement** provides a global overview of your financial situation, helping you identify your overall savings available for retirement. A **Cash Flow Statement** details annual inflows and outflows, enabling a deeper analysis of where your money is coming from and going to. This foundational understanding is vital for pinpointing areas for improvement and making informed decisions.</p>",
+      "sub_objectives": [
+        {
+          "h3_id": "positive-cash-flow",
+          "title": "Positive Cash Flow",
+          "teaser_public": "Positive cash flow is the new money available to save or deploy after all current expenses are met."
+        }
+      ]
+    },
+    {
+      "h2_id": "compounding-interest",
+      "title": "Compounding Interest",
+      "public_url": "/retirement-planning-basics-2025/cashflow-networth/compounding-interest/",
+      "preview_public_html": "<p>Compounding interest is the reinvestment of interest to grow an investment over time. It is the key to offsetting long-term inflation and building foundational wealth. This section explains the principle of compounding and its importance for long-term financial stability.</p>",
+      "section_public_html": "<h2>The Power of Compounding Interest</h2><p>The essence of wealth creation is setting money aside for a very long time, allowing compounding interest to work its magic. This overview will help you understand the concept of compounding and its role as a hedge against inflation. You will also learn why having short-term cash reserves allows you to capture long-term compounding interest with other money.</p>",
+      "sub_objectives": [
+        {
+          "h3_id": "using-the-time-value-of-money",
+          "title": "Using the Time Value of Money",
+          "teaser_public": "Understanding the time value of money is essential for predicting the long-term sustainability of a financial plan."
+        }
+      ]
+    },
+    {
+      "h2_id": "chapter-3-assessment",
+      "title": "Chapter 3 Assessment",
+      "public_url": "/retirement-planning-basics-2025/cashflow-networth/chapter-3-assessment/",
+      "preview_public_html": "<p>Complete the Chapter 3 assessment to confirm your mastery of the material covered in this chapter.</p>",
+      "section_public_html": "<h2>Assessment</h2><p>This assessment will test your knowledge on the concepts covered in this chapter, including budgeting, inflation, and retirement planning expectations. [[assessment:assessment-demo]]</p>",
+      "sub_objectives": [
+        {
+          "h3_id": "chapter-3-assessment",
+          "title": "Chapter 3 Assessment",
+          "visibility": "public_inline",
+          "type": "assessment",
+          "assessment": {
+            "id": "assessment-demo",
+            "src": "assessment-demo.json"
+          }
+        }
+      ]
+    }
+  ]
+}

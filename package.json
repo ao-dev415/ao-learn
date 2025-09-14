@@ -1,26 +1,21 @@
 {
-  "name": "ao-v1",
-  "version": "1.0.0",
-  "description": "How to add & place images (recommended workflow) 1) Where to put files",
-  "main": "index.js",
+  "name": "ao-learn-build",
+  "private": true,
+  "version": "0.3.0",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "rimraf dist site.json || true",
+    "prebuild": "node scripts/ingest_chapters.mjs || true",
+    "validate": "node scripts/validate_instruments.mjs",
+    "build:site": "node scripts/build_site.mjs",
+    "build:seo": "node scripts/generate_seo.mjs",
+    "build:rag": "node scripts/generate_rag_index.mjs",
+    "build": "npm run clean && npm run validate && npm run build:site && npm run build:seo && npm run build:rag",
+    "registry:sync": "node scripts/sync_registry.mjs",
+    "serve": "npx http-server -c-1 -p 5173 .",
+    "preview": "open http://localhost:5173 && npm run serve"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ao-dev415/ao-learn.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/ao-dev415/ao-learn/issues"
-  },
-  "homepage": "https://github.com/ao-dev415/ao-learn#readme",
-  "dependencies": {
-    "chalk": "^5.6.0",
-    "jsdom": "^26.1.0",
-    "mammoth": "^1.10.0"
+  "devDependencies": {
+    "rimraf": "^6.0.0"
   }
 }

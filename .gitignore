@@ -2,3 +2,13 @@
 _tmp_html/
 tmp_html/
 public/
+node_modules
+dist/site.json
+dist/site.v2.json
+docs/
+.DS_Store
+.cache
+node_modules/
+source/book 3.docx
+source/quizzes 3.json
+index.html.bak

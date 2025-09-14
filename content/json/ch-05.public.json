@@ -1,0 +1,98 @@
+{
+  "book": {
+    "id": "rpbasics-2025",
+    "title": "Retirement Planning Basics (2025)",
+    "slug": "retirement-planning-basics-2025"
+  },
+  "chapter_id": "ch-05",
+  "chapter_title": "Guarantees",
+  "sections": [
+    {
+      "h2_id": "social-security-basics",
+      "title": "Social Security Basics",
+      "public_url": "/retirement-planning-basics-2025/guarantees/social-security-basics/",
+      "preview_public_html": "<p>President Franklin D. Roosevelt signed the Social Security Act in 1935 to boost retirement income and savings. This section explains the fundamentals of Social Security, including how benefits are estimated and the key factors that can affect your monthly payout.</p>",
+      "section_public_html": "<h2>Social Security Fundamentals</h2><p>The calculation for your Social Security benefit is based on your highest 35 years of earnings. This section walks you through the concepts of Average Indexed Monthly Earnings (AIME) and Primary Insurance Amount (PIA) and discusses how to get a projection of your benefits. It also provides an overview of the factors that can change your benefit amount over time.</p>",
+      "sub_objectives": [
+        {
+          "h3_id": "estimating-my-benefits",
+          "title": "Estimating my benefits",
+          "teaser_public": "Social Security uses a formula based on your highest 35 years of earnings to estimate your benefits."
+        },
+        {
+          "h3_id": "taking-social-security",
+          "title": "Taking Social Security",
+          "teaser_public": "Deciding when to take Social Security requires evaluating several variables, including longevity, career choices, and market performance."
+        },
+        {
+          "h3_id": "the-earnings-limit",
+          "title": "The Earnings Limit",
+          "teaser_public": "If you work past age 65, the earnings limit may reduce your Social Security benefits, especially if you start collecting them before your Full Retirement Age."
+        },
+        {
+          "h3_id": "knowledge-check-quiz",
+          "title": "Knowledge Check",
+          "visibility": "public_inline",
+          "type": "quiz",
+          "quiz": {
+            "id": "quiz-demo",
+            "src": "data/quizzes/quiz-demo.json"
+          }
+        }
+      ]
+    },
+    {
+      "h2_id": "defined-benefit-plans",
+      "title": "Defined Benefit Plans",
+      "public_url": "/retirement-planning-basics-2025/guarantees/defined-benefit-plans/",
+      "preview_public_html": "<p>A Defined Benefit Plan (DBP) is an employer-offered pension plan that generally pays a lump sum or monthly annuity. It traditionally provides a guaranteed retirement benefit and can be a stable source of income for life. This section explains the characteristics of these plans and how they differ from other retirement vehicles.</p>",
+      "section_public_html": "<h2>Pensions and Defined Benefit Plans</h2><p>Defined Benefit Plans are traditional pensions that offer a lump sum or monthly annuity based on an employee's earnings and age. These plans often provide a guaranteed benefit and may include a cost-of-living adjustment (COLA). We will explore the pros and cons of these plans and provide key questions to ask your plan administrator when considering a lump sum versus a pension option.</p>",
+      "sub_objectives": [
+        {
+          "h3_id": "pension-vs-lump-sum",
+          "title": "Pension vs. Lump Sum",
+          "teaser_public": "Choosing between a pension and a lump sum is a personal and factual decision that requires careful analysis of longevity, risk tolerance, and cash flow needs."
+        }
+      ]
+    },
+    {
+      "h2_id": "wep-and-gpo",
+      "title": "WEP and GPO",
+      "public_url": "/retirement-planning-basics-2025/guarantees/wep-and-gpo/",
+      "preview_public_html": "<p>The Windfall Elimination Provision (WEP) and the Government Pension Offset (GPO) are two rules that may reduce Social Security benefits for those who also receive a pension from non-covered work. This section details how these rules work and helps you understand if they apply to your situation.</p>",
+      "section_public_html": "<h2>Understanding WEP and GPO Offsets</h2><p>Here is a quick quiz to check your understanding of these concepts.</p>[[quiz:quiz-demo]]<p>The WEP works by changing the formula used to calculate a worker’s benefits, potentially reducing the amount of Social Security received by the worker and their family. Similarly, the GPO applies to spousal and survivor benefits for those with a pension from a non-covered government job, and it could significantly reduce or even eliminate these benefits. This page provides a clear overview of these complex rules and includes tables and examples to help you determine if you might be affected.</p>",
+      "sub_objectives": [
+        {
+          "h3_id": "windfall-elimination-provision",
+          "title": "Windfall Elimination Provision (WEP)",
+          "teaser_public": "The WEP can reduce Social Security benefits for workers with a pension from non-covered work, but guarantees benefits won't be reduced by more than half the pension amount."
+        },
+        {
+          "h3_id": "government-pension-offset",
+          "title": "Government Pension Offset (GPO)",
+          "teaser_public": "The GPO may reduce a spouse’s or widower's Social Security benefits if they have a pension from a non-covered government job."
+        },
+        {
+          "h3_id": "knowledge-check-quiz",
+          "title": "Knowledge Check",
+          "visibility": "public_inline",
+          "type": "quiz",
+          "quiz": {
+            "id": "quiz-demo",
+            "src": "data/quizzes/quiz-demo.json"
+          }
+        },
+        {
+          "h3_id": "chapter-5-assessment",
+          "title": "Chapter 5 Assessment",
+          "visibility": "public_inline",
+          "type": "assessment",
+          "assessment": {
+            "id": "assessment-ch5",
+            "src": "data/assessments/assessment-ch5.json"
+          }
+        }
+      ]
+    }
+  ]
+}

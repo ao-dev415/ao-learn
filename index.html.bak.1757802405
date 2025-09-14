@@ -1,0 +1,1222 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Advice-Only® Learning Management System (Preview)</title>
+  <meta name="robots" content="noindex,nofollow"/>
+  <!-- Used by resolveRoot() so relative data paths work everywhere -->
+  <meta name="ao-root" content="/"/>
+
+  <link rel="stylesheet" href="static/css/ao-ui.css"/>
+
+  <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+  <link rel="preconnect" href="https://www.google-analytics.com" crossorigin>
+  <link rel="preconnect" href="https://www.clarity.ms" crossorigin>
+
+  <link href="static/js/vendor/survey/survey-core.min.css" rel="stylesheet"/>
+  <script src="static/js/vendor/survey/survey.core.min.js">
+</script>
+  <script src="static/js/vendor/survey/survey-js-ui.min.js">
+</script>
+
+  <script>
+    // Warm the registry ASAP; everything still works if it arrives late.
+    (function () {
+      const g = window;
+      g.REGISTRY = g.REGISTRY || null;
+
+      g.__ao_ensureRegistry = (function () {
+        let p;
+        return function () {
+          if (p) return p;
+          p = fetch('data/registry.json', { cache: 'no-store' })
+            .then(r => r.ok ? r.json() : { quizzes: {}, assessments: {} })
+            .catch(() => ({ quizzes: {}, assessments: {} }))
+            .then(j => (g.REGISTRY = j, j));
+          return p;
+        };
+      })();
+
+      g.__ao_ensureRegistry();
+    })();
+  
+</script>
+
+  <script>
+    /* AO PATCH: promote assessment + allow quiz-by-ref (no inline payload required) */
+    function __ao_patch_preAdapt(v2) {
+      const REG = window.REGISTRY; // may be null when this runs
+
+      (v2.chapters || []).forEach(ch => {
+        // Promote first section-level assessment to chapter.assessment
+        if (!ch.assessment) {
+          const sec = (ch.sections || []).find(s =>
+            (s.sub_objectives || []).some(so => so && so.type === 'assessment' && (so.assessment || so.src || so.ref))
+          );
+          if (sec) {
+            const so = (sec.sub_objectives || []).find(x => x && x.type === 'assessment');
+            const ref = so?.ref || so?.assessment?.id || null;
+            const regA = REG && ref ? REG.assessments?.[ref] : null;
+
+            const src =
+              (so.assessment && so.assessment.src) ||
+              so.src ||
+              (regA && regA.src) ||
+              (ref ? ('data/assessments/' + ref + '.json') : null);
+
+            if (src) {
+              ch.assessment = {
+                id: ref || so?.assessment?.id || 'assessment',
+                title: sec.title || 'Chapter Assessment',
+                href: '/' + (ref || 'assessment'),
+                src
+              };
+              ch.items = Array.isArray(ch.items) ? ch.items : [];
+              if (!ch.items.some(it => it && it.type === 'assessment')) {
+                ch.items.push({ type: 'assessment', title: ch.assessment.title, href: ch.assessment.href });
+              }
+            }
+          }
+        }
+
+        // Ensure quizzes can render even if payloads aren’t inlined
+        (ch.sections || []).forEach(sec => {
+          (sec.sub_objectives || []).forEach(so => {
+            if (so && so.type === 'quiz' && !so.quiz) {
+              const ref = so.ref || so.id || null;
+              const regQ = REG && ref ? REG.quizzes?.[ref] : null;
+              const src = so.src || (regQ && regQ.src) || (ref ? ('data/quizzes/' + ref + '.json') : null);
+              if (src) so.quiz = { src }; // renderQuiz() will lazy-load by src
+            }});        });
+      });
+
+
+      return v2;
+    }
+  
+</script>
+
+  <script>
+    (function() {
+      const GA_ID = 'G-C2E79R93CQ';
+      const CLARITY_ID = 't38u1ekrco';
+
+      function loadGA() {
+        if (!GA_ID || window.__gaLoaded) return;
+        window.__gaLoaded = true;
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(GA_ID);
+        document.head.appendChild(s);
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){ dataLayer.push(arguments); }
+        window.gtag = gtag;
+        gtag('js', new Date());
+        gtag('config', GA_ID, { anonymize_ip: true });
+      }
+
+      function loadClarity() {
+        if (!CLARITY_ID || window.__clarityLoaded) return;
+        window.__clarityLoaded = true;
+        (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){ (c[a].q=c[a].q||[]).push(arguments); };
+          t=l.createElement(r); t.async=1; t.src='https://www.clarity.ms/tag/' + i;
+          y=l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t,y);
+        })(window, document, 'clarity', 'script', CLARITY_ID);
+      }
+
+      window.loadGA = loadGA;
+      window.loadClarity = loadClarity;
+
+      window.AOAnalytics = {
+        enable(){ localStorage.setItem('ao.v2.analytics.ga','1'); localStorage.setItem('ao.v2.analytics.clarity','1'); window.loadGA?.(); window.loadClarity?.(); },
+        disable(){ localStorage.setItem('ao.v2.analytics.ga','0'); localStorage.setItem('ao.v2.analytics.clarity','0'); },
+        isOn(){ return localStorage.getItem('ao.v2.analytics.ga')==='1' || localStorage.getItem('ao.v2.analytics.clarity')==='1'; }
+      };
+    })();
+  
+</script>
+</head>
+<body>
+
+<header class="top" id="top">
+  <div class="top-wrap">
+    <div class="logo">
+      <img src="static/brand/ao-teal-logo.png" alt="AO Logo" onerror="this.remove()"/>
+      <a href="#home" id="brand">Advice-Only®</a>
+    </div>
+    <nav class="menu" id="menu">
+      <a href="#home" data-route="home">Home</a>
+      <a href="#data" data-route="data">My Data</a>
+      <a href="#events" data-route="events">Events</a>
+      <a href="#privacy" data-route="privacy">Privacy</a>
+      <a href="#about" data-route="about">About</a>
+    </nav>
+    <div class="search" id="search">
+      <input id="q" aria-label="Search or ask" placeholder="Search or ask (Enter to view all)…" autocomplete="off"/>
+      <div class="dd" id="dd"></div>
+    </div>
+    <button id="theme-toggle" aria-label="Toggle theme">
+      <svg class="icon-dark" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <title>Activate light mode</title>
+        <circle cx="12" cy="12" r="5"></circle>
+        <path d="M12 1v2m0 18v2m11-11h-2M3 12H1m16.95 7.05-1.41-1.41M6.46 6.46 5.05 5.05m13.9 0-1.41 1.41M6.46 17.54 5.05 18.95"></path>
+      </svg>
+      <svg class="icon-light" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <title>Activate dark mode</title>
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<div class="wrap">
+  <aside class="card nav" id="nav"><div class="muted">Loading…</div></aside>
+
+  <main class="card main" id="main">
+    <h1>Welcome</h1>
+    <p class="lead">Select a learning objective from the left. Use the search above to jump to content.</p>
+    <div class="muted">Data comes from <span class="kbd">site.json</span>. Add <span class="kbd">?full=1</span> to load <span class="kbd">full/site.json</span>.</div>
+  </main>
+
+  <aside class="card rail" id="rail">
+    <div class="cardlet">
+      <h4>Alerts</h4>
+      <div class="muted">This panel is a placeholder for progress and events.</div>
+    </div>
+    <div class="cardlet" id="rail-events"></div>
+    <div class="cardlet" id="rail-progress"></div>
+  </aside>
+</div>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Zoom" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);align-items:center;justify-content:center;z-index:100">
+  <button class="btn" id="lbClose" style="position:absolute;top:14px;right:14px">Close</button>
+  <div id="lbSlot" style="max-width:92vw;max-height:92vh;margin:auto"></div>
+</div>
+
+<script>
+  (function(){
+    const KEY='ao.theme';
+    const root=document.documentElement;
+    const btn=document.getElementById('theme-toggle');
+    const apply=isLight=>root.classList.toggle('light', isLight);
+    let saved=false;
+    try{ saved = localStorage.getItem(KEY)==='light'; }catch{}
+    apply(saved);
+    btn?.addEventListener('click', ()=>{
+      const next=!root.classList.contains('light');
+      apply(next);
+      try{ localStorage.setItem(KEY, next?'light':'dark'); }catch{}
+    });
+  })();
+</script><script>
+document.addEventListener('DOMContentLoaded', function() {
+  /* Surface any boot errors in the left nav */
+  window.addEventListener('error', (ev) => {
+    try {
+      const n = document.getElementById('nav');
+      if (n) {
+        n.innerHTML = '';
+        const d = document.createElement('div');
+        d.className = 'muted';
+        d.textContent = 'Script error: ' + (ev.error?.message || ev.message || 'unknown');
+        n.appendChild(d);
+      }
+    } catch {}
+  });
+
+  window.addEventListener('unhandledrejection', (ev)=>{
+    try{
+      const n=document.getElementById('nav');
+      if(n){
+        n.innerHTML='';
+        const d=document.createElement('div');
+        d.className='muted';
+        d.textContent='Promise error: ' + (ev.reason?.message || String(ev.reason));
+        n.appendChild(d);
+      }
+    }catch{}
+  });
+
+  (function(){
+    // ---------- DOM ----------
+    const NAV  = document.getElementById('nav');
+    const MAIN = document.getElementById('main');
+    const RAIL = document.getElementById('rail');
+    const MENU = document.getElementById('menu');
+    const SEARCH_BOX = document.getElementById('q');
+    const SEARCH_DD  = document.getElementById('dd');
+    const LB = document.getElementById('lightbox');
+    const LB_SLOT = document.getElementById('lbSlot');
+    const LB_CLOSE = document.getElementById('lbClose');
+
+    // ---------- Config ----------
+    const LS_SEEN  = 'ao.v2.seen';
+    const LS_TIME  = 'ao.v2.time';
+    const LS_LAST  = 'ao.v2.last';
+    const LS_QUIZ  = 'ao.v2.quiz';
+    const LS_ASSESS= 'ao.v2.assess';
+    const COMP_THRESH = { red:20, yellow:60 };
+
+    const params    = new URLSearchParams(location.search);
+    const WANT_DEMO = params.get('demo') === '1';
+    const WANT_FULL = params.get('full') === '1';
+
+    // ---------- Helpers ----------
+    const h=(t,a={},...c)=>{const e=document.createElement(t);for(const[k,v]of Object.entries(a)){if(k==='class')e.className=v;else if(k==='html'&&e)e.innerHTML=v;else if(k.startsWith('on')&&typeof v==='function')e.addEventListener(k.slice(2),v);else e.setAttribute(k,v);}c.forEach(x=>{if(x!=null)e.appendChild(typeof x==='string'?document.createTextNode(x):x)});return e;};
+    const num = s => s ? parseInt(s,10) : NaN;
+    const tokenize = s => (s||'').toLowerCase().replace(/[^\p{L}\p{N}\s]/gu,' ').split(/\s+/).filter(Boolean);
+    const fmtDate=(iso,tz,time)=>{try{const dt=new Date(`${iso}T${time||'00:00'}:00`);const opt={dateStyle:'medium',timeStyle:time?'short':undefined};if(tz)opt.timeZone=tz;const s=new Intl.DateTimeFormat(undefined,opt).format(dt);return s+(tz?` (${(tz.split('/')[1]||tz)})`:'');}catch{return iso+(time?` ${time}`:'');}};
+    const loadJSON=(k,def)=>{try{const v=JSON.parse(localStorage.getItem(k)||'');return v??def;}catch{return def;}};
+    const saveJSON=(k,v)=>localStorage.setItem(k, JSON.stringify(v));
+
+    function csvEscape(v){ 
+      const s = String(v ?? "");
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
+    }
+    function buildCSV(){
+      const rows = [];
+      rows.push(["Chapter/LO","Seconds","Seen?"].map(csvEscape).join(","));
+      (chapters||[]).forEach((ch,ci)=>{
+        (ch.los||[]).forEach((lo,li)=>{
+          const key = `${ci+1}.${li+1}`;
+          const secs = timeMap[key] || 0;
+          const seenFlag = seen.has(key) ? "yes" : "no";
+          rows.push([`${key} ${lo.title||""}`, secs, seenFlag].map(csvEscape).join(","));
+        });
+      });
+      rows.push("", "Quiz Results", "Quiz ID,Score,Total,When,LO Key");
+      Object.entries(quizResults||{}).forEach(([id,res])=>{
+        rows.push([id, res.score??"", res.total??"", new Date(res.ts||Date.now()).toISOString(), res.key||""].map(csvEscape).join(","));
+      });
+      rows.push("", "Assessments", "Assessment ID,Score,When");
+      Object.entries(assessResults||{}).forEach(([id,res])=>{
+        rows.push([id, res.answers?.totalScore ?? "", new Date(res.ts||Date.now()).toISOString()].map(csvEscape).join(","));
+      });
+      return rows.join("\n");
+    }
+    function downloadFile(filename, content, mime){
+      const blob = new Blob([content], {type: mime || "application/octet-stream"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click();
+      setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 0);
+    }
+
+    // ---------- State ----------
+    const seen = new Set(loadJSON(LS_SEEN, []));
+    const timeMap = loadJSON(LS_TIME, {});
+    const quizResults = loadJSON(LS_QUIZ, {});
+    const assessResults = loadJSON(LS_ASSESS, {});
+    let currentTimer = null;
+    let site=null, chapters=[], docs=[];
+
+    // ---------- Timing ----------
+    function startTiming(key){stopTiming();currentTimer={key,start:Date.now()};localStorage.setItem(LS_LAST,key);}
+    function stopTiming(){if(!currentTimer)return;const dt=Math.max(0,Math.round((Date.now()-currentTimer.start)/1000));timeMap[currentTimer.key]=(timeMap[currentTimer.key]||0)+dt;saveJSON(LS_TIME,timeMap);currentTimer=null;localStorage.removeItem(LS_LAST);}
+    window.addEventListener('beforeunload', stopTiming);
+    document.addEventListener('visibilitychange', ()=>{if(document.hidden)stopTiming();});
+    (function recover(){const last=localStorage.getItem(LS_LAST);if(last){seen.add(last);saveJSON(LS_SEEN,[...seen]);localStorage.removeItem(LS_LAST);}})();
+
+    // ---------- Ordering + labels ----------
+    function chapterOrderIndex(ch,i){
+      if(typeof ch.index==='number')return ch.index;
+      const ct=(ch.title||'').trim();
+      let m=/^Chapter\s+(\d+)/i.exec(ct);
+      if(m)return num(m[1]);
+      let best=Infinity;
+      (ch.los||[]).forEach(lo=>{
+        const t=(lo.title||'').trim();
+        const matches=t.match(/\b(\d+\.\d+)\b/g);
+        if(matches){
+          matches.forEach(mm=>{
+            const major=parseInt(mm.split('.')[0],10);
+            if(!Number.isNaN(major)&&major<best)best=major;
+          })
+        }
+      });
+      return best!==Infinity?best:1000+i;
+    }
+    function loLabel(lo){
+      const t=(lo.title||'').trim();
+      const m=t.match(/(\d+\.\d+)/);
+      if(m){
+        const rest=t.replace(m[0],'').replace(/^[-—:\s]+/,'').trim();
+        return`${m[0]} — ${rest||''}`.trim();
+      }
+      return t||'Untitled';
+    }
+
+    // ---------- Inline media (tokens) ----------
+    function normalizeMedia(raw){
+      const toItem=(x)=>{
+        if(typeof x==='string'){
+          if(/^https?:/i.test(x)&&(/\.(mp4|webm|ogg)(\?|$)/i).test(x))return{kind:'video',src:x};
+          return{kind:'image',src:x};
+        }
+        if(x&&typeof x==='object'){
+          const kind=x.type==='video'||x.video?'video':((x.src||'').match(/\.(mp4|webm|ogg)(\?|$)/i)?'video':'image');
+          return{kind,src:x.src,alt:x.alt||'',caption:x.caption||x.title||''};
+        }
+        return null;
+      };
+      if(Array.isArray(raw))return raw.map(toItem).filter(Boolean);
+      if(!raw)return[];
+      const one=toItem(raw);
+      return one?[one]:[];
+    }
+    
+function extractTokenIndices(text, token){
+  const re = token === 'img'
+    ? /\[\[img:(\d+)\]\]/gi
+    : /\[\[vid:(\d+)\]\]/gi;
+  const inds = [];
+  (text || '').replace(re, (_, n) => {
+    inds.push(Math.max(1, parseInt(n, 10)) - 1);
+    return '';
+  });
+  return inds;
+}
+// Resolve instrument src by ref using registry (fallback to data/*)
+  
+function resolveAssessmentSrc(ref){
+  try {
+    const REG = window.REGISTRY || {};
+    const map = (REG.assessments || {});
+    const src = map[ref] && map[ref].src;
+    return src || "data/assessments/" + ref + ".json";
+  } catch(e){
+    console.warn("[helpers] resolveAssessmentSrc fallback", e);
+    return "data/assessments/" + ref + ".json";
+  }
+}
+function resolveQuizSrc(ref){
+  try {
+    const REG = window.REGISTRY || {};
+    const map = (REG.quizzes || {});
+    const src = map[ref] && map[ref].src;
+    return src || "data/quizzes/" + ref + ".json";
+  } catch(e){
+    console.warn("[helpers] resolveQuizSrc fallback", e);
+    return "data/quizzes/" + ref + ".json";
+  }
+}
+    function openZoom(node){
+      if(LB_SLOT)LB_SLOT.innerHTML='';
+      if(node.tagName==='IMG'){
+        LB_SLOT.appendChild(h('img',{src:node.src,alt:node.alt||''}));
+      }else if(node.tagName==='VIDEO'){
+        const v=h('video',{src:node.currentSrc||node.src,controls:true,autoplay:true});
+        LB_SLOT.appendChild(v);
+      }
+      if(LB)LB.style.display='flex';
+    }
+    function closeZoom(){if(LB)LB.style.display='none';if(LB_SLOT)LB_SLOT.innerHTML='';}
+    LB_CLOSE.addEventListener('click',closeZoom);
+    LB.addEventListener('click',(e)=>{if(e.target===LB)closeZoom();});
+    document.addEventListener('keydown',(e)=>{if(e.key==='Escape')closeZoom();});
+
+    // ---------- QUIZ & ASSESSMENT ----------
+    function saveQuizResult(id, payload){ quizResults[id] = payload; saveJSON(LS_QUIZ, quizResults); }
+    function saveAssessResult(id, payload){ assessResults[id] = payload; saveJSON(LS_ASSESS, assessResults); }
+
+    // Root resolver + robust JSON fetcher
+    function resolveRoot(u) {
+      const metaRoot = document.querySelector('meta[name="ao-root"]')?.content || '/';
+      if (!u) return u;
+      if (/^https?:\/\//i.test(u) || u.startsWith('/')) return u;
+      const base = metaRoot.endsWith('/') ? metaRoot.slice(0, -1) : metaRoot;
+      return base + '/' + u.replace(/^\/+/, '');
+    }
+    async function loadJSONMaybe(u) {
+      const url = resolveRoot(u);
+      const res = await fetch(url, { cache: 'no-store', credentials: 'same-origin' });
+      if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+      return res.json();
+    }
+
+    async function renderQuiz(quiz, key){
+      try{
+        let surveyJson = quiz;
+        if (!surveyJson?.pages && typeof quiz?.src === 'string') {
+          surveyJson = await loadJSONMaybe(quiz.src);
+        }
+        if (!surveyJson?.pages?.length) throw new Error('Quiz JSON has no pages/elements.');
+
+        const surveyHost = h('div', { class: 'cardlet', style: 'margin-top:20px;' });
+        MAIN.appendChild(surveyHost);
+
+        if (Survey?.Theme?.applyTheme) Survey.Theme.applyTheme(Survey.Theme.Default);
+        else if (Survey?.StylesManager?.applyTheme) Survey.StylesManager.applyTheme('defaultV2');
+
+        const survey = new Survey.Model(surveyJson);
+        survey.onComplete.add(sender => {
+          saveQuizResult(quiz.id || `quiz_${key}`, {
+            key,
+            score: sender.getCorrectAnswerCount?.() ?? null,
+            total: sender.getQuestionCount?.() ?? null,
+            answers: sender.data,
+            ts: Date.now()
+          });
+        });
+        survey.render(surveyHost);
+      }catch(err){
+        console.error('[quiz] render failed:', err);
+        MAIN.appendChild(h('div', { class: 'cardlet' },
+          h('div', { class: 'muted' }, 'Quiz failed to load: ' + (err.message || err))
+        ));
+      }
+    }
+
+    async function renderAssessment(assessment, key, host) {
+      try{
+        let surveyJson = assessment;
+        if (!surveyJson?.pages && typeof assessment?.src === 'string') {
+          surveyJson = await loadJSONMaybe(assessment.src);
+        }
+        if (!surveyJson?.pages?.length) throw new Error('Assessment JSON has no pages/elements.');
+
+        const surveyHost = host || h('div', { class: 'cardlet', style: 'margin-top:20px;' });
+        if (!host) MAIN.appendChild(surveyHost);
+
+        if (Survey?.Theme?.applyTheme) Survey.Theme.applyTheme(Survey.Theme.Default);
+        else if (Survey?.StylesManager?.applyTheme) Survey.StylesManager.applyTheme('defaultV2');
+
+        const survey = new Survey.Model(surveyJson);
+        survey.onComplete.add(sender => {
+          const chapter = parseInt((key || '').split('.')[0], 10) || null;
+          saveAssessResult(assessment.id || `assess_${key}`, {
+            chapter,
+            answers: sender.data,
+            ts: Date.now()
+          });
+        });
+        survey.render(surveyHost);
+      }catch(err){
+        console.error('[assess] render failed:', err);
+        const holder = host || MAIN;
+        holder.appendChild(h('div', { class: 'cardlet' },
+          h('div', { class: 'muted' }, 'Assessment failed to load: ' + (err.message || err))
+        ));
+      }
+    }
+
+    // ---------- Reader & Page Views ----------
+    function renderMain(ch, lo, chIdx, loIdx){
+      const key = `${chIdx+1}.${loIdx+1}`;
+      if(!seen.has(key)){ seen.add(key); saveJSON(LS_SEEN,[...seen]); }
+      stopTiming(); startTiming(key);
+
+      if (MAIN) MAIN.innerHTML='';
+
+      MAIN.append(
+        h('h1',{}, `${ch.title || 'Chapter'} — ${lo.title || 'Learning Objective'}`),
+        h('p',{class:'lead'}, lo.preview || 'This is preview text for this learning objective.')
+      );
+
+      const pool = [...normalizeMedia(lo.images), ...normalizeMedia(lo.image||lo.img)];
+      (lo.snippets||[]).forEach(s=>{ pool.push(...normalizeMedia(s.images), ...normalizeMedia(s.image||s.img)); });
+
+      const addFigure = (item)=>{
+        const fig=h('figure');
+        if(item.kind==='image'){const im=h('img',{src:item.src,alt:item.alt||''});im.addEventListener('dblclick',()=>openZoom(im));fig.appendChild(im);}
+        else{const v=h('video',{src:item.src,controls:true,autoplay:true});v.addEventListener('dblclick',()=>openZoom(v));fig.appendChild(v);}
+        if(item.caption)fig.appendChild(h('figcaption',{},item.caption));
+        MAIN.appendChild(fig);
+      };
+
+      let hasMediaToken = false;
+      (lo.snippets || []).forEach(s => {
+        if (!s) return;
+        if (s.type === 'quiz' && s.quiz) { renderQuiz(s.quiz, key); return; }
+        if (s.type === 'assessment' && s.assessment) { renderAssessment(s.assessment, key); return; }
+        if (s.title) MAIN.append(h('h3', {}, s.title));
+        
+        if (s.body) {
+          // 1) strip media tokens from paragraph copy
+          const strippedBody = s.body.replace(/\[\[(img|vid):\d+\]\]/gi, '').trim();
+          // Inline instrument tokens (assessment & quiz)
+          try{
+            const assessMatches = [...(s.body.matchAll(/\[\[assessment:([a-z0-9._-]+)\]\]/gi) || [])].map(m => m[1]);
+            const quizMatches   = [...(s.body.matchAll(/\[\[quiz:([a-z0-9._-]+)\]\]/gi) || [])].map(m => m[1]);
+
+            quizMatches.forEach(id => renderQuiz({ id, src: resolveQuizSrc(id) }, key));
+            assessMatches.forEach(id => renderAssessment({ id, src: resolveAssessmentSrc(id) }, key));
+          }catch(e){ console.warn('[tokens] parse failed', e); }
+
+          if (strippedBody) MAIN.append(h('p', {}));
+
+          // 2) media tokens -> figures
+          const imgTokens = extractTokenIndices(s.body,'img').filter(i=>pool[i] && pool[i].kind==='image');
+          const vidTokens = extractTokenIndices(s.body,'vid').filter(i=>pool[i] && pool[i].kind==='video');
+          if (imgTokens.length || vidTokens.length) hasMediaToken = true;
+          [...imgTokens.map(i=>({i,kind:'img'})), ...vidTokens.map(i=>({i,kind:'vid'}))]
+            .sort((a,b)=>a.i-b.i).forEach(t => addFigure(pool[t.i]));
+
+          // 3) NEW: instrument tokens
+          const assessMatches = [...(s.body.matchAll(/\[\[assessment:([a-z0-9._-]+)\]\]/gi) || [])].map(m => m[1]);
+          const quizMatches   = [...(s.body.matchAll(/\[\[quiz:([a-z0-9._-]+)\]\]/gi) || [])].map(m => m[1]);
+
+          // Render inline
+          quizMatches.forEach(id => renderQuiz({ id, src: resolveQuizSrc(id) }, key));
+          assessMatches.forEach(id => renderAssessment({ id, src: resolveAssessmentSrc(id) }, key));
+
+          // Media token figures (original)
+      if(!hasMediaToken && pool[0]) addFigure(pool[0]);
+
+      // assessment invitation at end of chapter
+      if (ch.assessment && Array.isArray(ch.los) && loIdx === ch.los.length - 1) {
+        renderAssessmentInvitation(ch, chIdx);
+      }
+    }
+
+    function renderAssessmentView(ch, chIdx) {
+      stopTiming();
+      if (MAIN) MAIN.innerHTML = '';
+      const container = h('div', { id: 'survey-container' });
+      MAIN.append(
+        h('h1', {}, `${ch.title || 'Chapter'} — Assessment`),
+        container
+      );
+      renderAssessment(ch.assessment, `${chIdx+1}`, container);
+    }
+
+    function renderAssessmentInvitation(ch, chIdx) {
+      if (!ch.assessment) return;
+      const host = h('div', { class: 'cardlet', style: 'margin-top: 16px;' });
+      host.appendChild(h('h4', {}, ch.assessment.title || 'Chapter Assessment'));
+      host.appendChild(h('p', { class: 'muted' }, 'You have completed the learning objectives for this chapter.'));
+      const assessButton = h('a', { class: 'btn', href: `#ch${chIdx + 1}-assessment` }, 'Begin Assessment');
+      host.appendChild(h('div', { style: 'margin-top:12px;' }, assessButton));
+      MAIN.appendChild(host);
+    }
+
+    function buildLeftNav() {
+      if (NAV) NAV.innerHTML = '';
+      const list = h('ul');
+      chapters.forEach((ch, chIdx) => {
+        list.append(h('h3', {}, ch.title || `Chapter ${chIdx+1}`));
+        (ch.los || []).forEach((lo, loIdx) => {
+          const btn = h('button', {
+            class: 'lo',
+            onclick: () => {
+              renderMain(ch, lo, chIdx, loIdx);
+              location.hash = `#ch${chIdx+1}-lo${loIdx+1}`;
+              setActiveLO(btn);
+              refreshRail();
+            }
+          }, loLabel(lo));
+          list.append(h('li', {}, btn));
+        });
+
+        if (ch.assessment) {
+          const assessmentBtn = h('button', {
+            class: 'assessment-link',
+            onclick: () => {
+              renderAssessmentView(ch, chIdx);
+              location.hash = `#ch${chIdx+1}-assessment`;
+              setActiveLO(assessmentBtn);
+            }
+          }, ch.assessment.title || 'Chapter Assessment');
+          list.append(h('li', {}, assessmentBtn));
+        }
+      });
+      NAV.append(list, h('a', { href: '#data', class: 'meta-link' }, '→ Open My Data'));
+      const year = new Date().getFullYear();
+      const foot = h('div',{ class:'foot', id:'foot' });
+      foot.appendChild(h('div',{ html: `©${year} Hall Financial Services, Inc. d/b/a ADVICE ONLY.` }));
+      foot.appendChild(h('div', {}, h('a', {
+        href: 'https://adviceonly.info/important-disclosures-and-privacy/',
+        target: '_blank',
+        rel: 'noopener'
+      }, 'Privacy')));
+      NAV.appendChild(foot);
+    }
+
+    function setActiveLO(btn){
+      NAV.querySelectorAll('button[aria-current="true"]').forEach(b=>b.setAttribute('aria-current','false'));
+      btn?.setAttribute('aria-current','true');
+      btn?.scrollIntoView({block:'nearest',inline:'nearest'});
+    }
+
+    function openFromHash(){
+      const m_lo=location.hash.match(/^#ch(\d+)-lo(\d+)$/);
+      if(m_lo){
+        const ch=chapters[+m_lo[1]-1];
+        const lo=ch?.los?.[+m_lo[2]-1];
+        if(ch&&lo){
+          renderMain(ch,lo,+m_lo[1]-1,+m_lo[2]-1);
+          const btns=NAV.querySelectorAll('button');
+          let flat=0,target=-1;
+          chapters.forEach((c,ci)=>{
+            (c.los||[]).forEach((l,li)=>{if(c===ch&&l===lo)target=flat;flat++;});
+            if(c.assessment)flat++;
+          });
+          if(target!==-1)setActiveLO(btns[target]);
+          return true;
+        }
+      }
+      const m_as=location.hash.match(/^#ch(\d+)-assessment$/);
+      if(m_as){
+        const ch=chapters[+m_as[1]-1];
+        if(ch&&ch.assessment){
+          renderAssessmentView(ch,+m_as[1]-1);
+          const btns=NAV.querySelectorAll('button');
+          let flat=0,target=-1;
+          chapters.forEach((c,ci)=>{
+            flat+=(c.los||[]).length;
+            if(c===ch)target=flat;
+            if(c.assessment)flat++;
+          });
+          if(target!==-1)setActiveLO(btns[target]);
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function totals(){
+      let total=0;
+      (chapters||[]).forEach(ch=>total+=(ch.los?.length||0));
+      let done=0;
+      for(const k of seen){
+        const[ci,li]=(k||'').split('.').map(Number);
+        if(chapters?.[ci-1]?.los?.[li-1])done++;
+      }
+      return{done,total,pct:total?Math.round((done/total)*100):0};
+    }
+
+    function refreshRail(){
+      const evHost=document.getElementById('rail-events');
+      const progHost=document.getElementById('rail-progress');
+      if(evHost){
+        evHost.innerHTML='<h4>Next event</h4>';
+        const list=Array.isArray(site?.events)?site.events.slice():[];
+        if(!list.length){evHost.appendChild(h('div',{class:'muted'},'No events'));}
+        else{
+          list.sort((a,b)=>new Date(`${a.date}T${a.time||'00:00'}:00`)-new Date(`${b.date}T${b.time||'00:00'}:00`));
+          const ev=list.find(e=>new Date(`${e.date}T${e.time||'00:00'}:00`)>=new Date())||list[0];
+          evHost.appendChild(h('div',{class:'muted'},fmtDate(ev.date,ev.tz,ev.time)));
+          evHost.appendChild(h('div',{style:'font-weight:600',marginTop:'4px'},ev.title||'Event'));
+          if(ev.mode)evHost.appendChild(h('div',{class:'muted',style:'margin-top:2px'},ev.mode));
+          if(ev.ctaUrl&&ev.ctaLabel)evHost.appendChild(h('div',{style:'margin-top:8px'},h('a',{href:ev.ctaUrl,class:'btn',target:'_blank',rel:'noopener'},ev.ctaLabel)));
+        }
+      }
+      if(progHost){
+        const{done,total,pct}=totals();
+        progHost.innerHTML='<h4>Your progress</h4>';
+        progHost.appendChild(h('div',{class:'muted'},`${done} of ${total} (${pct}%)`));
+        progHost.appendChild(h('div',{class:'progress',style:'margin-top:6px'},h('i',{style:`width:${pct}%;`})));
+      }
+    }
+
+    function setActiveMenu() {
+  const r = (location.hash.replace("#","") || "home").split(":")[0];
+  MENU.querySelectorAll("a[data-route]").forEach(a => {
+    a.setAttribute("aria-current", a.dataset.route === r ? "page" : "false");
+  });
+}
+
+function renderHome(){
+      stopTiming();
+      if(MAIN)MAIN.innerHTML='';
+      MAIN.append(
+        h('h1',{},site?.title||site?.book?.title||'Advice-Only®'),
+        h('p',{class:'lead'},'Welcome. Browse chapters on the left, or use search above.')
+      );
+      const{done,total,pct}=totals();
+      MAIN.append(
+        h('div',{class:'cardlet'},
+          h('h4',{},'At a glance'),
+          h('div',{class:'muted'}, `${done} of ${total} viewed (${pct}%)`),
+          h('div',{class:'progress',style:'margin-top:6px'},h('i',{style:`width:${pct}%;`})),
+          h('div',{style:'margin-top:10px;display:flex;gap:8px;flex-wrap:wrap'},
+            h('a',{href:'#data',class:'btn'},'Open My Data'),
+            h('a',{href:'#events',class:'btn'},'View Events')
+          )
+        )
+      );
+    }
+
+    function renderEvents(){
+      stopTiming();
+      if(MAIN)MAIN.innerHTML='';
+      MAIN.append(h('h1',{},'Events'),h('p',{class:'lead'},'Upcoming and past sessions.'));
+      const list=Array.isArray(site?.events)?site.events.slice():[];
+      if(!list.length){MAIN.append(h('div',{class:'muted'},'No events found.'));return;}
+      list.sort((a,b)=>new Date(`${a.date}T${a.time||'00:00'}:00`)-new Date(`${b.date}T${b.time||'00:00'}:00`));
+      list.forEach(e=>{MAIN.append(h('div',{class:'cardlet'},h('div',{style:'font-weight:600'},e.title||'Event'),h('div',{class:'muted'},fmtDate(e.date,e.tz,e.time)),e.mode?h('div',{class:'muted'},e.mode):null,(e.ctaUrl&&e.ctaLabel)?h('div',{style:'margin-top:6px'},h('a',{href:e.ctaUrl,class:'btn',target:'_blank',rel:'noopener'},e.ctaLabel)):null));});
+    }
+
+    function renderPrivacy(){
+      stopTiming();
+      if(MAIN)MAIN.innerHTML='';
+      MAIN.append(
+        h('h1',{},'Privacy Policy (US/California)'),
+        h('p',{class:'lead'}, 'Summary: We don’t collect personal information on our servers. Your reading progress and quiz results are saved on your device only.')
+      );
+      MAIN.append(
+        h('div',{class:'cardlet'},
+          h('h4',{},'What we collect'),
+          h('p',{},'• On-device data: Learning progress, time-on-page counters, and quiz/assessment answers. This stays on your device unless you choose to export it.'),
+          h('p',{},'• Server logs: Basic device/browser information for security and reliability (e.g., IP address). We don’t link this to your on-device data.'),
+          h('p',{},'• Forms you send us: If you email us or submit a contact form, we’ll use it to reply and support you.')
+        ),
+        h('div',{class:'cardlet'},
+          h('h4',{},'Optional analytics'),
+          h('p',{},'To improve the user experience, we use basic, anonymous analytics from Google and Microsoft Clarity. These are enabled by default in most regions but can be disabled at any time using the button below. We honor Global Privacy Control (GPC) signals by keeping analytics disabled when GPC is present.'),
+          h('div',{style:'margin-top:12px'},h('button',{class:'btn',onclick:()=>{window.AOPrivacy.open();}},'Change Privacy Choices'))
+        ),
+        h('div',{class:'cardlet'},
+          h('h4',{},'What we don’t do'),
+          h('p',{},'• We do not sell your personal information.'),
+          h('p',{},'• We do not share your personal information for cross-context behavioral advertising.'),
+          h('p',{},'• We do not combine your on-device learning data with server logs or third-party data.')
+        )
+      );
+    }
+
+    async function renderAbout(){
+      stopTiming();
+      if(MAIN)MAIN.innerHTML='';
+      if(RAIL)RAIL.innerHTML='';
+      let a=null;
+      try{
+        const response=await fetch('data/about.json');
+        if(!response.ok)throw new Error(`HTTP error! status: ${response.status}`);
+        a=await response.json();
+      }catch(e){
+        console.error("Failed to load about.json",e);
+        MAIN.append(h('h1',{},'About'),h('div',{class:'muted'},'Could not load about information.'));
+        return;
+      }
+      const socialLinksContainer=h('div',{class:'social-links'});
+      (a.socials||[]).forEach(s=>{socialLinksContainer.appendChild(h('a',{class:'btn',href:s.url,target:'_blank',rel:'noopener'},s.text));});
+      if(a.cta){socialLinksContainer.appendChild(h('a',{class:'btn btn-brand',href:a.cta.url,target:'_blank',rel:'noopener'},a.cta.text));}
+      const profileCard=h('div',{class:'card profile-card'},h('img',{src:a.imageSrc||'',alt:a.name||'Profile picture'}),h('div',{},h('p',{class:'muted'},(a.socials||[]).map(s=>s.text).join(' • ')),socialLinksContainer));
+      MAIN.append(h('h1',{},a.name||'Profile'),h('p',{class:'lead'},a.location||''),profileCard);
+      if(a.office&&a.office.mapUrl){MAIN.append(h('h2',{},'Office'),h('div',{class:'card office-map'},h('h3',{},a.office.location),h('iframe',{title:`${a.office.location} map`,width:'100%',height:'220',loading:'lazy',allowfullscreen:'',referrerpolicy:'no-referrer-when-downgrade',src:a.office.mapUrl||''})));}
+      const aboutCard=h('div',{class:'cardlet'},h('h4',{},'About'),h('div',{class:'alert'},a.bio||''));
+      RAIL.appendChild(aboutCard);
+    }
+
+    function renderMyData(){
+      stopTiming();
+      if (MAIN) MAIN.innerHTML = '';
+      const compColor = secs => secs < COMP_THRESH.red ? 'red' : (secs < COMP_THRESH.yellow ? 'yellow' : 'green');
+      const agg = Object.entries(timeMap).reduce((acc,[,s])=>{const c=compColor(s);acc[c]++;acc.totalSecs+=s;return acc;},{red:0,yellow:0,green:0,totalSecs:0});
+      const {done,total,pct} = totals();
+
+      MAIN.append(
+        h('h1',{},'My Data'),
+        h('p',{class:'lead'},'Local-only engagement, quiz results, and assessments (nothing leaves your browser).')
+      );
+      MAIN.append(
+        h('div',{class:'data-grid'},
+          h('div',{class:'cardlet'},
+            h('h4',{},'Overall progress'),
+            h('div',{class:'muted'}, `${done} of ${total} viewed (${pct}%)`),
+            h('div',{class:'progress',style:'margin-top:6px'}, h('i',{style:`width:${pct}%;`}))
+          ),
+          h('div',{class:'cardlet'},
+            h('h4',{},'Engagement balance'),
+            h('div',{class:'legend',style:'margin-top:4px'},
+              h('span',{}, h('i',{class:'dot red'}),'Under 20s'),
+              h('span',{}, h('i',{class:'dot yellow'}),'20–59s'),
+              h('span',{}, h('i',{class:'dot green'}),'60s+')
+            ),
+            h('div',{class:'muted',style:'margin-top:8px'}, `Total time: ${Math.round(agg.totalSecs/60)} min`)
+          )
+        )
+      );
+      const table=h('table',{class:'data-table', style:'margin-top:8px'});
+      table.innerHTML=`<thead><tr><th>Chapter / LO</th><th style="text-align:right">Time (s)</th><th style="text-align:right">Status</th></tr></thead><tbody></tbody>`;
+      const tb=table.querySelector('tbody');
+      (chapters||[]).forEach((ch,ci)=>{
+        const title = ch.title || `Chapter ${ci+1}`;
+        let chTime=0;
+        (ch.los||[]).forEach((_,li)=>{ chTime += (timeMap[`${ci+1}.${li+1}`]||0); });
+        tb.appendChild(h('tr',{},
+          h('td',{style:'font-weight:600'}, title),
+          h('td',{style:'text-align:right'}, String(chTime)),
+          h('td',{style:'text-align:right'}, '')
+        ));
+        (ch.los||[]).forEach((lo,li)=>{
+          const key=`${ci+1}.${li+1}`, secs=(timeMap[key]||0);
+          const color=compColor(secs);
+          tb.appendChild(h('tr',{},
+            h('td',{}, h('span',{class:'muted'}, `${key} `), lo.title || `LO ${li+1}`),
+            h('td',{style:'text-align:right'}, String(secs)),
+            h('td',{style:'text-align:right'}, h('i',{class:`dot ${color}`},''))
+          ));
+        });
+      });
+      MAIN.append(table);
+
+      const quizCard = h('div',{class:'cardlet',style:'margin-top:12px'});
+      quizCard.appendChild(h('h4',{},'Quizzes'));
+      if(Object.keys(quizResults||{}).length===0){
+        quizCard.appendChild(h('div',{class:'muted'},'No quiz attempts yet.'));
+      }else{
+        const qt = h('table',{class:'data-table',style:'margin-top:6px'});
+        qt.innerHTML = `<thead><tr><th>Quiz ID</th><th>Score</th><th>Total</th><th>When</th><th>LO Key</th></tr></thead><tbody></tbody>`;
+        const qtb = qt.querySelector('tbody');
+        Object.entries(quizResults).forEach(([id,res])=>{
+          const when = new Date(res.ts||Date.now()).toLocaleString();
+          qtb.appendChild(h('tr',{},
+            h('td',{}, id),
+            h('td',{}, `${res.score??'?'}/${res.total??'?'}`),
+            h('td',{}, when),
+            h('td',{}, res.key||'')
+          ));
+        });
+        quizCard.appendChild(qt);
+      }
+      MAIN.append(quizCard);
+
+      const assessCard = h('div',{class:'cardlet',style:'margin-top:12px'});
+      assessCard.appendChild(h('h4',{},'Assessments'));
+      if(Object.keys(assessResults||{}).length===0){
+        assessCard.appendChild(h('div',{class:'muted'},'No assessments yet.'));
+      }else{
+        const at = h('table',{class:'data-table',style:'margin-top:6px'});
+        at.innerHTML = `<thead><tr><th>Assessment ID</th><th>Score</th><th>When</th></tr></thead><tbody></tbody>`;
+        const atb = at.querySelector('tbody');
+        Object.entries(assessResults).forEach(([id,res])=>{
+          const when = new Date(res.ts||Date.now()).toLocaleString();
+          const score = res.answers?.totalScore ?? 'N/A';
+          atb.appendChild(h('tr',{},
+            h('td',{}, id),
+            h('td',{}, String(score)),
+            h('td',{}, when)
+          ));
+        });
+        assessCard.appendChild(at);
+      }
+      MAIN.append(assessCard);
+
+      MAIN.append(h('div',{style:'margin-top:12px;display:flex;gap:8px;flex-wrap:wrap'},
+        h('button',{class:'btn',onclick:()=>{localStorage.removeItem(LS_SEEN);seen.clear();refreshRail();renderMyData();}},'Clear progress'),
+        h('button',{class:'btn',onclick:()=>{localStorage.removeItem(LS_TIME);for(const k in timeMap)delete timeMap[k];renderMyData();}},'Clear time'),
+        h('button',{class:'btn',onclick:()=>{localStorage.removeItem(LS_QUIZ);for(const k in quizResults)delete quizResults[k];renderMyData();}},'Clear quizzes'),
+        h('button',{class:'btn',onclick:()=>{localStorage.removeItem(LS_ASSESS);for(const k in assessResults)delete assessResults[k];renderMyData();}},'Clear assessments'),
+        h('button',{class:'btn',onclick:()=>{const payload={seen:[...seen],timeMap,quizResults,assessResults};downloadFile('my-data.json',JSON.stringify(payload,null,2),'application/json');}},'Download JSON'),
+        h('button',{class:'btn',onclick:()=>{downloadFile('my-data.csv',buildCSV(),'text/csv');}},'Download CSV'),
+        h('a',{href:'#home',class:'btn'},'Back to Home')
+      ));
+    }
+
+    // ---------- Search ----------
+    function buildDocs(){
+      docs=[];
+      (chapters||[]).forEach((ch,ci)=>{
+        (ch.los||[]).forEach((lo,li)=>{
+          const fields=[];
+          if(lo.title)fields.push({text:lo.title,w:3});
+          if(lo.preview)fields.push({text:lo.preview,w:2});
+          (lo.snippets||[]).forEach(s=>{
+            if(s.title)fields.push({text:s.title,w:2});
+            if(s.body)fields.push({text:s.body,w:1});
+          });
+          docs.push({ci,li,chTitle:ch.title||`Chapter ${ci+1}`,loTitle:lo.title||`LO ${li+1}`,fields});
+        });
+      });
+    }
+    function scoreDoc(qTokens,doc){
+      let score=0;
+      for(const f of doc.fields){
+        const fTokens=tokenize(f.text);
+        for(const qt of qTokens){
+          const hits=fTokens.filter(t=>t===qt).length;
+          if(hits)score+=hits*f.w;
+        }
+      }
+      const lt=(doc.loTitle||'').toLowerCase();
+      if(qTokens.some(q=>lt.includes(q)))score+=2;
+      return score;
+    }
+    function hilite(text,qTokens){
+      if(!text)return'';
+      let out=text;
+      qTokens.forEach(q=>{
+        const esc=q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+        out=out.replace(new RegExp(`(${esc})`,'ig'),'<mark>$1</mark>');
+      });
+      return out;
+    }
+    function showSearchDD(results, qTokens){
+      if (SEARCH_DD) SEARCH_DD.innerHTML ='';
+      if(!results.length){ SEARCH_DD.classList.remove('show'); return; }
+      results.slice(0,8).forEach(r=>{
+        const pv = (chapters[r.ci].los[r.li].snippets?.[0]?.body) || (chapters[r.ci].los[r.li].preview) || '';
+        SEARCH_DD.appendChild(
+          h('div',{class:'res', onclick:()=>{ location.hash = `#ch${r.ci+1}-lo${r.li+1}`; SEARCH_DD.classList.remove('show'); SEARCH_BOX.blur(); }},
+            h('div',{html: hilite(`${r.chTitle} — ${r.loTitle}`, qTokens)}),
+            h('small',{html: hilite(pv, qTokens)})
+          )
+        );
+      });
+      SEARCH_DD.classList.add('show');
+    }
+    function runSearch(q,mode){
+      const qTokens=tokenize(q);
+      if(!qTokens.length){SEARCH_DD.classList.remove('show');return;}
+      const results=docs.map(d => {
+        const pv=(chapters[d.ci].los[d.li].snippets?.[0]?.body)||(chapters[d.ci].los[d.li].preview)||'';
+        return {...d,score:scoreDoc(qTokens,d),preview:pv};
+      }).filter(r=>r.score>0).sort((a,b)=>b.score-a.score);
+      if(mode==='dd'){showSearchDD(results,qTokens);return;}
+      stopTiming();
+      SEARCH_DD.classList.remove('show');
+      if(MAIN)MAIN.innerHTML='';
+      MAIN.append(h('h1',{},'Search'),h('p',{class:'lead'},`Results for “${q}”`));
+      if(!results.length){MAIN.append(h('div',{class:'muted'},'No matches.'));return;}
+      results.slice(0,30).forEach(r=>{
+        MAIN.append(h('div',{class:'cardlet'},
+          h('div',{style:'font-weight:600',html:hilite(`${r.chTitle} — ${r.loTitle}`,qTokens)}),
+          h('p',{class:'muted',html:hilite(r.preview||'',qTokens)}),
+          h('div',{},h('a',{href:`#ch${r.ci+1}-lo${r.li+1}`,class:'btn'},'Open'))
+        ));
+      });
+    }
+    let searchDebounce;
+    SEARCH_BOX.addEventListener('input', e=>{
+      clearTimeout(searchDebounce);
+      const q=e.target.value.trim();
+      searchDebounce=setTimeout(()=>{ if(!q){SEARCH_DD.classList.remove('show');return;} runSearch(q,'dd'); }, 120);
+    });
+    SEARCH_BOX.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){
+        const q=SEARCH_BOX.value.trim();
+        if(q){location.hash='#search:'+encodeURIComponent(q);}
+      }else if(e.key==='Escape'){SEARCH_DD.classList.remove('show');}
+    });
+    document.addEventListener('click',(e)=>{ const box = document.getElementById('search'); if (!box || !box.contains(e.target)) SEARCH_DD.classList.remove('show'); });
+
+    // ---------- Boot ----------
+    async function loadSiteJSON(){
+      const metaRoot=document.querySelector('meta[name="ao-root"]')?.content??'/';
+      const bases = WANT_FULL ? ['full/site.json','site.json'] : ['site.json'];
+      const tried = [];
+      for (const base of bases) {
+        const candidates = [];
+        const add=(u)=>{ if(!candidates.includes(u)) candidates.push(u); };
+        add((metaRoot||'')+base);
+        add(base);
+        add('/'+base);
+        for (const u of candidates) {
+          try {
+            const res = await fetch(u,{cache:'no-store',credentials:'same-origin'});
+            if(res.ok){ return JSON.parse(await res.text()); }
+            tried.push(`${u} -> HTTP ${res.status}`);
+          } catch(e) {
+            tried.push(`${u} -> ${e.message||e}`);
+          }
+        }
+      }
+      throw new Error(tried.join(' | '));
+    }
+
+    function __ao_isV2Shape(obj){
+      try {
+        if (!obj || !Array.isArray(obj.chapters)) return false;
+        const first = obj.chapters[0] || {};
+        return Array.isArray(first.sections);
+      } catch { return false; }
+    }
+    function __ao_plainText(s){
+  if (!s) return '';
+  s = String(s);
+  // strip style/script blocks first
+  s = s.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+  s = s.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+  // strip remaining HTML tags
+  s = s.replace(/<[^>]+>/g, '');
+  // decode a few common entities
+  s = s.replace(/&nbsp;/gi,' ')
+       .replace(/&amp;/gi,'&')
+       .replace(/&quot;/gi,'"')
+       .replace(/&lt;/gi,'<')
+       .replace(/&gt;/gi,'>');
+  // collapse whitespace
+  return s.replace(/\s+/g,' ').trim();
+}
+function __ao_adaptV2ToLegacy(v2){
+      try { v2 = __ao_patch_preAdapt(v2); } catch (e) { console.warn('[AO] preAdapt failed:', e); }
+      const out = {
+        title: (v2.book && (v2.book.title || v2.book.id)) || (v2.title || ""),
+        events: Array.isArray(v2.events) ? v2.events.slice() : [],
+        chapters: []
+      };
+
+      (v2.chapters || []).forEach(ch => {
+        const legacyCh = {
+          title: ch.title || ch.slug || 'Chapter',
+          los: []
+        };
+        if (ch.assessment) legacyCh.assessment = ch.assessment;
+
+        (ch.sections || []).forEach(sec => {
+          const lo = {
+            title: sec.title || sec.h2_id || 'Learning Objective',
+            preview: sec.preview_public_html || "",
+            snippets: []
+          };
+
+          if (sec.section_public_html) {
+            lo.snippets.push({
+              title: "Overview",
+              body: __ao_plainText(sec.section_public_html)
+            });
+          }
+
+          (sec.sub_objectives || []).forEach(so => {
+            if ((so.type === 'quiz' || so.kind === 'quiz') && so.quiz) {
+              lo.snippets.push({
+                type: 'quiz',
+                title: so.title || 'Quick Check',
+                quiz: so.quiz
+              });
+              return;
+            }
+            const vis = (so.visibility || 'gated');
+            if (vis === 'public_inline') {
+              lo.snippets.push({
+                title: so.title || '',
+                body: __ao_plainText(so.body_public_html || so.body || "")
+              });
+            } else if (vis === 'public_page') {
+              const b = so.teaser_public
+                ? __ao_plainText(so.teaser_public) + (so.public_url ? " (See: " + so.public_url + ")" : "")
+                : (so.public_url ? "Read more: " + so.public_url : "");
+              lo.snippets.push({ title: so.title || '', body: b });
+            } else {
+              if (so.teaser_public) {
+                lo.snippets.push({ title: so.title || '', body: __ao_plainText(so.teaser_public) });
+              } else {
+                lo.snippets.push({ title: so.title || '', body: "(Gated content)" });
+              }
+            }
+          });
+
+          legacyCh.los.push(lo);
+        });
+
+        out.chapters.push(legacyCh);
+      });
+
+      return out;
+    }
+
+    async function boot(){
+      try{
+        site=await loadSiteJSON();
+        if (__ao_isV2Shape(site)) {
+          try {
+            site = __ao_adaptV2ToLegacy(site);
+            console.log('[AO] adapted v2 → legacy');
+          } catch(e){ console.warn('[AO] adapt failed:', e); }
+        }
+      }catch(e){
+        if(!WANT_DEMO){
+          if(NAV)NAV.innerHTML='';
+          NAV.append(h('div',{class:'muted'},`Could not load site.json (${e.message||e}).`));
+          site={title:'',chapters:[],events:[]};
+        }else{
+          site=makeDemoSite();
+        }
+      }
+
+      chapters=(site.chapters||[]).map((ch,i)=>({ch,ord:chapterOrderIndex(ch,i)})).sort((a,b)=>a.ord-b.ord).map(x=>x.ch);
+      buildLeftNav();
+      buildDocs();
+      refreshRail();
+      route();
+      window.addEventListener('hashchange',route);
+    }
+
+    function route(){
+      setActiveMenu();
+      const hash=location.hash||'#home';
+      if(/^#ch\d+-lo\d+$/.test(hash)){ if(!openFromHash())renderHome(); return; }
+      if(/^#ch\d+-assessment$/.test(hash)){ if(!openFromHash())renderHome(); return; }
+      if(hash.startsWith('#home'))   { renderHome();   return; }
+      if(hash.startsWith('#data'))   { renderMyData(); return; }
+      if(hash.startsWith('#events')) { renderEvents(); return; }
+      if(hash.startsWith('#privacy')){ renderPrivacy();return; }
+      if(hash.startsWith('#about'))  { renderAbout();  return; }
+      if(hash.startsWith('#search:')){ runSearch(decodeURIComponent(hash.split(':')[1]||''),'page'); return; }
+      if(chapters[0]?.los?.length){ location.hash='#ch1-lo1'; openFromHash(); } else { renderHome(); }
+    }
+
+    function makeDemoSite(){
+      return{
+        title:"Demo Samples",
+        alerts:["Demo is enabled via ?demo=1. Remove the query parameter to hide."],
+        events:[{title:"Live Q&A",date:"2026-01-08",time:"13:00",tz:"America/New_York",mode:"Zoom",ctaUrl:"#",ctaLabel:"Details"}],
+        chapters:[{title:"Demo Samples",los:[{title:"1.1 — Inline tokens",preview:"Two images and one short video, tokenized.",images:["https://picsum.photos/seed/a/1200/800","https://picsum.photos/seed/b/1200/800",{type:"video",src:"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm",caption:"Sample video"}],snippets:[{title:"Body",body:"Here’s an image [[img:1]] in-line, then a video [[vid:3]], and later another image [[img:2]]."}]}]}]
+      };
+    }
+
+    
+boot();
+  });
+</script>
+
+<script>
+// ===== AO Privacy Popup & Consent (clean) =====
+document.addEventListener('DOMContentLoaded', () => {
+  const LS = window.localStorage;
+  const KEY = 'ao:consent';
+  const banner   = document.getElementById('ao-v2-privacyBanner');
+  const allowBtn = document.getElementById('ao-analytics-allow');
+  const saveBtn  = document.getElementById('ao-analytics-save');
+  const gaBox    = document.getElementById('opt-ga');
+  const mcBox    = document.getElementById('opt-clarity');
+  const hasGPC   = () => (navigator && navigator.globalPrivacyControl === true);
+
+  const get  = () => { try { return JSON.parse(LS.getItem(KEY) || '{}'); } catch { return {}; } };
+  const set  = (v) => { try { LS.setItem(KEY, JSON.stringify(v)); } catch {} };
+
+  const apply = (c) => {
+    // Hook analytics loaders here if you want; no-op by default.
+    if (!hasGPC() && c.ga) { window.dataLayer = window.dataLayer || []; }
+  };
+
+  const state = get();
+  if (!hasGPC() && (state.ga || state.clarity)) apply(state);
+
+  if (banner) {
+    const save = () => {
+      const next = { ga: !!(gaBox && gaBox.checked), clarity: !!(mcBox && mcBox.checked) };
+      set(next); apply(next);
+      banner.style.display = 'none';
+    };
+    if (allowBtn) allowBtn.addEventListener('click', () => {
+      if (gaBox) gaBox.checked = true;
+      if (mcBox) mcBox.checked = true;
+      save();
+    });
+    if (saveBtn) saveBtn.addEventListener('click', save);
+  }
+});
+
+</script>
+
+<script>
+/* ===== AO Modal & SurveyJS Logic (safe minimal stub) ===== */
+document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('click', function (e) {
+    const btn = e.target && e.target.closest && e.target.closest('.ao-token');
+    if (!btn) return;
+    e.preventDefault();
+    // TODO: wire to SurveyJS here if needed.
+    console.log('[ao-token]', btn.dataset && btn.dataset.kind, btn.dataset && btn.dataset.id);
+  });
+});
+
+</script>
+</body>
+</html>

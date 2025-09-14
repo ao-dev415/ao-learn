@@ -1,0 +1,18 @@
+{
+  "title": "Expenses Basics — Quick Check",
+  "showProgressBar": "bottom",
+  "pages": [
+    {
+      "elements": [
+        {
+          "type": "radiogroup",
+          "name": "q1",
+          "title": "Which is typically a fixed expense?",
+          "choices": ["Groceries", "Rent", "Gasoline", "Dining out"],
+          "correctAnswer": "Rent"
+        }
+      ]
+    }
+  ],
+  "completedHtml": "<h3>Thanks!</h3><p>You completed the Expenses Basics quick check.</p>"
+}

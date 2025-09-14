@@ -1,0 +1,19 @@
+{
+  "name": "Quincy Hall, CFP®",
+  "location": "Advice Only — Corte Madera, CA",
+  "imageSrc": "static/brand/Quincy-Hall-CFP-profile.webp",
+  "socials": [
+    { "text": "YouTube", "url": "https://www.youtube.com/@adviceonly" },
+    { "text": "LinkedIn", "url": "https://www.linkedin.com/in/quincyhall/" },
+    { "text": "Instagram", "url": "https://www.instagram.com/adviceonlyadvisor" }
+  ],
+  "cta": {
+    "text": "Contact",
+    "url": "https://adviceonly.info/contact-us"
+  },
+    "office": {
+    "location": "Corte Madera, CA",
+    "mapUrl": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3147.2087400888195!2d-122.52514918832557!3d37.92555367183081!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80859b6b23b9d1cd%3A0xf2017c8ee78ff8c3!2sAdvice%20Only%E2%84%A2%20Financial%20Advisors%20CA!5e0!3m2!1sen!2sus!4v1756609374047!5m2!1sen!2sus"
+  },
+  "bio": "Advice-only planning. No commissions. This is the longer descriptive text that appears in the right sidebar rail when viewing the About page."
+}
