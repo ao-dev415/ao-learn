@@ -396,7 +396,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     console.log('[boot] calling…');
     await fn();
-    document.querySelector('.card .muted')?.textContent = 'Loaded.';
+    (()=>{const _el=document.querySelector('.card .muted'); if(_el) _el.textContent = 'Loaded.';})();
     console.log('[boot] ok');
   } catch (e) {
     console.error('[boot] failed', e);
