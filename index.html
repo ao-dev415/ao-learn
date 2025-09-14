@@ -361,7 +361,7 @@ async function boot(){
       const brand=document.getElementById('brand');
       if (brand && site?.title) brand.textContent = site.title;
 
-      const nav = document.getElementById('nav') || document.getElementById('menu');
+      const nav = document.getElementById('menu') || document.querySelector('nav.menu');
       if (nav && Array.isArray(site?.chapters)){
         nav.innerHTML='';
         site.chapters.forEach((ch,i)=>{
