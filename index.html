@@ -327,52 +327,67 @@ document.addEventListener('DOMContentLoaded', function () {
 <script>
 /* ===== Restored boot() (exported, guarded) ===== */
 async function boot(){
-  const WANT_DEMO = /[?&]demo=1/.test(location.search);
-  const NAV = document.getElementById('nav') || document.getElementById('menu');
-
-  // Load site.json
+  // 1) Load site.json (directly or via loadSiteJSON if present)
   let site;
-  try {
-    site = await (typeof loadSiteJSON==='function' ? loadSiteJSON() : (await fetch('site.json')).json());
-  } catch (e) {
-    console.error('[boot] loadSiteJSON failed', e);
+  try{
+    site = await (typeof loadSiteJSON==='function'
+      ? loadSiteJSON()
+      : (await fetch('site.json')).json());
+  }catch(e){
+    console.error('[boot] load site.json failed', e);
     throw e;
   }
 
-  // Optionally adapt v2->legacy
-  try {
-    if (typeof __ao_isV2Shape==='function' && __ao_isV2Shape(site)) {
-      if (typeof __ao_adaptV2ToLegacy==='function') {
-        site = __ao_adaptV2ToLegacy(site);
-        console.log('[AO] adapted v2 → legacy');
-      }
+  // 2) Adapt v2 -> legacy if those helpers exist
+  try{
+    if (typeof __ao_isV2Shape==='function' && __ao_isV2Shape(site) &&
+        typeof __ao_adaptV2ToLegacy==='function'){
+      site = __ao_adaptV2ToLegacy(site);
+      console.log('[AO] adapted v2 → legacy');
     }
-  } catch (e) {
-    console.warn('[AO] adapt failed:', e);
+  }catch(e){ console.warn('[AO] adapt failed:', e); }
+
+  // 3) Try legacy helpers first
+  let used=false;
+  try{
+    if (typeof buildLeftNav==='function'){ buildLeftNav(); used=true; }
+    if (typeof buildDocs   ==='function'){ buildDocs();    used=true; }
+    if (typeof refreshRail ==='function'){ refreshRail(); }
+    if (typeof route       ==='function'){ route(); window.addEventListener('hashchange', route); used=true; }
+  }catch(e){
+    console.warn('[boot] legacy render failed, will attempt minimal fallback', e);
   }
 
-  // Render (call helpers only if they exist)
-  try {
-    if (WANT_DEMO && NAV) {
-      const d=document.createElement('div');
-      d.className='muted';
-      d.textContent='Could not load full nav/docs in demo.';
-      NAV.innerHTML=''; NAV.appendChild(d);
-    } else {
-      if (typeof buildLeftNav === 'function') buildLeftNav();
-      if (typeof buildDocs    === 'function') buildDocs();
-      if (typeof refreshRail  === 'function') refreshRail();
-      if (typeof route        === 'function') {
-        route();
-        window.addEventListener('hashchange', route);
+  // 4) Minimal fallback renderer (brand + simple nav + clear the "Loading..." msg)
+  if (!used){
+    try{
+      const brand=document.getElementById('brand');
+      if (brand && site?.title) brand.textContent = site.title;
+
+      const nav = document.getElementById('nav') || document.getElementById('menu');
+      if (nav && Array.isArray(site?.chapters)){
+        nav.innerHTML='';
+        site.chapters.forEach((ch,i)=>{
+          const a=document.createElement('a');
+          a.textContent = ch.title || ('Chapter '+(i+1));
+          a.href = '#ch-'+i;
+          a.dataset.route='chapter';
+          nav.appendChild(a);
+        });
       }
+
+      const main = document.querySelector('main') || document.getElementById('home') || document.getElementById('content');
+      if (main){
+        const loading = [...main.querySelectorAll('.muted')].find(n=>/loading/i.test(n.textContent||'')) || null;
+        if (loading) loading.textContent = 'Loaded.';
+      }
+    }catch(e){
+      console.warn('[minimal] render failed', e);
     }
-    // expose to window for other blocks that expect it
-    try { window.boot = boot; } catch {}
-  } catch (e) {
-    console.error('[boot] render failed', e);
-    throw e;
   }
+
+  // 5) Expose for the DCL caller
+  try{ window.boot = boot; }catch{}
 }
 </script>
 
