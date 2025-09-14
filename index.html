@@ -247,23 +247,20 @@ window.route       = window.route       || function(){};   // no-op
 
 <script>
 // ===== Boot (safe) =====
-document.addEventListener('DOMContentLoaded', async () => {
-  try {
-    if (typeof boot === 'function') {
-      await boot();
-      return;
+document.addEventListener('DOMContentLoaded', () => {
+  const callBoot = () => {
+    if (typeof window.boot === 'function') {
+      Promise.resolve(window.boot()).catch(e => console.error('[boot] failed', e));
+      return true;
     }
-  } catch (e) {
-    console.error('[boot] failed', e);
-    // fall through to probe
-  }
-  // Probe site.json so we can see it in Network and log status
-  try {
-    const r = await fetch('site.json');
-    console.log('[probe] site.json', r.status);
-    if (!r.ok) console.warn('Could not load site.json');
-  } catch (e) {
-    console.error('[probe] failed', e);
+    return false;
+  };
+  // try immediately
+  if (!callBoot()) {
+    // and try once more on next tick; also probe site.json so you see it in Network
+    setTimeout(() => { callBoot(); }, 30);
+    fetch('site.json').then(r => console.log('[probe] site.json', r.status))
+                      .catch(e => console.error('[probe] failed', e));
   }
 });
 </script>
